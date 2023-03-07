@@ -3,8 +3,9 @@
 	import Celebration, { endCelebration, startCelebration } from './Celebration.svelte';
 	import Keyboard from './Keyboard.svelte';
 	import PlaySounds, { playSound, Sounds } from './PlaySounds.svelte';
-	import Timer from './Timer.svelte';
-	//, { startTimer, stopTimer }
+	import StopWatch from '../lib/utilities/StopWatch/StopWatch.svelte';
+	import { elapsedTime, pauseStopWatch, resetStopWatch, resumeStopWatch, toggleStopWatch } from '../lib/utilities/StopWatch/stopwatch';
+
 	const { data, settings, sources } = myStore;
 
 	let inner: HTMLTextAreaElement;
@@ -29,7 +30,6 @@
 
 	let expectedPhrase = '';
 	let typedPhrase = '';
-	let startTime = 0;
 	let rightLetters = 0;
 	let wrongLetters = 0;
 	let rawWPM = 0;
@@ -43,6 +43,7 @@
 		expectedPhrase = dataSource.phrases[0] || '';
 		dataSource.phrasesCurrentIndex = 0;
 		initializePhrase();
+		resetStopWatch();
 	}
 
 	function generatePhrases(numberOfItemsToCombine: number, repetitions: number, filter: string) {
@@ -99,13 +100,6 @@
 		}
 
 		return phrases;
-	}
-
-	function pauseTimer() {
-		// stopTimer(); // TODO
-	}
-	function resumeTimer() {
-		// startTimer(); // TODO;
 	}
 
 	const ColorChars = {
@@ -169,7 +163,7 @@
 		}
 		event.preventDefault();
 		if (typedPhrase.length == 0) {
-			startTime = Date.now() / 1000;
+			resetStopWatch();
 		}
 		if (typedPhrase.length > expectedPhrase.length) {
 			typedPhrase = typedPhrase.slice(0, -1);
@@ -226,7 +220,7 @@
 			return;
 		}
 
-		resumeTimer();
+		resumeStopWatch();
 
 		if (expectedPhrase.startsWith(typedPhrase)) {
 			if ($settings.sounds[SoundIndex.rightletter]) playSound(Sounds.rightLetter);
@@ -240,10 +234,12 @@
 		if (typedPhrase.trimEnd() === expectedPhrase) {
 			// console.log('typedPhrase === expectedPhrase');
 			let currentTime = Date.now() / 1000;
+			console.log('$elapsedTime seconds' + ($elapsedTime / 1000) * 60);
 			rawWPM = Math.round(
-				((rightLetters + wrongLetters) / 5 / (currentTime - startTime)) * 60 // 5 chars per word average
+				((rightLetters + wrongLetters) / 5 / ($elapsedTime / 1000)) * 60 // 5 chars per word average
 			);
 			accuracy = Math.round((rightLetters / (rightLetters + wrongLetters)) * 100);
+			console.log('rawWPM' + rawWPM);
 
 			// Failed Goals
 			if (rawWPM < $settings.minimumWPM || accuracy < $settings.minimumAccuracy) {
@@ -261,7 +257,7 @@
 			dataSource.WPMs.push(rawWPM);
 
 			if ($settings.sounds[SoundIndex.passedGoals]) playSound(Sounds.passedGoals);
-			pauseTimer();
+			pauseStopWatch();
 			nextPhrase();
 		} else {
 			makeColorPhrase();
@@ -269,7 +265,8 @@
 	}
 
 	function initializePhrase() {
-		pauseTimer();
+		console.log('resetStopWatch():' + $elapsedTime);
+		resetStopWatch();
 		rightLetters = 0;
 		wrongLetters = 0;
 		typedPhrase = '';
@@ -372,7 +369,7 @@
 	</h4>
 </div>
 <div>
-	<Timer />
+	<StopWatch />
 </div>
 
 <svelte:window on:keydown={on_key_down} />

@@ -1,36 +1,31 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-
-	let time = new Date();
-	//let time = Date.now();TODO
+	import { onMount, onDestroy } from 'svelte';
+	import { elapsedTime, destroyStopWatch, resetStopWatch, toggleStopWatch } from './stopwatch';
 
 	// these automatically update when `time`
 	// changes, because of the `$:` prefix
-	$: hours = time.getHours();
-	$: minutes = time.getMinutes();
-	$: seconds = time.getSeconds();
-	$: milliseconds = time.getMilliseconds();
+	$: seconds = Math.floor($elapsedTime / 1000);
+	$: minutes = Math.floor(seconds / 60);
+	$: hours = Math.floor(minutes / 60);
+	// $: milliseconds = time.getMilliseconds();
 
 	onMount(() => {
-		const interval = setInterval(() => {
-			time = new Date(); //let time = Date.now();TODO
-		}, 100);
-
-		return () => {
-			clearInterval(interval);
-		};
+		resetStopWatch();
 	});
 
-	let timing = false;
-	export function startTimer(): void {
-		timing = true;
+	onDestroy(() => {
+		destroyStopWatch();
+	});
+
+	function onClick(event: MouseEvent) {
+		toggleStopWatch();
 	}
-	export function stopTimer() {
-		timing = false;
+	function onKeyDown(event: KeyboardEvent) {
+		toggleStopWatch();
 	}
 </script>
 
-<svg viewBox="-50 -50 100 100">
+<svg viewBox="-50 -50 100 100" on:click={onClick} on:keyup={onKeyDown}>
 	<circle class="clock-face-outer" r="40" style="fill-opacity: .25;" />
 	<circle class="clock-face-inner" r="20" style="fill-opacity: .25;" />
 

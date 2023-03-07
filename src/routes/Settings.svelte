@@ -90,11 +90,11 @@
 				{/each}
 				<RadioItem bind:group={$data.source} name="Code" value={OptionIndex.code_words}
 					>Code
-					<button class="btn h-0 px-0 space-y-0" on:click={modalCode}>⚙️</button>
+					<button class="btn h-0 px-0" on:click={modalCode}>⚙️</button>
 				</RadioItem>
 				<RadioItem bind:group={$data.source} name="Custom" value={OptionIndex.custom_words}
 					><span class="space-y-0">Custom</span>
-					<button class="btn h-0 px-0 space-y-0" on:click={modalCustom}>⚙️</button>
+					<button class="btn h-0 px-0" on:click={modalCustom}>⚙️</button>
 				</RadioItem>
 			</RadioGroup>
 		</div>

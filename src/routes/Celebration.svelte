@@ -1,10 +1,5 @@
 <script lang="ts" context="module">
-	// export let top = 0;
-	// export let bottom = 0;
-	// export let left = 0;
-	// export let right = 0;
-
-	let element: HTMLElement;
+	import { onMount, onDestroy } from 'svelte';
 
 	let characters = ['🥳', '🪅', '🎉', '🎊', '✨', '🎭', '🤩', '🫧', '🥳', '🥰', '❤️‍🔥', '🎁', '💫', '🌟', '🐣', '🌟', '🌜', '🌛', '🌝', '⚡'];
 	export let duration = 10000;
@@ -19,7 +14,7 @@
 				y: -20 - Math.random() * 100,
 				r: 0.1 + Math.random() * 1.5,
 				d: 'emoj' + i,
-				o: 0.0,
+				o: 0,
 				e: null as any,
 			};
 		})
@@ -106,7 +101,7 @@
 	}
 </script>
 
-<div bind:this={element}>
+<div>
 	<slot>
 		{#each confetti as c}
 			<span id={c.d} style="left: {c.x}%; top: {c.y}%; transform: scale({c.r})">{c.character}</span>

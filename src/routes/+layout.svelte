@@ -31,12 +31,6 @@
 	function drawerClose(): void {
 		drawerStore.close();
 	}
-
-	let open = false;
-	const toggle = () => {
-		open = !open;
-		open ? drawerOpen() : drawerClose();
-	};
 </script>
 
 <svelte:head />
@@ -47,10 +41,6 @@
 		<div>
 			<Settings />
 		</div>
-	{:else if $drawerStore.id === 'example-2'}
-		(show 'example-2' contents)
-	{:else}
-		(fallback contents)
 	{/if}
 </Drawer>
 <AppBar gridColumns="grid-cols-3" slotDefault="place-self-center" slotTrail="place-content-end p-4">
