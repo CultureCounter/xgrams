@@ -76,7 +76,7 @@ export function startLap() {
 	// console.log('startLap elapsedTime:' + get(elapsedTime));
 
 	if (timer == null) {
-		console.log('startLap starting');
+		// console.log('startLap starting');
 		startTime = Date.now();
 		baseTime = get(lapTime);
 		timer = setInterval(() => {

@@ -240,14 +240,14 @@
 		// Full phrase correctly entered
 		if (typedPhrase.trimEnd() === expectedPhrase) {
 			// console.log('typedPhrase === expectedPhrase');
-			endLap();
-			console.log('$lapTime seconds' + ($lapTime / 1000) * 60);
+			// console.log('$lapTime seconds' + ($lapTime / 1000) * 60);
 			rawWPM = Math.round(
 				((rightLetters + wrongLetters) / 5 / ($lapTime / 1000)) * 60 // 5 chars per word average
 			);
 			accuracy = Math.round((rightLetters / (rightLetters + wrongLetters)) * 100);
-			console.log('rawWPM' + rawWPM);
+			// console.log('rawWPM' + rawWPM);
 
+			endLap();
 			// Failed Goals
 			if (rawWPM < $settings.minimumWPM || accuracy < $settings.minimumAccuracy) {
 				if ($settings.sounds[SoundIndex.failedGoals]) playSound(Sounds.failedGoals);
@@ -349,11 +349,6 @@
 	on:mouseover={handleMouseOver}
 	on:mouseleave={handleMouseLeave}
 	tabindex="-1">
-	<!-- <h3 class="font-sans">
-		<span class={'font-sans ' + ClassSpan[ColorChars.normalChar]}>
-			{expectedPhrase}
-		</span>
-	</h3> -->
 	<h3>
 		{#each classPhrase as cp}
 			{#if cp.typing}

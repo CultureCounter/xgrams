@@ -1,3 +1,7 @@
+# Try It Out
+
+[`Live Xgrams`](https://xgrams.vercel.app/)
+
 # New keyboard
 
 After pining for a mechanical Microsoft Natural keyboard for a long long time I finally discovered it! [`Moonlander Keyboard`](https://www.zsa.io/moonlander) and the excellet online layout and ROM flashing editor for it: [`Oryx`](https://configure.zsa.io/moonlander/layouts/dneZx/latest/0)
