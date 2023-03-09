@@ -18,7 +18,7 @@
 	}
 
 	function stopPlayingSound(): void {
-		// Sounds at the end of each phrase/lesson
+		// Sounds at the end of each line/lesson
 		// dont need to be played from the beginning.
 		if (currentPlayingSound == passedGoalsSound || currentPlayingSound == failedGoalsSound || currentPlayingSound == lessonsDoneSound) {
 			return;

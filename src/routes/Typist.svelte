@@ -8,12 +8,6 @@
 
 	const { data, settings, sources } = myStore;
 
-	let inner: HTMLTextAreaElement;
-	const resize = () => {
-		inner.style.height = 'auto';
-		inner.style.height = 4 + inner.scrollHeight + 'px';
-	};
-
 	function shuffle(array: string[]): void {
 		for (let i = array.length - 1; i > 0; i--) {
 			let j = Math.floor(Math.random() * (i + 1));
@@ -28,31 +22,33 @@
 		}
 	}
 
-	let expectedPhrase = '';
-	let typedPhrase = '';
+	let expectedLine = '';
+	let typedLine = '';
 	let rightLetters = 0;
 	let wrongLetters = 0;
 	let rawWPM = 0;
 	let accuracy = 0;
-	let phrasesCurrentIndex = 0;
+	let linesCurrentIndex = 0;
 	let isMouseInside = false;
 
+	/**
+	 *
+	 */
 	function initializeLesson() {
 		let dataSource = $data.currentOptions;
-		dataSource.phrases = generatePhrases(dataSource.combination, dataSource.repetition, dataSource.filter);
-		expectedPhrase = dataSource.phrases[0] || '';
-		dataSource.phrasesCurrentIndex = 0;
-		initializePhrase();
+		dataSource.lines = generateLines(dataSource.combination, dataSource.repetition, dataSource.filter);
+		expectedLine = dataSource.lines[0] || '';
+		dataSource.linesCurrentIndex = 0;
+		initializeLine();
 		resetStopWatch();
 	}
 
 	/**
-	 *
 	 * @param combinations how many words, ngrams, etc. to combine
 	 * @param repetitions how many sets of the combinations to create
 	 * @param filter reduce the available combinations
 	 */
-	function generatePhrases(combinations: number, repetitions: number, filter: string) {
+	function generateLines(combinations: number, repetitions: number, filter: string) {
 		let dataSource = $data.currentOptions;
 		let scope = dataSource.scope;
 		let source = $sources.source[$data.source];
@@ -88,23 +84,23 @@
 		let ngrams = deepCopy(source);
 		shuffle(ngrams);
 
-		padToMultiple(ngrams, combinations); // Ensure all subPhrases have requested combinations
+		padToMultiple(ngrams, combinations); // Ensure all subLines have requested combinations
 
 		let ngramsProcessed = 0;
-		let phrases = [];
+		let lines = [];
 		while (ngrams.length) {
 			let ngramsSublist = ngrams.slice(0, combinations);
-			let subPhrase = ngramsSublist.join(' ');
-			let _phrase = [];
+			let subLine = ngramsSublist.join(' ');
+			let _line = [];
 			for (let i = 0; i < repetitions; i++) {
-				_phrase.push(subPhrase);
+				_line.push(subLine);
 			}
-			phrases.push(_phrase.join(' '));
+			lines.push(_line.join(' '));
 			// Remove the processed ngrams.
 			ngrams.splice(0, combinations);
 		}
 
-		return phrases;
+		return lines;
 	}
 
 	const ColorChars = {
@@ -115,25 +111,25 @@
 		failedChar: 4,
 		remedyChar: 5,
 	};
-	let colorPhrase: number[] = [];
+	let colorLine: number[] = [];
 
 	const ClassSpan = ['', 'normalChar', 'typingChar', 'betterChar', 'failedChar', 'remedyChar'] as const;
-	type ClassPhrase = { class: string; chars: string; typing: boolean };
-	let classPhrase: ClassPhrase[] = [];
+	type ClassLine = { class: string; chars: string; typing: boolean };
+	let classLine: ClassLine[] = [];
 
-	function makeColorPhrase() {
+	function makeColorLine() {
 		let currentColor = ColorChars.untoldChar;
 		let currentIsTyping = false;
-		let currentClass: ClassPhrase = {
+		let currentClass: ClassLine = {
 			class: ClassSpan[ColorChars.typingChar],
 			chars: '',
 			typing: false,
 		};
-		let aClassPhrase: ClassPhrase[] = [];
-		let typingIndex = typedPhrase.length;
-		let length = colorPhrase.length;
+		let aClassLine: ClassLine[] = [];
+		let typingIndex = typedLine.length;
+		let length = colorLine.length;
 		for (let i = 0; i < length; i++) {
-			let c = colorPhrase[i];
+			let c = colorLine[i];
 			if (i > typingIndex) {
 				c = ColorChars.normalChar;
 			}
@@ -143,9 +139,9 @@
 				currentColor = c;
 				currentIsTyping = isTyping;
 				currentClass = { class: ClassSpan[currentColor], chars: '', typing: isTyping };
-				aClassPhrase.push(currentClass);
+				aClassLine.push(currentClass);
 			}
-			let t = expectedPhrase[i];
+			let t = expectedLine[i];
 			if (t == ' ') {
 				// currentClass.chars += `&nbsp;`; //&#9141
 				currentClass.chars += ` `; //&#9141
@@ -157,9 +153,9 @@
 				currentClass.chars += t;
 			}
 		}
-		// console.log('classPhrase:' + JSON.stringify(classPhrase, null, '\t'));
-		classPhrase = aClassPhrase;
-		// console.log('classPhrase:' + JSON.stringify(classPhrase, null, '\t'));
+		// console.log('classLine:' + JSON.stringify(classLine, null, '\t'));
+		classLine = aClassLine;
+		// console.log('classLine:' + JSON.stringify(classLine, null, '\t'));
 	}
 
 	function onKeyDown(event: KeyboardEvent) {
@@ -167,13 +163,13 @@
 			return;
 		}
 		event.preventDefault();
-		if (typedPhrase.length == 0) {
+		if (typedLine.length == 0) {
 			resetLap();
-		} else if (typedPhrase.length > 0) {
+		} else if (typedLine.length > 0) {
 			startLap();
 		}
-		if (typedPhrase.length > expectedPhrase.length) {
-			typedPhrase = typedPhrase.slice(0, -1);
+		if (typedLine.length > expectedLine.length) {
+			typedLine = typedLine.slice(0, -1);
 			if ($settings.sounds[SoundIndex.wrongletter]) playSound(Sounds.wrongLetter);
 			return;
 		}
@@ -181,15 +177,15 @@
 		let key = event.key;
 		// console.log(key);
 		if (event.ctrlKey && key === 'Backspace') {
-			initializePhrase();
+			initializeLine();
 			return;
 		}
 		if (key === 'Backspace') {
-			typedPhrase = typedPhrase.slice(0, -1);
-			// console.log('typedPhrase:' + typedPhrase);
-			makeColorPhrase();
-			if (typedPhrase.length == 0) {
-				initializePhrase();
+			typedLine = typedLine.slice(0, -1);
+			// console.log('typedLine:' + typedLine);
+			makeColorLine();
+			if (typedLine.length == 0) {
+				initializeLine();
 			}
 			return;
 		}
@@ -205,41 +201,41 @@
 		// failedChar -> remedyChar
 		// typingChar floats virtually at the insertion point
 		// TODO separate into a component
-		typedPhrase += key;
-		let i = typedPhrase.length - 1;
-		if (colorPhrase.length < typedPhrase.length) {
-			let oldLength = colorPhrase.length;
-			colorPhrase.length = typedPhrase.length;
-			colorPhrase.fill(ColorChars.normalChar, oldLength, i);
+		typedLine += key;
+		let i = typedLine.length - 1;
+		if (colorLine.length < typedLine.length) {
+			let oldLength = colorLine.length;
+			colorLine.length = typedLine.length;
+			colorLine.fill(ColorChars.normalChar, oldLength, i);
 		}
-		if (key == expectedPhrase[i]) {
-			if (colorPhrase[i] == ColorChars.normalChar || colorPhrase[i] == ColorChars.typingChar) {
-				colorPhrase[i] = ColorChars.betterChar;
+		if (key == expectedLine[i]) {
+			if (colorLine[i] == ColorChars.normalChar || colorLine[i] == ColorChars.typingChar) {
+				colorLine[i] = ColorChars.betterChar;
 			} else {
-				colorPhrase[i] = ColorChars.remedyChar;
+				colorLine[i] = ColorChars.remedyChar;
 			}
 		} else {
-			colorPhrase[i] = ColorChars.failedChar;
+			colorLine[i] = ColorChars.failedChar;
 		}
 
-		typedPhrase = typedPhrase.trimStart();
-		if (!typedPhrase.length) {
+		typedLine = typedLine.trimStart();
+		if (!typedLine.length) {
 			return;
 		}
 
 		startLap();
 
-		if (expectedPhrase.startsWith(typedPhrase)) {
+		if (expectedLine.startsWith(typedLine)) {
 			if ($settings.sounds[SoundIndex.rightletter]) playSound(Sounds.rightLetter);
 			rightLetters += 1;
-		} else if (expectedPhrase !== typedPhrase.trimEnd()) {
+		} else if (expectedLine !== typedLine.trimEnd()) {
 			if ($settings.sounds[SoundIndex.wrongletter]) playSound(Sounds.wrongLetter);
 			wrongLetters += 1;
 		}
 
-		// Full phrase correctly entered
-		if (typedPhrase.trimEnd() === expectedPhrase) {
-			// console.log('typedPhrase === expectedPhrase');
+		// Full line correctly entered
+		if (typedLine.trimEnd() === expectedLine) {
+			// console.log('typedLine === expectedLine');
 			// console.log('$lapTime seconds' + ($lapTime / 1000) * 60);
 			rawWPM = Math.round(
 				((rightLetters + wrongLetters) / 5 / ($lapTime / 1000)) * 60 // 5 chars per word average
@@ -251,48 +247,48 @@
 			// Failed Goals
 			if (rawWPM < $settings.minimumWPM || accuracy < $settings.minimumAccuracy) {
 				if ($settings.sounds[SoundIndex.failedGoals]) playSound(Sounds.failedGoals);
-				initializePhrase();
+				initializeLine();
 				return;
 			}
 
 			// Goals Achieved
 			let dataSource = $data.currentOptions;
-			let newRoundStarted = dataSource.phrasesCurrentIndex == 0;
+			let newRoundStarted = dataSource.linesCurrentIndex == 0;
 			if (newRoundStarted) {
 				dataSource.WPMs = [];
 			}
 			dataSource.WPMs.push(rawWPM);
 
 			if ($settings.sounds[SoundIndex.passedGoals]) playSound(Sounds.passedGoals);
-			nextPhrase();
+			nextLine();
 		} else {
-			makeColorPhrase();
+			makeColorLine();
 		}
 	}
 
-	function initializePhrase() {
+	function initializeLine() {
 		// console.log('resetLap():' + $lapTime);
 		resetLap();
 		rightLetters = 0;
 		wrongLetters = 0;
-		typedPhrase = '';
-		colorPhrase.length = expectedPhrase.length;
-		colorPhrase = colorPhrase.fill(ColorChars.normalChar, 0, expectedPhrase.length);
-		colorPhrase[0] = ColorChars.typingChar;
-		makeColorPhrase();
-		phrasesCurrentIndex = $data.currentOptions.phrasesCurrentIndex;
-		// console.log('resetCurrentPhrase phrasesCurrentIndex:' + $data.currentOptions.phrasesCurrentIndex);
+		typedLine = '';
+		colorLine.length = expectedLine.length;
+		colorLine = colorLine.fill(ColorChars.normalChar, 0, expectedLine.length);
+		colorLine[0] = ColorChars.typingChar;
+		makeColorLine();
+		linesCurrentIndex = $data.currentOptions.linesCurrentIndex;
+		// console.log('resetCurrentLine linesCurrentIndex:' + $data.currentOptions.linesCurrentIndex);
 	}
 
-	function nextPhrase() {
+	function nextLine() {
 		let dataSource = $data.currentOptions;
-		let nextPhraseExists = dataSource.phrases.length > dataSource.phrasesCurrentIndex + 1;
-		if (nextPhraseExists) {
-			// console.log('nextPhrase phrasesCurrentIndex:' + dataSource.phrasesCurrentIndex);
-			dataSource.phrasesCurrentIndex += 1;
-			// console.log('nextPhrase phrasesCurrentIndex:' + dataSource.phrasesCurrentIndex);
-			expectedPhrase = dataSource.phrases[dataSource.phrasesCurrentIndex];
-			initializePhrase();
+		let nextLineExists = dataSource.lines.length > dataSource.linesCurrentIndex + 1;
+		if (nextLineExists) {
+			// console.log('nextLine linesCurrentIndex:' + dataSource.linesCurrentIndex);
+			dataSource.linesCurrentIndex += 1;
+			// console.log('nextLine linesCurrentIndex:' + dataSource.linesCurrentIndex);
+			expectedLine = dataSource.lines[dataSource.linesCurrentIndex];
+			initializeLine();
 		} else {
 			// Start again from beginning, but generate new data.
 			if ($settings.sounds[SoundIndex.lessonsDone]) playSound(Sounds.lessonsDone);
@@ -350,7 +346,7 @@
 	on:mouseleave={handleMouseLeave}
 	tabindex="-1">
 	<h3>
-		{#each classPhrase as cp}
+		{#each classLine as cp}
 			{#if cp.typing}
 				<span class={'font-sans ' + cp.class + ' ' + ClassSpan[ColorChars.typingChar]}>{cp.chars}</span>
 			{:else}
@@ -360,7 +356,7 @@
 	</h3>
 	<h4 class="flex place-content-evenly gap-x-3 mt-6">
 		<div>
-			<strong>Lesson {phrasesCurrentIndex} / {$data.currentOptions.phrases.length}</strong>
+			<strong>Lesson {linesCurrentIndex} / {$data.currentOptions.lines.length}</strong>
 		</div>
 	</h4>
 	<h4 class="flex place-content-evenly gap-x-3 mt-0">

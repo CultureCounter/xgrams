@@ -21,7 +21,7 @@
 <div class="modal-example-form {cBase}">
 	<header class={cHeader}>Custom Words</header>
 	<article>Add custom words, separated by spaces/newlines:</article>
-	<textarea class="textarea" rows="4" bind:value={$data.sourceOptions[OptionIndex.custom_words].phrases} />
+	<textarea class="textarea" rows="4" bind:value={$data.sourceOptions[OptionIndex.custom_words].lines} />
 	<footer class="modal-footer {parent.regionFooter}">
 		<button class="btn {parent.buttonPositive}" on:click={onFormSubmit}><slot /></button>
 	</footer>

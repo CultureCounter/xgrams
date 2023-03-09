@@ -60,8 +60,8 @@ class SourceOptions {
 	repetition: number = 5;
 	filter: string = '';
 	WPMs: number[] = [];
-	phrases: string[] = [];
-	phrasesCurrentIndex: number = 0;
+	lines: string[] = [];
+	linesCurrentIndex: number = 0;
 }
 class OptionsClass {
 	'bigrams'?: SourceOptions;
