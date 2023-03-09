@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
-	import { elapsedTime, destroyStopWatch, resetStopWatch, toggleStopWatch } from './stopwatch';
+	import { elapsedTime, destroyStopWatch, resetStopWatch, toggleStopWatch, lapTime } from './stopwatch';
 
 	// these automatically update when `time`
 	// changes, because of the `$:` prefix
-	$: seconds = Math.floor($elapsedTime / 1000);
+	$: someTime = $elapsedTime + $lapTime;
+	$: seconds = Math.floor(someTime / 1000);
 	$: minutes = Math.floor(seconds / 60);
 	$: hours = Math.floor(minutes / 60);
 	// $: milliseconds = time.getMilliseconds();

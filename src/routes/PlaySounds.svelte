@@ -35,7 +35,7 @@
 	export function playSound(sound: Sounds): void {
 		if (TheSounds.length == 0) {
 			TheSounds = [rightLetterSound, wrongLetterSound, failedGoalsSound, passedGoalsSound, lessonsDoneSound];
-			console.log(TheSounds);
+			// console.log(TheSounds);
 		}
 		stopPlayingSound();
 		let theSound = TheSounds[sound];

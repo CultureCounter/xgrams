@@ -4,7 +4,7 @@
 	import Keyboard from './Keyboard.svelte';
 	import PlaySounds, { playSound, Sounds } from './PlaySounds.svelte';
 	import StopWatch from '../lib/utilities/StopWatch/StopWatch.svelte';
-	import { elapsedTime, pauseStopWatch, resetStopWatch, resumeStopWatch, toggleStopWatch } from '../lib/utilities/StopWatch/stopwatch';
+	import { elapsedTime, lapTime, resetStopWatch, resetLap, startLap, endLap } from '../lib/utilities/StopWatch/stopwatch';
 
 	const { data, settings, sources } = myStore;
 
@@ -46,7 +46,13 @@
 		resetStopWatch();
 	}
 
-	function generatePhrases(numberOfItemsToCombine: number, repetitions: number, filter: string) {
+	/**
+	 *
+	 * @param combinations how many words, ngrams, etc. to combine
+	 * @param repetitions how many sets of the combinations to create
+	 * @param filter reduce the available combinations
+	 */
+	function generatePhrases(combinations: number, repetitions: number, filter: string) {
 		let dataSource = $data.currentOptions;
 		let scope = dataSource.scope;
 		let source = $sources.source[$data.source];
@@ -57,7 +63,6 @@
 
 		// Use indexing to limit scope of Xgrams.
 		// Select the Top 50...16000
-		// Custom and Code have no scope.
 		if (scope) {
 			source = source.slice(0, scope);
 		}
@@ -83,12 +88,12 @@
 		let ngrams = deepCopy(source);
 		shuffle(ngrams);
 
-		padToMultiple(ngrams, numberOfItemsToCombine); // Ensure all subPhrases have requested combinations
+		padToMultiple(ngrams, combinations); // Ensure all subPhrases have requested combinations
 
 		let ngramsProcessed = 0;
 		let phrases = [];
 		while (ngrams.length) {
-			let ngramsSublist = ngrams.slice(0, numberOfItemsToCombine);
+			let ngramsSublist = ngrams.slice(0, combinations);
 			let subPhrase = ngramsSublist.join(' ');
 			let _phrase = [];
 			for (let i = 0; i < repetitions; i++) {
@@ -96,7 +101,7 @@
 			}
 			phrases.push(_phrase.join(' '));
 			// Remove the processed ngrams.
-			ngrams.splice(0, numberOfItemsToCombine);
+			ngrams.splice(0, combinations);
 		}
 
 		return phrases;
@@ -157,13 +162,15 @@
 		// console.log('classPhrase:' + JSON.stringify(classPhrase, null, '\t'));
 	}
 
-	function on_key_down(event: KeyboardEvent) {
+	function onKeyDown(event: KeyboardEvent) {
 		if (!isMouseInside) {
 			return;
 		}
 		event.preventDefault();
 		if (typedPhrase.length == 0) {
-			resetStopWatch();
+			resetLap();
+		} else if (typedPhrase.length > 0) {
+			startLap();
 		}
 		if (typedPhrase.length > expectedPhrase.length) {
 			typedPhrase = typedPhrase.slice(0, -1);
@@ -220,7 +227,7 @@
 			return;
 		}
 
-		resumeStopWatch();
+		startLap();
 
 		if (expectedPhrase.startsWith(typedPhrase)) {
 			if ($settings.sounds[SoundIndex.rightletter]) playSound(Sounds.rightLetter);
@@ -233,10 +240,10 @@
 		// Full phrase correctly entered
 		if (typedPhrase.trimEnd() === expectedPhrase) {
 			// console.log('typedPhrase === expectedPhrase');
-			let currentTime = Date.now() / 1000;
-			console.log('$elapsedTime seconds' + ($elapsedTime / 1000) * 60);
+			endLap();
+			console.log('$lapTime seconds' + ($lapTime / 1000) * 60);
 			rawWPM = Math.round(
-				((rightLetters + wrongLetters) / 5 / ($elapsedTime / 1000)) * 60 // 5 chars per word average
+				((rightLetters + wrongLetters) / 5 / ($lapTime / 1000)) * 60 // 5 chars per word average
 			);
 			accuracy = Math.round((rightLetters / (rightLetters + wrongLetters)) * 100);
 			console.log('rawWPM' + rawWPM);
@@ -257,7 +264,6 @@
 			dataSource.WPMs.push(rawWPM);
 
 			if ($settings.sounds[SoundIndex.passedGoals]) playSound(Sounds.passedGoals);
-			pauseStopWatch();
 			nextPhrase();
 		} else {
 			makeColorPhrase();
@@ -265,8 +271,8 @@
 	}
 
 	function initializePhrase() {
-		console.log('resetStopWatch():' + $elapsedTime);
-		resetStopWatch();
+		// console.log('resetLap():' + $lapTime);
+		resetLap();
 		rightLetters = 0;
 		wrongLetters = 0;
 		typedPhrase = '';
@@ -321,12 +327,12 @@
 
 	function handleMouseLeave(event: MouseEvent) {
 		isMouseInside = false;
-		// console.log('handleMouseLeave');
+		endLap();
 	}
 
 	function handleBlur(event: FocusEvent) {
 		isMouseInside = false;
-		// console.log('handleBlur');
+		endLap();
 	}
 
 	function handleFocus(event: FocusEvent) {
@@ -372,7 +378,7 @@
 	<StopWatch />
 </div>
 
-<svelte:window on:keydown={on_key_down} />
+<svelte:window on:keydown={onKeyDown} />
 <!-- on:keyup={on_key_up} -->
 
 <PlaySounds />
