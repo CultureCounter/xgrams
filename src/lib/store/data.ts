@@ -85,6 +85,7 @@ export class XgramSettings {
 	minimumWPM: number = 40;
 	minimumAccuracy: number = 100;
 	public sounds: boolean[] = [true, true, true, true, true];
+	font: string = ' ';
 }
 
 export class XgramData {
@@ -108,12 +109,32 @@ export class XgramData {
 	public currentOptions: SourceOptions = new SourceOptions();
 }
 
+function dataParse(): XgramData {
+	let aData: XgramData;
+	try {
+		aData = typia.assertParse<XgramData>(localStorage.getItem('data') ?? '');
+	} catch (error) {
+		// we'll proceed, but let's report it
+		aData = new XgramData();
+	}
+	return aData;
+}
+
+function settingsParse(): XgramSettings {
+	let aSettings: XgramSettings;
+	try {
+		aSettings = typia.assertParse<XgramSettings>(localStorage.getItem('settings') ?? '');
+	} catch (error) {
+		// we'll proceed, but let's report it
+		aSettings = new XgramSettings();
+	}
+	return aSettings;
+}
+
 class MyStore {
 	constructor(
-		public data: Writable<XgramData> = writable<XgramData>(browser && localStorage.getItem('data') ? typia.assertParse<XgramData>(localStorage.getItem('data') ?? '') : new XgramData()),
-		public settings: Writable<XgramSettings> = writable<XgramSettings>(
-			browser && 'settings' in localStorage ? typia.assertParse<XgramSettings>(localStorage.getItem('settings') ?? '') : new XgramSettings()
-		),
+		public data: Writable<XgramData> = writable<XgramData>(browser && 'data' in localStorage ? dataParse() : new XgramData()),
+		public settings: Writable<XgramSettings> = writable<XgramSettings>(browser && 'settings' in localStorage ? settingsParse() : new XgramSettings()),
 		public sources: Writable<XgramSources> = writable<XgramSources>(
 			browser && 'sources' in localStorage ? typia.assertParse<XgramSources>(localStorage.getItem('sources') ?? '') ?? '' : new XgramSources()
 		)

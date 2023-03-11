@@ -13,6 +13,13 @@ module.exports = {
 			'4xl': '2048px',
 		},
 		extend: {
+			fontFamily: {
+				serif: ['kobenhavn', 'ui-serif'],
+				sans: ['BlinkMacSystemFont', 'ui-sans-serif', 'sans-serif', 'Roboto'],
+				mono: ['fira-mono', 'ui-monospace'],
+			},
+			// --theme-font-family-base: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji',
+			// 	'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 			// colors: {
 			// 	'primary-color': 'var(--primary-color)',
 			// 	'secondary-color': 'var(--secondary-color)'

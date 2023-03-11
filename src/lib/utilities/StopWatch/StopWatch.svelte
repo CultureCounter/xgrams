@@ -26,6 +26,15 @@
 	}
 </script>
 
+<div class="flex justify-center bg-color-clockhour-50">
+	<div class=" w-6/12 bg-color-clockhour-900">row</div>
+</div>
+<!-- <div class="flex-col items-center bg-red-100">
+	<div class=" basis-1/4" />
+	<div class="justify-items-center basis-1/2 bg-red-900">col</div>
+	<div class=" basis-1/4" />
+</div> -->
+
 <svg viewBox="-50 -50 100 100" on:click={onClick} on:keyup={onKeyDown}>
 	<circle class="clock-face-outer" r="40" style="fill-opacity: .25;" />
 	<circle class="clock-face-inner" r="20" style="fill-opacity: .25;" />
@@ -47,9 +56,9 @@
 
 	<!-- hour hand -->
 	<g transform="rotate({30 * hours})">
-		<line class="hour" y1="-33" y2="-40" />
-		<line class="hour-counterweight" y1="-45" y2="-50" />
-		<circle class="hour" r="4" cx="0" cy="-29" style="fill-opacity: .25;" />
+		<line class="stroke-2 stroke-color-clock-hour-50" y1="-33" y2="-40" />
+		<line class="stroke-6 stroke-color-clock-hour-50 fill-white" y1="-45" y2="-50" />
+		<circle class="stroke-2 stroke-color-clock-hour-900 fill-white" r="4" cx="0" cy="-29" style="fill-opacity: .25;" />
 	</g>
 
 	<!-- minute hand -->
@@ -82,12 +91,11 @@
 		fill: #002525;
 	}
 
-	.hour,
+	/* .hour,
 	.hour-counterweight {
 		fill: #0066a6;
-		stroke: #066;
 		stroke-width: 2;
-	}
+	} */
 
 	.major,
 	.clock-face-outer {
@@ -95,9 +103,9 @@
 		stroke-width: 2;
 	}
 
-	.hour-counterweight {
+	/* .hour-counterweight {
 		stroke-width: 6;
-	}
+	} */
 
 	.minute-counterweight,
 	.clock-face-inner {
@@ -120,7 +128,7 @@
 	.second-counterweight,
 	.minor {
 		fill: #009090;
-		stroke: #0ee;
+		stroke: rgb(0, 238, 238);
 		stroke-width: 1;
 	}
 

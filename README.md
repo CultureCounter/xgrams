@@ -26,13 +26,14 @@ I searched for Mavis Beacon but she has left the building! RIP Mavis! I slowly d
 -   [`Ngram Type`](https://ranelpadon.github.io/ngram-type/) More Keyzen, now with ngrams. I hacked this one so much I finally just rewrote it from scratch.
 -   [`keybr`](https://www.keybr.com/) I mainlined this from a-z with the hacked Ranel Padon ngrams to focus around the new key.
 
-# Xgram
+# Xgrams
 
 -   Inspired by the above, most directly descended from the last 4
 -   Pangrams to discover weak spots or efficiently typing all letters
 -   Large amounts of ngrams
 -   Filtering so you can hone in on specific keys and fingers
 -   Popular programming language keywords
+-   The fount of wisdom [Google ngram corpus](https://books.google.com/ngrams/)
 
 # Tools
 
@@ -49,5 +50,5 @@ I went on a Javascript adventure. It makes me miss how superior Swift is.
 # TODO
 
 -   Other parts of the [`JamStack`](https://jamstack.org/) Architecture?
--   Host on GitHub Pages!
+-   Host on GitHub Pages! Turns out you can host on [`vercel`](https://vercel.com/) in 3 minutes flat.
 -   To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.

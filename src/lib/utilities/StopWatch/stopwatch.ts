@@ -22,9 +22,6 @@ export function resetStopWatch(): void {
 	elapsedTime.set(0);
 	baseTime = 0;
 
-	if (timer != null) {
-		clearInterval(timer);
-	}
 	resetLap();
 }
 
@@ -90,12 +87,14 @@ export function startLap() {
  * Clear timers and end lap, increase elapsedTime
  */
 export function endLap() {
-	let currentTime = Date.now();
-	lapTime.set(baseTime + currentTime - startTime);
-	// console.log('endLap lapTime:' + (baseTime + currentTime - startTime));
-	elapsedTime.set(get(elapsedTime) + get(lapTime));
-	// console.log('endLap elapsedTime:' + get(elapsedTime));
-	resetLap();
+	if (timer != null) {
+		let currentTime = Date.now();
+		lapTime.set(baseTime + currentTime - startTime);
+		// console.log('endLap lapTime:' + (baseTime + currentTime - startTime));
+		elapsedTime.set(get(elapsedTime) + get(lapTime));
+		// console.log('endLap elapsedTime:' + get(elapsedTime));
+		resetLap();
+	}
 }
 
 /**

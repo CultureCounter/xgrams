@@ -3,20 +3,10 @@
 	import Typist from './Typist.svelte';
 </script>
 
-<div class="container h-full mx-auto flex justify-center items-center">
-	<div class="space-y-10 text-center">
-		<div class="space-y-2">
-			<div>
-				<Typist />
-			</div>
-			<div>
-				<Keyboard />
-			</div>
-		</div>
-	</div>
-</div>
+<Typist />
+<Keyboard />
 
-<style lang="postcss">
+<!-- <style lang="postcss">
 	/* figure {
 		@apply flex relative flex-col;
 	}
@@ -47,4 +37,4 @@
 			transform: scale(1.5);
 		}
 	}
-</style>
+</style> -->

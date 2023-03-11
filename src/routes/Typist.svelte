@@ -113,7 +113,7 @@
 	};
 	let colorLine: number[] = [];
 
-	const ClassSpan = ['', 'normalChar', 'typingChar', 'betterChar', 'failedChar', 'remedyChar'] as const;
+	const ClassSpan = ['', 'normalChar', 'underline ', 'text-slate-400 ', 'text-red-600 ', 'text-orange-600 '] as const;
 	type ClassLine = { class: string; chars: string; typing: boolean };
 	let classLine: ClassLine[] = [];
 
@@ -335,25 +335,19 @@
 		isMouseInside = true;
 		// console.log('handleFocus');
 	}
+	$: theFont = $settings.font;
 </script>
 
-<div
-	id="textZone"
-	class={isMouseInside ? 'font-sans textFocus textZone' : 'font-sans textBlur textZone'}
-	on:focus={handleFocus}
-	on:blur={handleBlur}
-	on:mouseover={handleMouseOver}
-	on:mouseleave={handleMouseLeave}
-	tabindex="-1">
-	<h3>
+<div class={isMouseInside ? 'textFocus textZone' : 'textBlur textZone'} on:focus={handleFocus} on:blur={handleBlur} on:mouseover={handleMouseOver} on:mouseleave={handleMouseLeave} tabindex="-1">
+	<h1 class={$settings.font}>
 		{#each classLine as cp}
 			{#if cp.typing}
-				<span class={'font-sans ' + cp.class + ' ' + ClassSpan[ColorChars.typingChar]}>{cp.chars}</span>
+				<span class={cp.class + ' ' + ClassSpan[ColorChars.typingChar]}>{cp.chars}</span>
 			{:else}
-				<span class={'font-sans ' + cp.class}>{cp.chars}</span>
+				<span class={cp.class}>{cp.chars}</span>
 			{/if}
 		{/each}
-	</h3>
+	</h1>
 	<h4 class="flex place-content-evenly gap-x-3 mt-6">
 		<div>
 			<strong>Lesson {linesCurrentIndex} / {$data.currentOptions.lines.length}</strong>
@@ -365,10 +359,9 @@
 		<div>Average WPM: {averageWPM()}</div>
 	</h4>
 </div>
-<div>
-	<StopWatch />
+<div class="flex justify-center">
+	<div class="w-6/12"><StopWatch /></div>
 </div>
-
 <svelte:window on:keydown={onKeyDown} />
 <!-- on:keyup={on_key_up} -->
 
@@ -378,28 +371,6 @@
 </div>
 
 <style>
-	h3 {
-		font-size: 2em;
-		justify-content: center;
-		align-items: center;
-		max-width: 100%;
-		font-kerning: auto;
-		/* font-family: 'Ubuntu Monokz', monospace; */
-	}
-
-	h4 {
-		display: flex;
-		font-size: 1em;
-		justify-content: center;
-		align-items: center;
-		max-width: 100%;
-		font-kerning: auto;
-	}
-
-	.textZone {
-		margin: 1em 0;
-		padding: 1em;
-	}
 	.textBlur {
 		border-color: rgba(255, 0, 0, 0.6);
 		box-shadow: inset 0 2px 2px rgba(0, 0, 0, 0.1), 0 0 8px rgba(255, 0, 0, 0.6);
@@ -408,10 +379,6 @@
 		cursor: none;
 		border-color: rgba(0, 0, 255, 0.6);
 		box-shadow: inset 0 2px 2px rgba(0, 0, 0, 0.1), 0 0 8px rgba(0, 0, 255, 0.6);
-	}
-
-	.normalChar {
-		color: --theme-font-color;
 	}
 
 	.typingChar {

@@ -48,19 +48,17 @@
 	<div class="flex justify-between p-4">
 		<div class="object-left">
 			<Darklight>
-				<!-- 🌚🌑 🌓 🌔🌕🌛🌞 overflow-y-auto-->
+				<!-- 🌚🌑 🌓 🌔🌕🌛🌞 -->
 				<button slot="dark" class="btn-icon"><h1>🌑</h1></button>
 				<button slot="os" class="btn-icon"><h1>🌓</h1></button>
 				<button slot="light" class="btn-icon"><h1>🌕</h1></button>
 			</Darklight>
 		</div>
-		<div class="object-center"><h1><span class="gradient-heading">Xgrams</span></h1></div>
+		<div class="object-center"><h1><span class="gradient-heading font-kobenhavn">Xgrams</span></h1></div>
 		<div class="object-right"><button class="btn-icon" on:click={drawerOpen}><h1>🧜‍♀️</h1></button></div>
 	</div>
 
-	<div class="flex justify-center">
-		<slot />
-	</div>
+	<slot />
 
 	<div class="flex justify-center items-center gap-8 p-4">
 		<a href="https://kit.svelte.dev">
