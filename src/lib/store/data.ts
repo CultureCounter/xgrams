@@ -114,7 +114,6 @@ function dataParse(): XgramData {
 	try {
 		aData = typia.assertParse<XgramData>(localStorage.getItem('data') ?? '');
 	} catch (error) {
-		// we'll proceed, but let's report it
 		aData = new XgramData();
 	}
 	return aData;
@@ -125,9 +124,10 @@ function settingsParse(): XgramSettings {
 	try {
 		aSettings = typia.assertParse<XgramSettings>(localStorage.getItem('settings') ?? '');
 	} catch (error) {
-		// we'll proceed, but let's report it
 		aSettings = new XgramSettings();
 	}
+	// console.log('settingsParse aSettings.font:' + aSettings.font);
+
 	return aSettings;
 }
 
@@ -154,6 +154,7 @@ class MyStore {
 			});
 			this.settings.subscribe((value) => {
 				localStorage.settings = typia.assertStringify<XgramSettings>(value);
+				// console.log('localStorage.settings font:' + value.font);
 			});
 			this.sources.subscribe((value) => {
 				localStorage.sources = typia.assertStringify<XgramSources>(value);

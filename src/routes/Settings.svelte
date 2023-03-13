@@ -89,47 +89,128 @@
 		return target;
 	}
 
-	let fontFamilyCSS = ['font-sans ', 'font-serif ', 'font-mono ', 'Fira Mono ', 'kobenhavn '];
-	let fontFamilyNames = ['serif', 'sans', 'mono', 'Fira Mono', 'kobenhavn'];
-	let selectedFontFamily: string;
+	/**
+	 * Find in space delimited `target` one of `candidates`
+	 * @param target
+	 * @param removals
+	 * @param add
+	 * @returns string `candidate` or ''
+	 */
+	function findStrings(target: string, candidates: string[]): string {
+		for (let candidate of candidates) {
+			if (target.includes(candidate)) {
+				return candidate;
+			}
+		}
+		return '';
+	}
+
+	let fontFamilyCSS = [
+		'font-sans ',
+		'helveticaNeue ',
+		'calibri ',
+		'candara ',
+		'century ',
+		'dejavu ',
+		'notoSans ',
+		'optima ',
+		'roboto ',
+		'ubuntu ',
+		'verdana ',
+
+		'font-serif ',
+		'baskerville ',
+		'calistoMT ',
+		'cambria ',
+		'didot ',
+		'garamond ',
+		'georgia ',
+		'notoSerif ',
+		'palatino ',
+
+		'font-mono ',
+		'font-andaleMono ',
+		'font-consolas ',
+		'font-courierNew ',
+		'ubuntuMono ',
+		'font-luminari ',
+		'font-comicSansMS ',
+	];
+	let fontFamilyNames = [
+		'---Sans-Serif---',
+		'Helvetica Neue',
+		'Calibri',
+		'Candara',
+		'Century',
+		'Dejavu Sans',
+		'Noto Sans',
+		'Optima',
+		'Roboto',
+		'Ubuntu',
+		'Verdana',
+		'---Serif---',
+		'Baskerville',
+		'Calisto MT',
+		'Cambria',
+		'Didot',
+		'Garamond',
+		'Georgia',
+		'Noto Serif',
+		'Palatino',
+		'---Mono---',
+		'Andale Mono',
+		'Consolas',
+		'Courier New',
+		'Ubuntu Mono',
+		'Luminari',
+		'Comic Sans MS',
+	];
+	let selectedFontFamily: string = findStrings($settings.font, fontFamilyCSS);
 	function setFontFamily(): void {
 		$settings.font = replaceStrings($settings.font, fontFamilyCSS, selectedFontFamily);
-		console.log('setFontFamily():' + $settings.font);
+		// console.log('setFontFamily():|' + $settings.font + '|');
 	}
 
-	let fontSizeCSS = ['text-xs ', 'text-sm ', 'text-base ', 'text-lg ', 'text-xl ', 'text-2xl ', 'text-3xl ', 'text-4xl ', 'text-5xl '];
-	let fontSizeNames = ['xs', 'sm', 'base', 'lg', 'xl', '2xl', '3xl', '4xl', '5xl'];
-	let selectedFontSize: string;
+	let fontSizeCSS = ['text-xs ', 'text-sm ', 'text-base ', 'text-lg ', 'text-xl ', 'text-2xl ', 'text-3xl ', 'text-4xl ', 'text-5xl ', 'text-6xl ', 'text-7xl ', 'text-8xl ', 'text-9xl '];
+	let fontSizeNames = ['xs', 'sm', 'base', 'lg', 'xl', '2xl', '3xl', '4xl', '5xl', '6xl', '7xl', '8xl', '9xl'];
+	let selectedFontSize: string = findStrings($settings.font, fontSizeCSS);
 	function setFontSize(): void {
 		$settings.font = replaceStrings($settings.font, fontSizeCSS, selectedFontSize);
-		console.log('setFontSize():' + $settings.font);
+		// console.log('setFontSize():|' + $settings.font + '|');
 	}
 
-	let fontWeightCSS = ['font-thin ', 'font-light ', 'font-normal ', 'font-medium ', 'font-bold '];
-	let fontWeightNames = ['thin', 'light', 'normal', 'medium', 'bold'];
-	let selectedFontWeight: string;
+	let fontWeightCSS = ['font-thin ', 'font-extralight ', 'font-light ', 'font-normal ', 'font-medium ', 'font-semibold ', 'font-bold ', 'font-extrabold ', 'font-black '];
+	let fontWeightNames = ['thin', 'extra light', 'light', 'normal', 'medium', 'bold', 'semibold', 'extrabold', 'black'];
+	let selectedFontWeight: string = findStrings($settings.font, fontWeightCSS);
 	function setFontWeight(): void {
 		$settings.font = replaceStrings($settings.font, fontWeightCSS, selectedFontWeight);
-		console.log('setFontWeight():' + $settings.font);
+		// console.log('setFontWeight():|' + $settings.font + '|');
 	}
 
 	let fontSpacingCSS = ['tracking-tighter ', 'tracking-tight ', 'tracking-normal ', 'tracking-wide ', 'tracking-wider ', 'tracking-widest '];
 	let fontSpacingNames = ['tighter', 'tight', 'normal', 'wide', 'wider', 'widest'];
-	let selectedFontSpacing: string;
+	let selectedFontSpacing: string = findStrings($settings.font, fontSpacingCSS);
 	function setFontSpacing(): void {
 		$settings.font = replaceStrings($settings.font, fontSpacingCSS, selectedFontSpacing);
-		console.log('setFontSpacing():' + $settings.font);
+		// console.log('setFontSpacing():|' + $settings.font + '|');
 	}
+
+	function clearFont(): void {
+		$settings.font = '';
+		selectedFontFamily = findStrings($settings.font, fontFamilyCSS);
+		selectedFontSize = findStrings($settings.font, fontSizeCSS);
+		selectedFontWeight = findStrings($settings.font, fontWeightCSS);
+		selectedFontSpacing = findStrings($settings.font, fontSpacingCSS);
+		// console.log('setFontSpacing():|' + $settings.font + '|');
+	}
+	let keyBackspace = `\u232B`;
 </script>
 
 <Modal />
 
-<section>
-	<h1 class="p-4">Settings</h1>
-	<br />
-</section>
+<h1 class="p-4">Settings</h1>
 <!-- <section class="grid grid-cols-1 sm:grid-cols-5 gap-2"> -->
-<section class="flex place-content-between gap-x-3 mt-6 gap-2">
+<section class="flex place-content-between gap-2">
 	<div class="card">
 		<header class="card-header">Source</header>
 		<div class="p-4">
@@ -153,7 +234,7 @@
 		<div class="p-4">
 			<RadioGroup rounded="rounded-2xl" display="flex-col" active="variant-filled-primary" hover="hover:variant-soft-primary">
 				{#each ScopeNames as name, i}
-					<RadioItem bind:group={$data.currentOptions.scope} {name} value={ScopeValues[i]}>{name}</RadioItem>
+					<RadioItem bind:group={$data.currentOptions.scope} {name} value={ScopeValues[i]}>Top&nbsp;{ScopeValues[i]}</RadioItem>
 				{/each}
 			</RadioGroup>
 		</div>
@@ -188,72 +269,78 @@
 			</div>
 		</div>
 	</div>
-	<div class="card">
-		<header class="card-header">Font</header>
-		<div class="p-4">
-			<div class="flex flex-col gap-2">
-				<!-- <form on:submit|preventDefault={setFontFamily}> -->
-				<label class="label">
-					<span>Font Family</span>
-					<select
-						class="input"
-						bind:value={selectedFontFamily}
-						on:change={() => {
-							setFontFamily();
-						}}>
-						{#each fontFamilyCSS as s, i}
-							<option class="variant-filled-primary" value={s}>
-								{fontFamilyNames[i]}
-							</option>
-						{/each}
-					</select>
-				</label>
-				<label class="label">
-					<span>Font Size</span>
-					<select
-						class="input"
-						bind:value={selectedFontSize}
-						on:change={() => {
-							setFontSize();
-						}}>
-						{#each fontSizeCSS as s, i}
-							<option class="variant-filled-primary" value={s}>
-								{fontSizeNames[i]}
-							</option>
-						{/each}
-					</select>
-				</label>
-				<label class="label">
-					<span>Font Weight</span>
-					<select
-						class="input"
-						bind:value={selectedFontWeight}
-						on:change={() => {
-							setFontWeight();
-						}}>
-						{#each fontWeightCSS as s, i}
-							<option class="variant-filled-primary" value={s}>
-								{fontWeightNames[i]}
-							</option>
-						{/each}
-					</select>
-				</label>
-				<label class="label">
-					<span>Font Spacing</span>
-					<select
-						class="input"
-						bind:value={selectedFontSpacing}
-						on:change={() => {
-							setFontSpacing();
-						}}>
-						{#each fontSpacingCSS as s, i}
-							<option class="variant-filled-primary" value={s}>
-								{fontSpacingNames[i]}
-							</option>
-						{/each}
-					</select>
-				</label>
-			</div>
+</section>
+<div class="card">
+	<header class="card-header">
+		<span>Font</span>
+		<button class="btn h-0 px-0" on:click={clearFont}>{keyBackspace}</button>
+	</header>
+	<div class="p-4">
+		<div class="flex gap-2">
+			<label class="label">
+				<span>Font Family</span>
+				<select
+					class="input"
+					bind:value={selectedFontFamily}
+					on:change={() => {
+						setFontFamily();
+					}}>
+					{#each fontFamilyCSS as s, i}
+						<option class="variant-filled-primary" value={s}>
+							{fontFamilyNames[i]}
+						</option>
+					{/each}
+				</select>
+			</label>
+			<label class="label">
+				<span>Font Size</span>
+				<select
+					class="input"
+					bind:value={selectedFontSize}
+					on:change={() => {
+						setFontSize();
+					}}>
+					{#each fontSizeCSS as s, i}
+						<option class="variant-filled-primary" value={s}>
+							{fontSizeNames[i]}
+						</option>
+					{/each}
+				</select>
+			</label>
+			<label class="label">
+				<span>Font Weight</span>
+				<select
+					class="input"
+					bind:value={selectedFontWeight}
+					on:change={() => {
+						setFontWeight();
+					}}>
+					{#each fontWeightCSS as s, i}
+						<option class="variant-filled-primary" value={s}>
+							{fontWeightNames[i]}
+						</option>
+					{/each}
+				</select>
+			</label>
+			<label class="label">
+				<span>Font Spacing</span>
+				<select
+					class="input"
+					bind:value={selectedFontSpacing}
+					on:change={() => {
+						setFontSpacing();
+					}}>
+					{#each fontSpacingCSS as s, i}
+						<option class="variant-filled-primary" value={s}>
+							{fontSpacingNames[i]}
+						</option>
+					{/each}
+				</select>
+			</label>
 		</div>
 	</div>
-</section>
+</div>
+<hr />
+<span class="bg-transparent {$settings.font}">il1IL1 dbdqpq DBQP ij., fgjty rnmrn RNMRN o0O</span>
+<span class="bg-transparent {$settings.font}">The quick brown fox jumps over the lazy dog</span>
+<section />

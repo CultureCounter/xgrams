@@ -54,10 +54,13 @@
 				<button slot="light" class="btn-icon"><h1>🌕</h1></button>
 			</Darklight>
 		</div>
-		<div class="object-center"><h1><span class="gradient-heading font-kobenhavn">Xgrams</span></h1></div>
+		<div class="object-center">
+			<h1>
+				<span class="bg-gradient-to-br from-yellow-300 dark:from-white-300 to-red-800 dark:to-red-800 bg-clip-text text-transparent box-decoration-clone">Xgrams</span>
+			</h1>
+		</div>
 		<div class="object-right"><button class="btn-icon" on:click={drawerOpen}><h1>🧜‍♀️</h1></button></div>
 	</div>
-
 	<slot />
 
 	<div class="flex justify-center items-center gap-8 p-4">

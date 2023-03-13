@@ -335,11 +335,10 @@
 		isMouseInside = true;
 		// console.log('handleFocus');
 	}
-	$: theFont = $settings.font;
 </script>
 
 <div class={isMouseInside ? 'textFocus textZone' : 'textBlur textZone'} on:focus={handleFocus} on:blur={handleBlur} on:mouseover={handleMouseOver} on:mouseleave={handleMouseLeave} tabindex="-1">
-	<h1 class={$settings.font}>
+	<div class={$settings.font}>
 		{#each classLine as cp}
 			{#if cp.typing}
 				<span class={cp.class + ' ' + ClassSpan[ColorChars.typingChar]}>{cp.chars}</span>
@@ -347,7 +346,7 @@
 				<span class={cp.class}>{cp.chars}</span>
 			{/if}
 		{/each}
-	</h1>
+	</div>
 	<h4 class="flex place-content-evenly gap-x-3 mt-6">
 		<div>
 			<strong>Lesson {linesCurrentIndex} / {$data.currentOptions.lines.length}</strong>
