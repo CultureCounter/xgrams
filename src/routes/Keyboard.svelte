@@ -34,46 +34,22 @@
 	}
 	let keyBackspace = `\u232B`;
 	let keyEnter = `\u23CE`;
+	let isLargeKey = true;
 </script>
 
-<div class="keyboard">
-	{#each ['`1234567890-=' + keyBackspace, 'QWERTYUIOP[]\\', "ASDFGHJKL;'" + keyEnter, 'ZXCVBNM,.'] as row, i}
-		<div class="row flex flex-1 justify-center">
-			{#each row as letter}
-				<KeyCap {letter} />
-			{/each}
-		</div>
-	{/each}
+<div class="flex flex-col justify-center relative overflow-hidden p-5">
+	<div class="mx-auto">
+		{#each ['`1234567890-=', 'QWERTYUIOP[]\\', "ASDFGHJKL;'", 'ZXCVBNM,.'] as row, i}
+			<div class="row flex justify-center">
+				{#each row as letter, i}
+					<KeyCap {letter} />
+				{/each}
+				{#if i == 0}
+					<KeyCap letter={keyBackspace} {isLargeKey} />
+				{:else if i == 2}
+					<KeyCap letter={keyEnter} {isLargeKey} />
+				{/if}
+			</div>
+		{/each}
+	</div>
 </div>
-
-<!-- <style>
-	@media (prefers-reduced-motion: no-preference) {
-		.row.current {
-			animation: wiggle 0.5s;
-		}
-	}
-
-	@keyframes wiggle {
-		0% {
-			transform: translateX(0);
-		}
-		10% {
-			transform: translateX(-2px);
-		}
-		30% {
-			transform: translateX(4px);
-		}
-		50% {
-			transform: translateX(-6px);
-		}
-		70% {
-			transform: translateX(+4px);
-		}
-		90% {
-			transform: translateX(-2px);
-		}
-		100% {
-			transform: translateX(0);
-		}
-	}
-</style> -->

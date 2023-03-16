@@ -41,6 +41,55 @@ export enum LanguageIndex {
 }
 export const LanguageNames = ['C++', 'C#', 'Go', 'Java', 'Javascript', 'Python', 'Rust', 'Swift', 'Typescript'];
 
+export enum ColorIndex {
+	red = 0,
+	orange,
+	amber,
+	yellow,
+	lime,
+	green,
+	emerald,
+	teal,
+	cyan,
+	sky,
+	blue,
+	indigo,
+	violet,
+	purple,
+	fuchsia,
+	pink,
+	rose,
+	slate,
+	gray,
+	zinc,
+	neutral,
+	stone,
+}
+export const ColorNames = [
+	'red',
+	'orange',
+	'amber',
+	'yellow',
+	'lime',
+	'green',
+	'emerald',
+	'teal',
+	'cyan',
+	'sky',
+	'blue',
+	'indigo',
+	'violet',
+	'purple',
+	'fuchsia',
+	'pink',
+	'rose',
+	'slate',
+	'gray',
+	'zinc',
+	'neutral',
+	'stone',
+];
+
 // Indexes both Sources and their options
 export enum OptionIndex {
 	bigrams = 0,
@@ -86,6 +135,7 @@ export class XgramSettings {
 	minimumAccuracy: number = 100;
 	public sounds: boolean[] = [true, true, true, true, true];
 	font: string = ' ';
+	color: ColorIndex = ColorIndex.teal;
 }
 
 export class XgramData {

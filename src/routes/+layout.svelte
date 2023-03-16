@@ -20,7 +20,7 @@
 			id: 'settings',
 			position: 'bottom',
 			// bgDrawer: 'bg-purple-900 text-white',
-			bgBackdrop: 'bg-gradient-to-tr from-indigo-500/50 via-purple-500/50 to-pink-500/50',
+			// bgBackdrop: 'bg-gradient-to-tr from-indigo-500/50 via-purple-500/50 to-pink-500/50',
 			width: 'w-[100%] md:w-[100%]',
 			padding: 'p-4',
 			rounded: 'rounded-xl',

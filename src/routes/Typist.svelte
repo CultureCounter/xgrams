@@ -337,29 +337,31 @@
 	}
 </script>
 
-<div class={isMouseInside ? 'textFocus textZone' : 'textBlur textZone'} on:focus={handleFocus} on:blur={handleBlur} on:mouseover={handleMouseOver} on:mouseleave={handleMouseLeave} tabindex="-1">
-	<div class={$settings.font}>
-		{#each classLine as cp}
-			{#if cp.typing}
-				<span class={cp.class + ' ' + ClassSpan[ColorChars.typingChar]}>{cp.chars}</span>
-			{:else}
-				<span class={cp.class}>{cp.chars}</span>
-			{/if}
-		{/each}
-	</div>
-	<h4 class="flex place-content-evenly gap-x-3 mt-6">
-		<div>
-			<strong>Lesson {linesCurrentIndex} / {$data.currentOptions.lines.length}</strong>
+<div class="mx-2">
+	<div class={isMouseInside ? 'textFocus textZone' : 'textBlur textZone'} on:focus={handleFocus} on:blur={handleBlur} on:mouseover={handleMouseOver} on:mouseleave={handleMouseLeave} tabindex="-1">
+		<div class="p-2 {$settings.font}">
+			{#each classLine as cp}
+				{#if cp.typing}
+					<span class={cp.class + ' ' + ClassSpan[ColorChars.typingChar]}>{cp.chars}</span>
+				{:else}
+					<span class={cp.class}>{cp.chars}</span>
+				{/if}
+			{/each}
 		</div>
-	</h4>
-	<h4 class="flex place-content-evenly gap-x-3 mt-0">
-		<div>WPM: {rawWPM}</div>
-		<div>Accuracy: {accuracy}%</div>
-		<div>Average WPM: {averageWPM()}</div>
-	</h4>
+		<h4 class="flex place-content-evenly gap-x-3 mt-6">
+			<div>
+				<strong>Lesson {linesCurrentIndex} / {$data.currentOptions.lines.length}</strong>
+			</div>
+		</h4>
+		<h4 class="flex place-content-evenly gap-x-3 mt-0">
+			<div>WPM: {rawWPM}</div>
+			<div>Accuracy: {accuracy}%</div>
+			<div>Average WPM: {averageWPM()}</div>
+		</h4>
+	</div>
 </div>
 <div class="flex justify-center">
-	<div class="w-6/12"><StopWatch /></div>
+	<div class="w-4/12"><StopWatch /></div>
 </div>
 <svelte:window on:keydown={onKeyDown} />
 <!-- on:keyup={on_key_up} -->

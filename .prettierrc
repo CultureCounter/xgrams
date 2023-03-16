@@ -13,6 +13,10 @@
 		{
 			"files": ".prettierrc",
 			"options": { "parser": "json" }
+		},
+		{
+			"files": ".postcss",
+			"options": { "parser": "css" }
 		}
 	]
 }

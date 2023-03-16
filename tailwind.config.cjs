@@ -13,6 +13,13 @@ module.exports = {
 			'4xl': '2048px',
 		},
 		extend: {
+			aspectRatio: {
+				'3/2': '3 / 2',
+			},
+			strokeWidth: {
+				0.5: '0.5px',
+				1.5: '1.5px',
+			},
 			fontFamily: {
 				// sans
 				helveticaNeue: ['Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { LanguageIndex, myStore, OptionIndex, ScopeNames, ScopeValues, SoundNames, SourceNames } from '$lib/store/data';
+	import { ColorIndex, LanguageIndex, myStore, OptionIndex, ScopeNames, ColorNames, ScopeValues, SoundNames, SourceNames } from '$lib/store/data';
 	import type { ModalComponent, ModalSettings } from '@skeletonlabs/skeleton';
 	import { Modal, InputChip, modalStore, RadioGroup, RadioItem, SlideToggle } from '@skeletonlabs/skeleton';
 	import Counter from './Counter.svelte';
@@ -195,6 +195,12 @@
 		// console.log('setFontSpacing():|' + $settings.font + '|');
 	}
 
+	let selectedColor: ColorIndex = $settings.color;
+	function setColor(): void {
+		$settings.color = selectedColor;
+		// console.log('setColor():|' + $settings.color + '|');
+	}
+
 	function clearFont(): void {
 		$settings.font = '';
 		selectedFontFamily = findStrings($settings.font, fontFamilyCSS);
@@ -271,12 +277,25 @@
 	</div>
 </section>
 <div class="card">
-	<header class="card-header">
-		<span>Font</span>
-		<button class="btn h-0 px-0" on:click={clearFont}>{keyBackspace}</button>
-	</header>
+	<header class="card-header" />
 	<div class="p-4">
 		<div class="flex gap-2">
+			<label class="label">
+				<span>Color</span>
+				<select
+					class="input"
+					bind:value={selectedColor}
+					on:change={() => {
+						setColor();
+					}}>
+					{#each ColorNames as s, i}
+						<option class="variant-filled-primary" value={i}>
+							{s}
+						</option>
+					{/each}
+				</select>
+			</label>
+			<button class="btn h-0 px-0" on:click={clearFont}>Clear Font {keyBackspace}</button>
 			<label class="label">
 				<span>Font Family</span>
 				<select
