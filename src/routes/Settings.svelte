@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { ColorIndex, LanguageIndex, myStore, OptionIndex, ScopeNames, ColorNames, ScopeValues, SoundNames, SourceNames } from '$lib/store/data';
+	import { ColorIndex, ColorNames, LanguageIndex, myStore, OptionIndex, ScopeNames, ScopeValues, SoundNames, SourceNames } from '$lib/store/data';
+	import { KeyboardIndex, KeyboardNames, LayoutIndex, LayoutNames } from '$lib/store/keyboard';
 	import type { ModalComponent, ModalSettings } from '@skeletonlabs/skeleton';
 	import { Modal, InputChip, modalStore, RadioGroup, RadioItem, SlideToggle } from '@skeletonlabs/skeleton';
 	import Counter from './Counter.svelte';
@@ -201,6 +202,18 @@
 		// console.log('setColor():|' + $settings.color + '|');
 	}
 
+	let selectedKeyboard: KeyboardIndex = $settings.keyboard;
+	function setKeyboard(): void {
+		$settings.keyboard = selectedKeyboard;
+		// console.log('setColor():|' + $settings.color + '|');
+	}
+
+	let selectedLayout: LayoutIndex = $settings.layout;
+	function setLayout(): void {
+		$settings.layout = selectedLayout;
+		// console.log('setColor():|' + $settings.color + '|');
+	}
+
 	function clearFont(): void {
 		$settings.font = '';
 		selectedFontFamily = findStrings($settings.font, fontFamilyCSS);
@@ -352,6 +365,36 @@
 					{#each fontSpacingCSS as s, i}
 						<option class="variant-filled-primary" value={s}>
 							{fontSpacingNames[i]}
+						</option>
+					{/each}
+				</select>
+			</label>
+			<label class="label">
+				<span>Keyboard</span>
+				<select
+					class="input"
+					bind:value={selectedKeyboard}
+					on:change={() => {
+						setKeyboard();
+					}}>
+					{#each KeyboardNames as s, i}
+						<option class="variant-filled-primary" value={i}>
+							{s}
+						</option>
+					{/each}
+				</select>
+			</label>
+			<label class="label">
+				<span>Layout</span>
+				<select
+					class="input"
+					bind:value={selectedLayout}
+					on:change={() => {
+						setLayout();
+					}}>
+					{#each LayoutNames as s, i}
+						<option class="variant-filled-primary" value={i}>
+							{s}
 						</option>
 					{/each}
 				</select>

@@ -1,5 +1,14 @@
+<!-- 
+	Initial Layouts from these two sites:
+	https://paulguerin.medium.com/the-search-for-the-worlds-best-keyboard-layout-98d61b33b8e1
+	https://colemakmods.github.io/mod-dh/keyboards.html
+ -->
 <script lang="ts">
 	import KeyCap from './KeyCap.svelte';
+	import { myStore } from '$lib/store/data';
+	import { keyboards, getKeyCaps, KeyboardSettings, KeyboardIndex, KeyboardNames, LayoutIndex, LayoutNames } from '$lib/store/keyboard';
+
+	const { settings } = myStore;
 
 	/**
 	 * A map of classnames for all letters that have been guessed,
@@ -32,22 +41,23 @@
 
 		document.querySelector(`[data-key="${event.key}" i]`)?.dispatchEvent(new MouseEvent('click', { cancelable: true }));
 	}
-	let keyBackspace = `\u232B`;
-	let keyEnter = `\u23CE`;
+
 	let isLargeKey = true;
+	$: keyCaps = getKeyCaps($settings.keyboard, $settings.layout);
 </script>
 
 <div class="flex flex-col justify-center relative overflow-hidden p-5">
 	<div class="mx-auto">
-		{#each ['`1234567890-=', 'QWERTYUIOP[]\\', "ASDFGHJKL;'", 'ZXCVBNM,.'] as row, i}
-			<div class="row flex justify-center">
+		{#each keyCaps as row, i}
+			<div class="row flex {keyboards[$settings.keyboard].justify}">
+				{#if keyboards[$settings.keyboard].leftKeys[i] != ''}
+					<KeyCap letter={keyboards[$settings.keyboard].leftKeys[i]} {isLargeKey} />
+				{/if}
 				{#each row as letter, i}
 					<KeyCap {letter} />
 				{/each}
-				{#if i == 0}
-					<KeyCap letter={keyBackspace} {isLargeKey} />
-				{:else if i == 2}
-					<KeyCap letter={keyEnter} {isLargeKey} />
+				{#if keyboards[$settings.keyboard].rightKeys[i] != ''}
+					<KeyCap letter={keyboards[$settings.keyboard].rightKeys[i]} {isLargeKey} />
 				{/if}
 			</div>
 		{/each}

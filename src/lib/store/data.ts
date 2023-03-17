@@ -4,6 +4,7 @@ import { localStorageStore } from '@skeletonlabs/skeleton';
 import type { Writable } from 'svelte/store';
 import { get, writable } from 'svelte/store';
 import typia from 'typia';
+import { KeyboardIndex, LayoutIndex } from './keyboard';
 import bigrams from './bigrams';
 import type { CodeLanguages, CodeMap } from './code';
 import code from './code';
@@ -135,7 +136,9 @@ export class XgramSettings {
 	minimumAccuracy: number = 100;
 	public sounds: boolean[] = [true, true, true, true, true];
 	font: string = ' ';
-	color: ColorIndex = ColorIndex.teal;
+	color: ColorIndex = ColorIndex.fuchsia;
+	keyboard: KeyboardIndex = KeyboardIndex.matrix;
+	layout: LayoutIndex = LayoutIndex.colemakDH;
 }
 
 export class XgramData {
