@@ -1,10 +1,10 @@
 import { get, writable } from 'svelte/store';
 
 /** Elapsed time in milliseconds */
-export let elapsedTime = writable<number>(0);
+export const elapsedTime = writable<number>(0);
 
 /** Added to Elapsed time on endLap(), milliseconds */
-export let lapTime = writable<number>(0);
+export const lapTime = writable<number>(0);
 
 /** Start time in milliseconds */
 let startTime = 0;
@@ -33,7 +33,7 @@ export function startStopWatch() {
 		startTime = Date.now();
 		baseTime = get(elapsedTime);
 		timer = setInterval(() => {
-			let currentTime = Date.now();
+			const currentTime = Date.now();
 			elapsedTime.set(baseTime + currentTime - startTime);
 		}, 100);
 	}
@@ -43,7 +43,7 @@ export function startStopWatch() {
  * Reset timers and stop
  */
 export function stopStopWatch() {
-	let currentTime = Date.now();
+	const currentTime = Date.now();
 	elapsedTime.set(baseTime + currentTime - startTime);
 	if (timer != null) {
 		clearInterval(timer);
@@ -77,7 +77,7 @@ export function startLap() {
 		startTime = Date.now();
 		baseTime = get(lapTime);
 		timer = setInterval(() => {
-			let currentTime = Date.now();
+			const currentTime = Date.now();
 			lapTime.set(baseTime + currentTime - startTime);
 		}, 100);
 	}
@@ -88,7 +88,7 @@ export function startLap() {
  */
 export function endLap() {
 	if (timer != null) {
-		let currentTime = Date.now();
+		const currentTime = Date.now();
 		lapTime.set(baseTime + currentTime - startTime);
 		// console.log('endLap lapTime:' + (baseTime + currentTime - startTime));
 		elapsedTime.set(get(elapsedTime) + get(lapTime));

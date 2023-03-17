@@ -18,14 +18,13 @@ module.exports = {
 		node: true,
 	},
 	rules: {
-		'comma-dangle': 'off',
-		'@typescript-eslint/comma-dangle': ['error', 'always'],
-		'object-property-newline': ['error', { allowAllPropertiesOnSameLine: true }],
-		'array-element-newline': [
-			'error',
+		'no-unused-vars': 'off',
+		'@typescript-eslint/no-unused-vars': [
+			'warn', // or "error"
 			{
-				ArrayExpression: { minItems: 2 },
-				ArrayPattern: { minItems: 2 },
+				argsIgnorePattern: '^_',
+				varsIgnorePattern: '^_',
+				caughtErrorsIgnorePattern: '^_',
 			},
 		],
 	},

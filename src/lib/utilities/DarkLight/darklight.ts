@@ -1,6 +1,5 @@
 // DarkLight Service
 import { localStorageStore } from '@skeletonlabs/skeleton';
-import type { Writable } from 'svelte/store';
 import { get } from 'svelte/store';
 import { TrinaryValue } from './trinary';
 
@@ -27,8 +26,7 @@ export function adjustFinalDarkLight(): boolean {
 	// console.log('\ngetFinalDarkLight() userDarkLight:' + userDarkLight);
 	switch (get(userDarkLight)) {
 		case TrinaryValue.neither:
-			let os = getOSDarkLight();
-			finalDarkLight = os;
+			finalDarkLight = getOSDarkLight();
 			// console.log('getFinalDarkLight() finalDarkLight os:' + finalDarkLight);
 			break;
 		case TrinaryValue.true:
@@ -73,6 +71,6 @@ function setCurrentDarkLight(value: boolean) {
 	currentDarklight.set(value);
 }
 
-export function initializeDarkLight(node: HTMLElement) {
+export function initializeDarkLight(_node: HTMLElement) {
 	adjustFinalDarkLight();
 }

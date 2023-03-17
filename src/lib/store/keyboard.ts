@@ -3,7 +3,7 @@ export class KeyboardSettings {
 	leftKeys: string[] = [];
 	rightKeys: string[] = [];
 	keyMaps: number[][] = [];
-	justify: string = 'justify-center';
+	justify = 'justify-center';
 	constructor(keyCaps: string[], leftKeys: string[], rightKeys: string[],keyMaps: number[][], justify: string) {
 		this.keyCaps = keyCaps;
 		this.leftKeys = leftKeys;
@@ -31,19 +31,19 @@ export enum LayoutIndex {
 }
 export const LayoutNames = ['Colemak-DH', 'Dvorak', 'Qwerty', 'Carpalx', 'Halmak', 'Norman', 'Workman'];
 
-	let keyAlt = `\u2387`;
-	let keyBackspace = `\u232B`;
-	let keyCapslock = `\u21ED`;
-	let keyCommand = `\u2318`;
-	let keyControl = `\u2388`;
-	let keyEnter = `\u23CE`;
-	let keyShift = `\u21E7`;
-	let keyTab = `\u21E5`;
+	const keyAlt = `\u2387`;
+	const keyBackspace = `\u232B`;
+	const keyCapslock = `\u21ED`;
+	const keyCommand = `\u2318`;
+	const keyControl = `\u2388`;
+	const keyEnter = `\u23CE`;
+	const keyShift = `\u21E7`;
+	const keyTab = `\u21E5`;
 // "          1         2         3         4           5         6",
 // "0123456789012345678901234567890123456789012 3 45678901234567890123456789",
 // "NTESIROALPUFYW;QHD,C.X/ZMGJBKV7483920165'`\\\"_:=-+[]{}()<>|?~&$*#@!^%",
 
-	export let keyboards: KeyboardSettings[] = [];
+	export const keyboards: KeyboardSettings[] = [];
 	keyboards[KeyboardIndex.matrix] = new KeyboardSettings(['1234567890-=', 'QWERTYUIOP[]', "ASDFGHJKL;'" + keyEnter, 'ZXCVBNM,./'],
 	['', '', '', ''], ['', '', '', ''],
 			[[41,37,35,33,31,39,38,30,32,34,36,47], [108,15,13,11,9,27,26,8,10,12,14,46], [103,7,5,3,1,25,24,0,2,4,6,40], [107,23,21,19,17,29,28,16,18,20,22,42]],
@@ -91,9 +91,9 @@ export const layouts = [
  * @returns string[]
  */ 
 export function getKeyCaps(keyboardIndex:KeyboardIndex,layoutIndex:LayoutIndex): string[] {
-	let keyboardSettings = keyboards[keyboardIndex];
-	let keyCaps = keyboardSettings.keyCaps;
-	let layout = layouts[layoutIndex];
+	const keyboardSettings = keyboards[keyboardIndex];
+	const keyCaps = keyboardSettings.keyCaps;
+	const layout = layouts[layoutIndex];
 		// console.log("\ngetKeyCaps layout:"+layout);
 	let i = 0;
 	for(const row of keyboardSettings.keyMaps) {

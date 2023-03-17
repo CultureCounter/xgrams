@@ -2,7 +2,7 @@
 	import { ColorIndex, ColorNames, LanguageIndex, myStore, OptionIndex, ScopeNames, ScopeValues, SoundNames, SourceNames } from '$lib/store/data';
 	import { KeyboardIndex, KeyboardNames, LayoutIndex, LayoutNames } from '$lib/store/keyboard';
 	import type { ModalComponent, ModalSettings } from '@skeletonlabs/skeleton';
-	import { Modal, InputChip, modalStore, RadioGroup, RadioItem, SlideToggle } from '@skeletonlabs/skeleton';
+	import { Modal, modalStore, RadioGroup, RadioItem, SlideToggle } from '@skeletonlabs/skeleton';
 	import Counter from './Counter.svelte';
 	import OptionsCode from './OptionsCode.svelte';
 	import OptionsCustom from './OptionsCustom.svelte';
@@ -69,10 +69,10 @@
 	let status = 'Closed';
 	$: updateCodeWords(status);
 
-	let isOpenCode = false;
-	const toggleCode = () => (isOpenCode = !isOpenCode);
-	let isOpenCustom = false;
-	const toggleCustom = () => (isOpenCustom = !isOpenCustom);
+	// let isOpenCode = false;
+	// const toggleCode = () => (isOpenCode = !isOpenCode);
+	// let isOpenCustom = false;
+	// const toggleCustom = () => (isOpenCustom = !isOpenCustom);
 
 	/**
 	 * Remove from space delimited `target` all `removals` and leave one `add`

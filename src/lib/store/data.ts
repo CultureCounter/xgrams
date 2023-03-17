@@ -1,12 +1,10 @@
 import { browser } from '$app/environment';
-import { TrinaryValue } from '$lib/utilities/DarkLight/trinary';
-import { localStorageStore } from '@skeletonlabs/skeleton';
 import type { Writable } from 'svelte/store';
-import { get, writable } from 'svelte/store';
+import { writable } from 'svelte/store';
 import typia from 'typia';
 import { KeyboardIndex, LayoutIndex } from './keyboard';
 import bigrams from './bigrams';
-import type { CodeLanguages, CodeMap } from './code';
+import type { CodeMap } from './code';
 import code from './code';
 import hexagrams from './hexagrams';
 import pangrams from './pangrams';
@@ -15,7 +13,7 @@ import tetragrams from './tetragrams';
 import trigrams from './trigrams';
 import words from './words';
 
-export const currentVersion: number = 0.01; // increment for schema changes.
+export const currentVersion = 0.01; // increment for schema changes.
 
 export enum SoundIndex {
 	rightletter = 0,
@@ -105,26 +103,14 @@ export enum OptionIndex {
 }
 export const SourceNames = ['Bigrams', 'Trigrams', 'Tetragrams', 'Pentagrams', 'Hexagrams', 'Pangrams', 'Words']; // Code Words, Custom Words
 class SourceOptions {
-	scope: number = 50;
-	combination: number = 2;
-	repetition: number = 5;
-	filter: string = '';
+	scope = 50;
+	combination = 2;
+	repetition = 5;
+	filter = '';
 	WPMs: number[] = [];
 	lines: string[] = [];
-	linesCurrentIndex: number = 0;
+	linesCurrentIndex = 0;
 }
-class OptionsClass {
-	'bigrams'?: SourceOptions;
-	'trigrams'?: SourceOptions;
-	'tetragrams'?: SourceOptions;
-	'pentagrams'?: SourceOptions;
-	'hexagrams'?: SourceOptions;
-	'pangrams'?: SourceOptions;
-	'words'?: SourceOptions;
-	'code_words'?: SourceOptions;
-	'custom_words'?: SourceOptions;
-}
-
 export class XgramSources {
 	source: string[][] = [bigrams, trigrams, tetragrams, pentagrams, hexagrams, pangrams, words, [], []];
 	code: CodeMap = code;
@@ -132,10 +118,10 @@ export class XgramSources {
 
 // These do not cause changes to typing lessons
 export class XgramSettings {
-	minimumWPM: number = 40;
-	minimumAccuracy: number = 100;
+	minimumWPM = 40;
+	minimumAccuracy = 100;
 	public sounds: boolean[] = [true, true, true, true, true];
-	font: string = ' ';
+	font = ' ';
 	color: ColorIndex = ColorIndex.fuchsia;
 	keyboard: KeyboardIndex = KeyboardIndex.matrix;
 	layout: LayoutIndex = LayoutIndex.colemakDH;
@@ -229,7 +215,12 @@ class MyStore {
 
 export const myStore = new MyStore();
 
-export function deepCopy(original: any) {
-	let clone = structuredClone(original);
-	return clone;
+/**
+ * Creates a deep clone of an object.
+ * @param original
+ * @returns the deep clone
+ */
+// eslint-disable-next-line
+export function deepClone(original: any): any {
+	return structuredClone(original);
 }

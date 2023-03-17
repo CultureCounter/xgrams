@@ -164,10 +164,10 @@
 		destroyStopWatch();
 	});
 
-	function onClick(event: MouseEvent) {
+	function onClick(_event: MouseEvent) {
 		toggleStopWatch();
 	}
-	function onKeyDown(event: KeyboardEvent) {
+	function onKeyDown(_event: KeyboardEvent) {
 		toggleStopWatch();
 	}
 </script>

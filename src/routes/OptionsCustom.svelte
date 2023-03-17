@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { LanguageNames, myStore, OptionIndex } from '$lib/store/data';
-	import { modalStore, SlideToggle } from '@skeletonlabs/skeleton';
+	import { myStore, OptionIndex } from '$lib/store/data';
+	import { modalStore } from '@skeletonlabs/skeleton';
 
 	const { data } = myStore;
 

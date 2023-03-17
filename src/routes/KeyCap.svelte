@@ -2,8 +2,8 @@
 	import { myStore } from '$lib/store/data';
 	const { settings } = myStore;
 
-	export let letter: string = 'a';
-	export let isLargeKey: boolean = false;
+	export let letter = 'a';
+	export let isLargeKey = false;
 	let glowColors = [
 		'bg-red-300 dark:bg-red-900',
 		'bg-orange-300 dark:bg-orange-900',

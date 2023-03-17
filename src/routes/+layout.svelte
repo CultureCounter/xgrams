@@ -1,13 +1,13 @@
 <script lang="ts">
 	import discord from '$lib/images/discord-mark-blue.svg';
 	import githubDark from '$lib/images/github-mark-white.svg';
-	import github from '$lib/images/github-mark.svg';
+	import _github from '$lib/images/github-mark.svg';
 	import svelte from '$lib/images/svelte-logo.svg';
 	import twitter from '$lib/images/twitter-circle-blue.svg';
 	import { initializeDarkLight } from '$lib/utilities/DarkLight/darklight';
 	import Darklight from '$lib/utilities/DarkLight/DarkLight.svelte';
 	import { arrow, autoUpdate, computePosition, flip, offset, shift } from '@floating-ui/dom';
-	import { AppBar, AppShell, Drawer, drawerStore, storePopup, type DrawerSettings } from '@skeletonlabs/skeleton';
+	import { Drawer, drawerStore, storePopup, type DrawerSettings } from '@skeletonlabs/skeleton';
 	import '@skeletonlabs/skeleton/styles/all.css';
 	import '../app.postcss';
 	import '../xgtheme.postcss';
@@ -26,10 +26,6 @@
 			rounded: 'rounded-xl',
 		};
 		drawerStore.open(settings);
-	}
-
-	function drawerClose(): void {
-		drawerStore.close();
 	}
 </script>
 

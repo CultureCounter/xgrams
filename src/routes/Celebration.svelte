@@ -1,6 +1,4 @@
 <script lang="ts" context="module">
-	import { onMount, onDestroy } from 'svelte';
-
 	let characters = ['🥳', '🪅', '🎉', '🎊', '✨', '🎭', '🤩', '🫧', '🥳', '🥰', '❤️‍🔥', '🎁', '💫', '🌟', '🐣', '🌟', '🌜', '🌛', '🌝', '⚡'];
 	export let duration = 10000;
 	export let fadeIn = 3000;

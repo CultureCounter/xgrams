@@ -1,10 +1,9 @@
 <script lang="ts">
-	import { deepCopy, myStore, OptionIndex, SoundIndex, XgramData } from '$lib/store/data';
-	import Celebration, { endCelebration, startCelebration } from './Celebration.svelte';
-	import Keyboard from './Keyboard.svelte';
+	import { deepClone, myStore, OptionIndex, SoundIndex, XgramData } from '$lib/store/data';
+	import Celebration, { startCelebration } from './Celebration.svelte';
 	import PlaySounds, { playSound, Sounds } from './PlaySounds.svelte';
 	import StopWatch from '../lib/utilities/StopWatch/StopWatch.svelte';
-	import { elapsedTime, lapTime, resetStopWatch, resetLap, startLap, endLap } from '../lib/utilities/StopWatch/stopwatch';
+	import { lapTime, resetStopWatch, resetLap, startLap, endLap } from '../lib/utilities/StopWatch/stopwatch';
 
 	const { data, settings, sources } = myStore;
 
@@ -32,7 +31,7 @@
 	let isMouseInside = false;
 
 	/**
-	 *
+	 * Lessons are a series of `lines`
 	 */
 	function initializeLesson() {
 		let dataSource = $data.currentOptions;
@@ -81,12 +80,11 @@
 			});
 		}
 
-		let ngrams = deepCopy(source);
+		let ngrams = deepClone(source);
 		shuffle(ngrams);
 
 		padToMultiple(ngrams, combinations); // Ensure all subLines have requested combinations
 
-		let ngramsProcessed = 0;
 		let lines = [];
 		while (ngrams.length) {
 			let ngramsSublist = ngrams.slice(0, combinations);
@@ -148,7 +146,6 @@
 			} else if (t == '&') {
 				// currentClass.chars += `&amp;`;
 				currentClass.chars += `&`;
-			} else if (t === undefined) {
 			} else {
 				currentClass.chars += t;
 			}
@@ -310,28 +307,28 @@
 		return Math.round(average);
 	}
 
-	function onDataChange(data: XgramData) {
+	function onDataChange(_data: XgramData) {
 		initializeLesson();
 	}
 
 	$: onDataChange($data);
 
-	function handleMouseOver(event: MouseEvent) {
+	function handleMouseOver(_event: MouseEvent) {
 		isMouseInside = true;
 		// console.log('handleMouseOver');
 	}
 
-	function handleMouseLeave(event: MouseEvent) {
+	function handleMouseLeave(_event: MouseEvent) {
 		isMouseInside = false;
 		endLap();
 	}
 
-	function handleBlur(event: FocusEvent) {
+	function handleBlur(_event: FocusEvent) {
 		isMouseInside = false;
 		endLap();
 	}
 
-	function handleFocus(event: FocusEvent) {
+	function handleFocus(_event: FocusEvent) {
 		isMouseInside = true;
 		// console.log('handleFocus');
 	}
