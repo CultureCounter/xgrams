@@ -1,6 +1,6 @@
 # Try It Out
 
-[`Live Xgrams`](https://xgrams-3zjixq1n4-culture-counter.vercel.app/)
+[`Live Xgrams`](https://xgrams-dirk-bester-culture-counter.vercel.app/)
 
 # New keyboard
 
