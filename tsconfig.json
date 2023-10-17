@@ -3,7 +3,11 @@
 	"compilerOptions": {
 		"allowJs": true,
 		"checkJs": true,
-		"esModuleInterop": true,
+		"module": "es2020",
+		"target": "es2020",
+		"verbatimModuleSyntax": true,
+		"esModuleInterop": false,
+		"importsNotUsedAsValues": "error",
 		"forceConsistentCasingInFileNames": true,
 		"resolveJsonModule": true,
 		"skipLibCheck": true,
