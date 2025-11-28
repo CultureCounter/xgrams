@@ -1,11 +1,19 @@
 <script lang="ts">
-	import { deepClone, myStore, OptionIndex, SoundIndex, XgramData } from '$lib/store/data';
-	import Celebration, { startCelebration } from './Celebration.svelte';
-	import PlaySounds, { playSound, Sounds } from './PlaySounds.svelte';
-	import StopWatch from '../lib/utilities/StopWatch/StopWatch.svelte';
-	import { lapTime, resetStopWatch, resetLap, startLap, endLap } from '../lib/utilities/StopWatch/stopwatch';
+	import { deepClone, myStore, SoundIndex, DataXG } from "$lib/store/data";
+	import { idbLanguages, idbSources, SourceKeys } from "$lib/store/xgramSources.svelte";
+	import Celebration, { startCelebration } from "./Celebration.svelte";
+	// import Celebration, { startCelebration, unleashWorker } from './Celebration.svelte';
+	import PlaySounds, { playSound, Sounds } from "./PlaySounds.svelte";
+	import StopWatch from "../lib/utilities/StopWatch/StopWatch.svelte";
+	import {
+		lapTime,
+		resetStopWatch,
+		resetLap,
+		startLap,
+		endLap,
+	} from "../lib/utilities/StopWatch/stopwatch";
 
-	const { data, settings, sources } = myStore;
+	const { data, settings } = myStore;
 
 	function shuffle(array: string[]): void {
 		for (let i = array.length - 1; i > 0; i--) {
@@ -21,22 +29,26 @@
 		}
 	}
 
-	let expectedLine = '';
-	let typedLine = '';
+	let expectedLine = "";
+	let typedLine = "";
 	let rightLetters = 0;
 	let wrongLetters = 0;
-	let rawWPM = 0;
-	let accuracy = 0;
-	let linesCurrentIndex = 0;
-	let isMouseInside = false;
+	let rawWPM = $state(0);
+	let accuracy = $state(0);
+	let linesCurrentIndex = $state(0);
+	let isMouseInside = $state(false);
 
 	/**
 	 * Lessons are a series of `lines`
 	 */
 	function initializeLesson() {
 		let dataSource = $data.currentOptions;
-		dataSource.lines = generateLines(dataSource.combination, dataSource.repetition, dataSource.filter);
-		expectedLine = dataSource.lines[0] || '';
+		dataSource.lines = generateLines(
+			dataSource.combination,
+			dataSource.repetition,
+			dataSource.filter
+		);
+		expectedLine = dataSource.lines[0] || "";
 		dataSource.linesCurrentIndex = 0;
 		initializeLine();
 		resetStopWatch();
@@ -50,22 +62,34 @@
 	function generateLines(combinations: number, repetitions: number, filter: string) {
 		let dataSource = $data.currentOptions;
 		let scope = dataSource.scope;
-		let source = $sources.source[$data.source];
+		let index = $data.source;
+		let s: string = SourceKeys[index];
+		// console.log("generateLines idbSources:", idbSources);
+		// console.log("generateLines source key:", s);
+		let source = idbSources[s];
+		// console.log("generateLines source:", source);
 
+		// console.log('Generating lines with dataSource:', dataSource);
+		// console.log('Generating lines with scope:', scope);
+		console.log("Generating lines with source length:", source.length);
 		if (source == null) {
-			source = $sources.source[OptionIndex.bigrams];
+			console.log("Generating lines with source == null:");
+			console.log("idbSources.source:", idbSources);
+			console.log("idbLanguages:", $state.snapshot(idbLanguages));
+			source = idbSources.bigrams.slice(0, scope);
 		}
 
 		// Use indexing to limit scope of Xgrams.
-		// Select the Top 50...16000
+		// Select the Top 50...16000 ngrams from source
 		if (scope) {
+			// console.log('Slicing source to scope:', source.length, '->', scope);
 			source = source.slice(0, scope);
 		}
 
 		if (filter.length > 0) {
 			// Filter: AND characters on the same line, OR different lines.
-			let orList = filter.split('\n');
-			source = source.filter(function (element) {
+			let orList = filter.split("\n");
+			source = source.filter(function (element: string) {
 				for (let andString of orList) {
 					let chosen = true;
 					for (let mandatoryChar of andString) {
@@ -88,12 +112,12 @@
 		let lines = [];
 		while (ngrams.length) {
 			let ngramsSublist = ngrams.slice(0, combinations);
-			let subLine = ngramsSublist.join(' ');
+			let subLine = ngramsSublist.join(" ");
 			let _line = [];
 			for (let i = 0; i < repetitions; i++) {
 				_line.push(subLine);
 			}
-			lines.push(_line.join(' '));
+			lines.push(_line.join(" "));
 			// Remove the processed ngrams.
 			ngrams.splice(0, combinations);
 		}
@@ -111,16 +135,23 @@
 	};
 	let colorLine: number[] = [];
 
-	const ClassSpan = ['', 'normalChar', 'underline ', 'text-slate-400 ', 'text-red-600 ', 'text-orange-600 '] as const;
+	const ClassSpan = [
+		"",
+		"normalChar",
+		"underline ",
+		"text-slate-400 ",
+		"text-red-600 ",
+		"text-orange-600 ",
+	] as const;
 	type ClassLine = { class: string; chars: string; typing: boolean };
-	let classLine: ClassLine[] = [];
+	let classLine: ClassLine[] = $state([]);
 
 	function makeColorLine() {
 		let currentColor = ColorChars.untoldChar;
 		let currentIsTyping = false;
 		let currentClass: ClassLine = {
 			class: ClassSpan[ColorChars.typingChar],
-			chars: '',
+			chars: "",
 			typing: false,
 		};
 		let aClassLine: ClassLine[] = [];
@@ -136,14 +167,14 @@
 				// Subsequent movie span
 				currentColor = c;
 				currentIsTyping = isTyping;
-				currentClass = { class: ClassSpan[currentColor], chars: '', typing: isTyping };
+				currentClass = { class: ClassSpan[currentColor], chars: "", typing: isTyping };
 				aClassLine.push(currentClass);
 			}
 			let t = expectedLine[i];
-			if (t == ' ') {
-				// currentClass.chars += `&nbsp;`; //&#9141
-				currentClass.chars += ` `; //&#9141
-			} else if (t == '&') {
+			if (t == " ") {
+				// currentClass.chars += `&nbsp;`; //`&#9141;`
+				currentClass.chars += ` `; //`&#9141;`
+			} else if (t == "&") {
 				// currentClass.chars += `&amp;`;
 				currentClass.chars += `&`;
 			} else {
@@ -173,11 +204,11 @@
 
 		let key = event.key;
 		// console.log(key);
-		if (event.ctrlKey && key === 'Backspace') {
+		if (event.ctrlKey && key === "Backspace") {
 			initializeLine();
 			return;
 		}
-		if (key === 'Backspace') {
+		if (key === "Backspace") {
 			typedLine = typedLine.slice(0, -1);
 			// console.log('typedLine:' + typedLine);
 			makeColorLine();
@@ -186,7 +217,7 @@
 			}
 			return;
 		}
-		if (key === 'Dead') {
+		if (key === "Dead") {
 			return;
 		}
 		if (key.length > 1) {
@@ -268,7 +299,7 @@
 		resetLap();
 		rightLetters = 0;
 		wrongLetters = 0;
-		typedLine = '';
+		typedLine = "";
 		colorLine.length = expectedLine.length;
 		colorLine = colorLine.fill(ColorChars.normalChar, 0, expectedLine.length);
 		colorLine[0] = ColorChars.typingChar;
@@ -285,6 +316,7 @@
 			dataSource.linesCurrentIndex += 1;
 			// console.log('nextLine linesCurrentIndex:' + dataSource.linesCurrentIndex);
 			expectedLine = dataSource.lines[dataSource.linesCurrentIndex];
+			// unleashWorker();
 			initializeLine();
 		} else {
 			// Start again from beginning, but generate new data.
@@ -307,50 +339,79 @@
 		return Math.round(average);
 	}
 
-	function onDataChange(_data: XgramData) {
+	// $effect(() => {
+	// 	idbSources;
+	// 	initializeLesson();
+	// });
+
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	function onDataChange(_data: DataXG) {
+		console.log("onDataChange changed, initializeLesson", idbSources);
 		initializeLesson();
 	}
 
-	$: onDataChange($data);
+	$effect(() => {
+		onDataChange($data);
+	});
 
-	function handleMouseOver(_event: MouseEvent) {
+	$effect(() => {
+		// eslint-disable-next-line @typescript-eslint/no-unused-expressions
+		idbSources;
+		console.log("idbSources changed, initializeLesson", idbSources);
+		initializeLesson();
+	});
+
+	function handleMouseOver() {
 		isMouseInside = true;
 		// console.log('handleMouseOver');
 	}
 
-	function handleMouseLeave(_event: MouseEvent) {
+	function handleMouseLeave() {
 		isMouseInside = false;
 		endLap();
 	}
 
-	function handleBlur(_event: FocusEvent) {
+	function handleBlur() {
 		isMouseInside = false;
 		endLap();
 	}
 
-	function handleFocus(_event: FocusEvent) {
+	function handleFocus() {
 		isMouseInside = true;
-		// console.log('handleFocus');
 	}
+
+	// function handleClick() {
+	// 	isMouseInside = true;
+	// }
+	// 	onclick={handleClick}
+	// 	onkeyup={handleClick}
 </script>
 
 <div class="mx-2">
-	<div class={isMouseInside ? 'textFocus textZone' : 'textBlur textZone'} on:focus={handleFocus} on:blur={handleBlur} on:mouseover={handleMouseOver} on:mouseleave={handleMouseLeave} tabindex="-1">
+	<div
+		role="textbox"
+		class={isMouseInside ? "textFocus textZone" : "textBlur textZone"}
+		onfocus={handleFocus}
+		onblur={handleBlur}
+		onmouseover={handleMouseOver}
+		onmouseleave={handleMouseLeave}
+		tabindex="-1"
+	>
 		<div class="p-2 {$settings.font}">
-			{#each classLine as cp}
+			{#each classLine as cp, i (cp.chars + i)}
 				{#if cp.typing}
-					<span class={cp.class + ' ' + ClassSpan[ColorChars.typingChar]}>{cp.chars}</span>
+					<span class={cp.class + " " + ClassSpan[ColorChars.typingChar]}>{cp.chars}</span>
 				{:else}
 					<span class={cp.class}>{cp.chars}</span>
 				{/if}
 			{/each}
 		</div>
-		<h4 class="flex place-content-evenly gap-x-3 mt-6">
+		<h4 class="mt-6 flex place-content-evenly gap-x-3">
 			<div>
 				<strong>Lesson {linesCurrentIndex} / {$data.currentOptions.lines.length}</strong>
 			</div>
 		</h4>
-		<h4 class="flex place-content-evenly gap-x-3 mt-0">
+		<h4 class="mt-0 flex place-content-evenly gap-x-3">
 			<div>WPM: {rawWPM}</div>
 			<div>Accuracy: {accuracy}%</div>
 			<div>Average WPM: {averageWPM()}</div>
@@ -371,12 +432,16 @@
 <style>
 	.textBlur {
 		border-color: rgba(255, 0, 0, 0.6);
-		box-shadow: inset 0 2px 2px rgba(0, 0, 0, 0.1), 0 0 8px rgba(255, 0, 0, 0.6);
+		box-shadow:
+			inset 0 2px 2px rgba(0, 0, 0, 0.1),
+			0 0 8px rgba(255, 0, 0, 0.6);
 	}
 	.textFocus {
 		cursor: none;
 		border-color: rgba(0, 0, 255, 0.6);
-		box-shadow: inset 0 2px 2px rgba(0, 0, 0, 0.1), 0 0 8px rgba(0, 0, 255, 0.6);
+		box-shadow:
+			inset 0 2px 2px rgba(0, 0, 0, 0.1),
+			0 0 8px rgba(0, 0, 255, 0.6);
 	}
 
 	.typingChar {
@@ -393,6 +458,8 @@
 
 	.betterChar {
 		color: #aaa;
-		text-shadow: 0px 1px 1px #fff, 0px 2px 2px #fff;
+		text-shadow:
+			0px 1px 1px #fff,
+			0px 2px 2px #fff;
 	}
 </style>

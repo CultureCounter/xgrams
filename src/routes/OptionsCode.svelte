@@ -1,32 +1,32 @@
 <script lang="ts">
-	import { LanguageNames, myStore } from '$lib/store/data';
-	import { modalStore, SlideToggle } from '@skeletonlabs/skeleton';
+	import { myStore } from "$lib/store/data";
+	import { CodeNames } from "$lib/store/code";
+	import { Switch } from "@skeletonlabs/skeleton-svelte";
 
 	const { data } = myStore;
 
-	// Props
-	/** Exposes parent props to this component. */
-	export let parent: any;
-
-	// Handle Form Submission
-	function onFormSubmit(): void {
-		modalStore.close();
-	}
-
-	// Base Classes
-	const cBase = 'card p-4 w-modal shadow-xl space-y-4';
-	const cHeader = 'text-2xl font-bold';
+	const onCheckedChange = (event: { checked: boolean; i: number }) => {
+		var checked = !event.checked;
+		$data.languages[event.i] = checked;
+		console.log(`Language ${CodeNames[event.i]} set to ${checked}`);
+	};
 </script>
 
-<div class="modal-example-form {cBase}">
-	<header class={cHeader}>Code</header>
-	<article>{$modalStore[0]?.body ?? '(body missing)'}</article>
-	{#each LanguageNames as name, i}
-		<div>
-			<SlideToggle {name} label={name} bind:checked={$data.languages[i]}>{name}</SlideToggle>
-		</div>
-	{/each}
-	<footer class="modal-footer {parent.regionFooter}">
-		<button class="btn {parent.buttonPositive}" on:click={onFormSubmit}><slot /></button>
-	</footer>
-</div>
+{#each CodeNames as name, i (name)}
+	<Switch
+		{name}
+		checked={$data.languages[i]}
+		onchange={() => {
+			onCheckedChange({ checked: $data.languages[i], i });
+		}}
+	>
+		<Switch.Control
+			class="preset-filled-secondary-50-950 data-[state=checked]:preset-filled-secondary-500"
+		>
+			<Switch.Thumb></Switch.Thumb>
+		</Switch.Control>
+		<Switch.Label>{name}</Switch.Label>
+
+		<Switch.HiddenInput />
+	</Switch>
+{/each}

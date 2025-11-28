@@ -1,4 +1,4 @@
-<script context="module" lang="ts">
+<script module lang="ts">
 	let rightLetterSound: HTMLAudioElement = null as unknown as HTMLAudioElement;
 	let wrongLetterSound: HTMLAudioElement = null as unknown as HTMLAudioElement;
 	let failedGoalsSound: HTMLAudioElement = null as unknown as HTMLAudioElement;
@@ -9,18 +9,24 @@
 
 	let TheSounds: HTMLAudioElement[] = [];
 
-	export enum Sounds {
-		'rightLetter' = 0,
-		'wrongLetter' = 1,
-		'failedGoals' = 2,
-		'passedGoals' = 3,
-		'lessonsDone' = 4,
-	}
+	export const Sounds = {
+		rightLetter: 0,
+		wrongLetter: 1,
+		failedGoals: 2,
+		passedGoals: 3,
+		lessonsDone: 4,
+	} as const;
+
+	export type Sounds = (typeof Sounds)[keyof typeof Sounds];
 
 	function stopPlayingSound(): void {
 		// Sounds at the end of each line/lesson
 		// dont need to be played from the beginning.
-		if (currentPlayingSound == passedGoalsSound || currentPlayingSound == failedGoalsSound || currentPlayingSound == lessonsDoneSound) {
+		if (
+			currentPlayingSound == passedGoalsSound
+			|| currentPlayingSound == failedGoalsSound
+			|| currentPlayingSound == lessonsDoneSound
+		) {
 			return;
 		}
 
@@ -34,7 +40,13 @@
 
 	export function playSound(sound: Sounds): void {
 		if (TheSounds.length == 0) {
-			TheSounds = [rightLetterSound, wrongLetterSound, failedGoalsSound, passedGoalsSound, lessonsDoneSound];
+			TheSounds = [
+				rightLetterSound,
+				wrongLetterSound,
+				failedGoalsSound,
+				passedGoalsSound,
+				lessonsDoneSound,
+			];
 			// console.log(TheSounds);
 		}
 		stopPlayingSound();
@@ -44,8 +56,8 @@
 	}
 </script>
 
-<audio src="/click.mp3" bind:this={rightLetterSound} />
-<audio src="/clack.mp3" bind:this={wrongLetterSound} />
-<audio src="/failed.mp3" bind:this={failedGoalsSound} />
-<audio src="/ding.wav" bind:this={passedGoalsSound} />
-<audio src="/tng_transporter9.mp3" bind:this={lessonsDoneSound} />
+<audio src="/click.mp3" bind:this={rightLetterSound}></audio>
+<audio src="/clack.mp3" bind:this={wrongLetterSound}></audio>
+<audio src="/failed.mp3" bind:this={failedGoalsSound}></audio>
+<audio src="/ding.wav" bind:this={passedGoalsSound}></audio>
+<audio src="/tng_transporter9.mp3" bind:this={lessonsDoneSound}></audio>

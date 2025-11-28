@@ -1,0 +1,17 @@
+# Package Managers
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+bun.lock
+bun.lockb
+
+# Miscellaneous
+/static/
+
+# Data Files
+/src/lib/store/bigrams.ts
+/src/lib/store/pentagrams.ts
+/src/lib/store/trigrams.ts
+/src/lib/store/tetragrams.ts
+/src/lib/store/hexagrams.ts
+/src/lib/store/words.ts

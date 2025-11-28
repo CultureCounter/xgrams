@@ -1,67 +1,101 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { adjustFinalDarkLight, currentDarklight, toggleBackUserDarkLight, userDarkLight } from './darklight';
-	// Types
-	import type { CssClasses } from '@skeletonlabs/skeleton';
-	type OnKeyDownEvent = KeyboardEvent & { currentTarget: EventTarget & HTMLDivElement };
+	import { onMount } from "svelte";
+	// DarkLight Service
+	import { TrinaryValue } from "./trinary";
+	import { LocalStorage } from "$lib/storage.svelte.ts";
 
-	// Props
-	/** Provide classes to set width styles. */
-	export let width: CssClasses = 'w-12';
-	/** Provide classes to set height styles.. */
-	export let height: CssClasses = 'w-12';
+	let { dark, light, os } = $props();
+	let userDarkLight = $state(new LocalStorage<TrinaryValue>("userDarkLight", TrinaryValue.neither));
 
-	// Classes
-	const cTransition = `transition-all duration-[200ms]`;
-	const cTrack = 'cursor-pointer';
+	/** Get the OS Preference for light/dark mode */
+	function getOSDarkLight(): boolean {
+		const osDarkLight = window.matchMedia("(prefers-color-scheme: light)").matches;
+		return osDarkLight;
+	}
+
+	/**
+	 * toggleBack false -> neither -> true -> false ...
+	 */
+	function toggleBackUserDarkLight(): TrinaryValue {
+		userDarkLight.current = Math.abs((userDarkLight.current + 2) % 3);
+		return userDarkLight.current;
+	}
+
+	/** Adjust the final dark light mode from combined user and OS preferences */
+	export function adjustFinalDarkLight(): boolean {
+		let finalDarkLight;
+		if (!("userDarkLight" in localStorage)) {
+			userDarkLight.current = TrinaryValue.neither;
+		}
+		switch (userDarkLight.current) {
+			case TrinaryValue.neither:
+				// The user respects the OS preference
+				finalDarkLight = getOSDarkLight();
+				if (finalDarkLight) {
+					document.documentElement.classList.remove("dark");
+				} else {
+					document.documentElement.classList.add("dark");
+				}
+				break;
+			case TrinaryValue.true:
+				finalDarkLight = true;
+				// Whenever the user explicitly chooses dark mode
+				console.log("getFinalDarkLight() finalDarkLight light:" + finalDarkLight);
+				document.documentElement.classList.toggle("dark", true);
+				break;
+			default:
+				finalDarkLight = false;
+				// Whenever the user explicitly chooses light mode
+				console.log("getFinalDarkLight() finalDarkLight dark:" + finalDarkLight);
+				document.documentElement.classList.toggle("dark", false);
+				break;
+		}
+		return finalDarkLight;
+	}
 
 	onMount(async () => {
-		if (window) {
-			window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
-				const colorScheme = e.matches ? 'dark' : 'light';
-				console.log(colorScheme);
-
-				adjustFinalDarkLight();
-			});
-		}
 		adjustFinalDarkLight();
 	});
 
 	function onToggleHandler(): void {
-		$userDarkLight = toggleBackUserDarkLight();
-		$currentDarklight = adjustFinalDarkLight();
+		userDarkLight.current = toggleBackUserDarkLight();
+		adjustFinalDarkLight();
 	}
+
 	// A11y Input Handlers
+	type OnKeyDownEvent = KeyboardEvent & { currentTarget: EventTarget & HTMLDivElement };
 	function onKeyDown(event: OnKeyDownEvent): void {
 		// Enter/Space triggers selecton event
-		if (['Enter', 'Space'].includes(event.code)) {
+		if (["Enter", "Space"].includes(event.code)) {
 			event.preventDefault();
 			event.currentTarget.click();
 		}
 	}
 
 	// Reactive
-	$: classesTrack = `${cTrack} ${cTransition} ${width} ${height} ${$$props.class ?? ''}`;
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	const cTransition = `transition-all duration-[200ms]`;
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	const cTrack = "cursor-pointer";
+	let classesTrack = $derived("{cTrack} {cTransition} {width} {height}");
 </script>
 
 <div
-	class={classesTrack}
-	on:click={onToggleHandler}
-	on:click
-	on:keydown={onKeyDown}
-	on:keydown
-	on:keyup
-	on:keypress
+	class={classesTrack ?? ""}
+	onclick={onToggleHandler}
+	onkeydown={onKeyDown}
 	role="button"
 	aria-label="Dark Mode Button"
-	aria-current={$currentDarklight}
-	title="Toggle {$userDarkLight == 2 ? 'Use OS' : $userDarkLight == 1 ? 'Light' : 'Dark'} Mode"
-	tabindex="0">
-	{#if $userDarkLight == 0}
-		<slot name="dark">Missing dark icon</slot>
-	{:else if $userDarkLight == 1}
-		<slot name="light">Missing light icon</slot>
-	{:else if $userDarkLight == 2}
-		<slot name="os">Missing OS icon</slot>
+	title="Toggle {userDarkLight.current == 2 ? 'Use OS'
+	: userDarkLight.current == 1 ? 'Light'
+	: 'Dark'} Mode"
+	tabindex="0"
+>
+	{#if userDarkLight.current == TrinaryValue.false}
+		{@render light()}
+	{:else if userDarkLight.current == 1}
+		{@render dark()}
+	{:else if userDarkLight.current == 2}
+		{@render os()}
 	{/if}
 </div>

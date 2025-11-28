@@ -1,10 +1,45 @@
-import typescript from '@rollup/plugin-typescript';
-import { sveltekit } from '@sveltejs/kit/vite';
+import devtoolsJson from 'vite-plugin-devtools-json';
+import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vitest/config';
+import { playwright } from '@vitest/browser-playwright';
+import { sveltekit } from '@sveltejs/kit/vite';
+import UnpluginTypia from '@ryoppippi/unplugin-typia/vite';
 
 export default defineConfig({
-	plugins: [sveltekit(), typescript()],
+	plugins: [
+		tailwindcss(),
+		UnpluginTypia({
+			cache: true,
+		}),
+		sveltekit(),
+		devtoolsJson(),
+	],
+	optimizeDeps: {},
 	test: {
-		include: ['src/**/*.{test,spec}.{js,ts}']
-	}
+		expect: { requireAssertions: true },
+		projects: [
+			{
+				extends: './vite.config.ts',
+				test: {
+					name: 'client',
+					browser: {
+						enabled: true,
+						provider: playwright(),
+						instances: [{ browser: 'chromium', headless: true }],
+					},
+					include: ['src/**/*.svelte.{test,spec}.{js,ts}'],
+					exclude: ['src/lib/server/**'],
+				},
+			},
+			{
+				extends: './vite.config.ts',
+				test: {
+					name: 'server',
+					environment: 'node',
+					include: ['src/**/*.{test,spec}.{js,ts}'],
+					exclude: ['src/**/*.svelte.{test,spec}.{js,ts}'],
+				},
+			},
+		],
+	},
 });

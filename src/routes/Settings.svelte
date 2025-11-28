@@ -1,78 +1,48 @@
 <script lang="ts">
-	import { ColorIndex, ColorNames, LanguageIndex, myStore, OptionIndex, ScopeNames, ScopeValues, SoundNames, SourceNames } from '$lib/store/data';
-	import { KeyboardIndex, KeyboardNames, LayoutIndex, LayoutNames } from '$lib/store/keyboard';
-	import type { ModalComponent, ModalSettings } from '@skeletonlabs/skeleton';
-	import { Modal, modalStore, RadioGroup, RadioItem, SlideToggle } from '@skeletonlabs/skeleton';
-	import Counter from './Counter.svelte';
-	import OptionsCode from './OptionsCode.svelte';
-	import OptionsCustom from './OptionsCustom.svelte';
-	import OptionsFilter from './OptionsFilter.svelte';
+	import {
+		ColorIndex,
+		ColorNames,
+		myStore,
+		ScopeNames,
+		ScopeValues,
+		SoundNames,
+	} from "$lib/store/data";
+	import {
+		idbLanguages,
+		idbSources,
+		SourceIndex,
+		SourceNames,
+	} from "$lib/store/xgramSources.svelte.ts";
+	import { CodeIndex } from "$lib/store/code";
+	import { KeyboardIndex, KeyboardNames, LayoutIndex, LayoutNames } from "$lib/store/keyboard";
+	import { Dialog, Portal, SegmentedControl, Switch } from "@skeletonlabs/skeleton-svelte";
+	import MusicIcon from "@lucide/svelte/icons/music";
 
-	const { data, settings, sources } = myStore;
+	import Counter from "./Counter.svelte";
+	import OptionsCode from "./OptionsCode.svelte";
+	import OptionsCustom from "./OptionsCustom.svelte";
+	import OptionsFilter from "./OptionsFilter.svelte";
 
-	const modalOptionsCode: ModalComponent = {
-		ref: OptionsCode,
-		slot: '<span>Done</span>',
-	};
-	function modalCode(): void {
-		const d: ModalSettings = {
-			type: 'component',
-			component: modalOptionsCode,
-		};
-		modalStore.trigger(d);
+	const { data, settings } = myStore;
+
+	function updateCodeWords() {
+		let codeWordsProccessed = [
+			...($data.languages[CodeIndex.languageCpp] ? idbLanguages.languageCpp : []),
+			...($data.languages[CodeIndex.languageCs] ? idbLanguages.languageCs : []),
+			...($data.languages[CodeIndex.languageGo] ? idbLanguages.languageGo : []),
+			...($data.languages[CodeIndex.languageJava] ? idbLanguages.languageJava : []),
+			...($data.languages[CodeIndex.languageJavascript] ? idbLanguages.languageJavascript : []),
+			...($data.languages[CodeIndex.languagePython] ? idbLanguages.languagePython : []),
+			...($data.languages[CodeIndex.languageRust] ? idbLanguages.languageRust : []),
+			...($data.languages[CodeIndex.languageSwift] ? idbLanguages.languageSwift : []),
+			...($data.languages[CodeIndex.languageTypescript] ? idbLanguages.languageTypescript : []),
+		];
+
+		// console.log('Updating code words to:', codeWordsProccessed);
+		idbSources.codeWords = codeWordsProccessed;
+		// console.log('Updated idbSources:', idbSources);
+		$data = $data;
 	}
-
-	const modalOptionsCustom: ModalComponent = {
-		ref: OptionsCustom,
-		slot: '<span>Done</span>',
-	};
-	function modalCustom(): void {
-		const d: ModalSettings = {
-			type: 'component',
-			component: modalOptionsCustom,
-		};
-		modalStore.trigger(d);
-	}
-
-	const modalOptionsFilter: ModalComponent = {
-		ref: OptionsFilter,
-		slot: '<span>Done</span>',
-	};
-	function modalFilter(): void {
-		const d: ModalSettings = {
-			type: 'component',
-			component: modalOptionsFilter,
-		};
-		modalStore.trigger(d);
-	}
-
-	function updateCodeWords(status: string) {
-		// console.log('updateCodeWords:' + status);
-		if (status == 'Closing') {
-			let codeWordsProccessed = [
-				...($data.languages[LanguageIndex.languageCpp] ? $sources.code.languageCpp : []),
-				...($data.languages[LanguageIndex.languageCs] ? $sources.code.languageCs : []),
-				...($data.languages[LanguageIndex.languageGo] ? $sources.code.languageGo : []),
-				...($data.languages[LanguageIndex.languageJava] ? $sources.code.languageJava : []),
-				...($data.languages[LanguageIndex.languageJavascript] ? $sources.code.languageJavascript : []),
-				...($data.languages[LanguageIndex.languagePython] ? $sources.code.languagePython : []),
-				...($data.languages[LanguageIndex.languageRust] ? $sources.code.languageRust : []),
-				...($data.languages[LanguageIndex.languageSwift] ? $sources.code.languageSwift : []),
-				...($data.languages[LanguageIndex.languageTypescript] ? $sources.code.languageTypescript : []),
-			];
-
-			$sources.source[OptionIndex.code_words] = codeWordsProccessed;
-			$sources = $sources;
-			$data = $data;
-		}
-	}
-	let status = 'Closed';
-	$: updateCodeWords(status);
-
-	// let isOpenCode = false;
-	// const toggleCode = () => (isOpenCode = !isOpenCode);
-	// let isOpenCustom = false;
-	// const toggleCustom = () => (isOpenCustom = !isOpenCustom);
 
 	/**
 	 * Remove from space delimited `target` all `removals` and leave one `add`
@@ -84,7 +54,7 @@
 	function replaceStrings(target: string, removals: string[], add: string): string {
 		for (let candidate of removals) {
 			// console.log('removing:`' + candidate + '`');
-			target = target.replace(candidate, '');
+			target = target.replace(candidate, "");
 		}
 		target += add;
 		return target;
@@ -103,119 +73,177 @@
 				return candidate;
 			}
 		}
-		return '';
+		return "";
 	}
 
+	type ConditionalDisplay = "fonts" | "filter" | "code" | "custom";
+	let conditionalDisplay = $state<ConditionalDisplay>("fonts");
+
 	let fontFamilyCSS = [
-		'font-sans ',
-		'helveticaNeue ',
-		'calibri ',
-		'candara ',
-		'century ',
-		'dejavu ',
-		'notoSans ',
-		'optima ',
-		'roboto ',
-		'ubuntu ',
-		'verdana ',
+		"font-sans ",
+		"helveticaNeue ",
+		"calibri ",
+		"candara ",
+		"century ",
+		"dejavu ",
+		"notoSans ",
+		"optima ",
+		"roboto ",
+		"ubuntu ",
+		"verdana ",
 
-		'font-serif ',
-		'baskerville ',
-		'calistoMT ',
-		'cambria ',
-		'didot ',
-		'garamond ',
-		'georgia ',
-		'notoSerif ',
-		'palatino ',
+		"font-serif ",
+		"baskerville ",
+		"calistoMT ",
+		"cambria ",
+		"didot ",
+		"garamond ",
+		"georgia ",
+		"notoSerif ",
+		"palatino ",
 
-		'font-mono ',
-		'font-andaleMono ',
-		'font-consolas ',
-		'font-courierNew ',
-		'ubuntuMono ',
-		'font-luminari ',
-		'font-comicSansMS ',
+		"font-mono ",
+		"font-andaleMono ",
+		"font-consolas ",
+		"font-courierNew ",
+		"ubuntuMono ",
+		"font-luminari ",
+		"font-comicSansMS ",
 	];
 	let fontFamilyNames = [
-		'---Sans-Serif---',
-		'Helvetica Neue',
-		'Calibri',
-		'Candara',
-		'Century',
-		'Dejavu Sans',
-		'Noto Sans',
-		'Optima',
-		'Roboto',
-		'Ubuntu',
-		'Verdana',
-		'---Serif---',
-		'Baskerville',
-		'Calisto MT',
-		'Cambria',
-		'Didot',
-		'Garamond',
-		'Georgia',
-		'Noto Serif',
-		'Palatino',
-		'---Mono---',
-		'Andale Mono',
-		'Consolas',
-		'Courier New',
-		'Ubuntu Mono',
-		'Luminari',
-		'Comic Sans MS',
+		"---Sans-Serif---",
+		"Helvetica Neue",
+		"Calibri",
+		"Candara",
+		"Century",
+		"Dejavu Sans",
+		"Noto Sans",
+		"Optima",
+		"Roboto",
+		"Ubuntu",
+		"Verdana",
+		"---Serif---",
+		"Baskerville",
+		"Calisto MT",
+		"Cambria",
+		"Didot",
+		"Garamond",
+		"Georgia",
+		"Noto Serif",
+		"Palatino",
+		"---Mono---",
+		"Andale Mono",
+		"Consolas",
+		"Courier New",
+		"Ubuntu Mono",
+		"Luminari",
+		"Comic Sans MS",
 	];
-	let selectedFontFamily: string = findStrings($settings.font, fontFamilyCSS);
+	let selectedFontFamily: string = $state(findStrings($settings.font, fontFamilyCSS));
 	function setFontFamily(): void {
 		$settings.font = replaceStrings($settings.font, fontFamilyCSS, selectedFontFamily);
 		// console.log('setFontFamily():|' + $settings.font + '|');
 	}
 
-	let fontSizeCSS = ['text-xs ', 'text-sm ', 'text-base ', 'text-lg ', 'text-xl ', 'text-2xl ', 'text-3xl ', 'text-4xl ', 'text-5xl ', 'text-6xl ', 'text-7xl ', 'text-8xl ', 'text-9xl '];
-	let fontSizeNames = ['xs', 'sm', 'base', 'lg', 'xl', '2xl', '3xl', '4xl', '5xl', '6xl', '7xl', '8xl', '9xl'];
-	let selectedFontSize: string = findStrings($settings.font, fontSizeCSS);
+	let fontSizeCSS = [
+		"text-xs ",
+		"text-sm ",
+		"text-base ",
+		"text-lg ",
+		"text-xl ",
+		"text-2xl ",
+		"text-3xl ",
+		"text-4xl ",
+		"text-5xl ",
+		"text-6xl ",
+		"text-7xl ",
+		"text-8xl ",
+		"text-9xl ",
+	];
+	let fontSizeNames = [
+		"xs",
+		"sm",
+		"base",
+		"lg",
+		"xl",
+		"2xl",
+		"3xl",
+		"4xl",
+		"5xl",
+		"6xl",
+		"7xl",
+		"8xl",
+		"9xl",
+	];
+	let selectedFontSize: string = $state(findStrings($settings.font, fontSizeCSS));
 	function setFontSize(): void {
 		$settings.font = replaceStrings($settings.font, fontSizeCSS, selectedFontSize);
 		// console.log('setFontSize():|' + $settings.font + '|');
 	}
 
-	let fontWeightCSS = ['font-thin ', 'font-extralight ', 'font-light ', 'font-normal ', 'font-medium ', 'font-semibold ', 'font-bold ', 'font-extrabold ', 'font-black '];
-	let fontWeightNames = ['thin', 'extra light', 'light', 'normal', 'medium', 'bold', 'semibold', 'extrabold', 'black'];
-	let selectedFontWeight: string = findStrings($settings.font, fontWeightCSS);
+	let fontWeightCSS = [
+		"font-thin ",
+		"font-extralight ",
+		"font-light ",
+		"font-normal ",
+		"font-medium ",
+		"font-semibold ",
+		"font-bold ",
+		"font-extrabold ",
+		"font-black ",
+	];
+	let fontWeightNames = [
+		"thin",
+		"extra light",
+		"light",
+		"normal",
+		"medium",
+		"bold",
+		"semibold",
+		"extrabold",
+		"black",
+	];
+	let selectedFontWeight: string = $state(findStrings($settings.font, fontWeightCSS));
 	function setFontWeight(): void {
 		$settings.font = replaceStrings($settings.font, fontWeightCSS, selectedFontWeight);
 		// console.log('setFontWeight():|' + $settings.font + '|');
 	}
 
-	let fontSpacingCSS = ['tracking-tighter ', 'tracking-tight ', 'tracking-normal ', 'tracking-wide ', 'tracking-wider ', 'tracking-widest '];
-	let fontSpacingNames = ['tighter', 'tight', 'normal', 'wide', 'wider', 'widest'];
-	let selectedFontSpacing: string = findStrings($settings.font, fontSpacingCSS);
+	let fontSpacingCSS = [
+		"tracking-tighter ",
+		"tracking-tight ",
+		"tracking-normal ",
+		"tracking-wide ",
+		"tracking-wider ",
+		"tracking-widest ",
+	];
+	let fontSpacingNames = ["tighter", "tight", "normal", "wide", "wider", "widest"];
+	let selectedFontSpacing: string = $state(findStrings($settings.font, fontSpacingCSS));
 	function setFontSpacing(): void {
 		$settings.font = replaceStrings($settings.font, fontSpacingCSS, selectedFontSpacing);
 		// console.log('setFontSpacing():|' + $settings.font + '|');
 	}
 
-	let selectedColor: ColorIndex = $settings.color;
+	let selectedColor: ColorIndex = $state($settings.color);
 	function setColor(): void {
 		$settings.color = selectedColor;
 		// console.log('setColor():|' + $settings.color + '|');
 	}
 
-	let selectedKeyboard: KeyboardIndex = $settings.keyboard;
+	let selectedKeyboard: KeyboardIndex = $state($settings.keyboard);
 	function setKeyboard(): void {
 		$settings.keyboard = selectedKeyboard;
 		// console.log('setColor():|' + $settings.color + '|');
 	}
 
-	let selectedLayout: LayoutIndex = $settings.layout;
+	let selectedLayout: LayoutIndex = $state($settings.layout);
 	function setLayout(): void {
 		$settings.layout = selectedLayout;
 		// console.log('setColor():|' + $settings.color + '|');
 	}
 
 	function clearFont(): void {
-		$settings.font = '';
+		$settings.font = "";
 		selectedFontFamily = findStrings($settings.font, fontFamilyCSS);
 		selectedFontSize = findStrings($settings.font, fontSizeCSS);
 		selectedFontWeight = findStrings($settings.font, fontWeightCSS);
@@ -223,186 +251,374 @@
 		// console.log('setFontSpacing():|' + $settings.font + '|');
 	}
 	let keyBackspace = `\u232B`;
+
+	let sourceValue = $state<string | null>(SourceNames[0]);
+	let scopeValue = $state<string | null>(ScopeNames[0]);
+	function soundsChanged(e: Event, i: number) {
+		$settings.sounds[i] = (e.target as HTMLInputElement).checked;
+	}
+
+	$effect(() => {
+		// console.log('sourceValue changed to ' + sourceValue);
+		// console.log('scopeValue changed to ' + scopeValue);
+		$data.source = sourceValue ? SourceNames.indexOf(sourceValue) : 0;
+		$data.currentOptions.scope = scopeValue ? ScopeValues[ScopeNames.indexOf(scopeValue)] : 50;
+	});
+
+	const animBackdrop =
+		"transition transition-discrete opacity-0 starting:data-[state=open]:opacity-0 data-[state=open]:opacity-100";
+	const animModal =
+		"transition transition-discrete opacity-0 -translate-x-full starting:data-[state=open]:opacity-0 starting:data-[state=open]:-translate-x-full data-[state=open]:opacity-100 data-[state=open]:translate-x-0";
+
+	const card1Classes = "card p-4 preset-outlined-primary-500 space-y-4";
+	// const card3Classes = 'card bg-noise bg-surface-50-950 border-[1px] border-surface-200-800 p-8';
+	// const card2Classes =
+	// 	'card preset-filled-surface-100-900 border-[1px] border-surface-200-800 card-hover divide-surface-200-800 block max-w-md divide-y overflow-hidden';
+	const cardClass = card1Classes;
+	const iconButtonClass =
+		"focus:ring-opacity-50 rounded-full text-white hover:bg-blue-600 focus:ring-2 focus:ring-blue-900 focus:outline-none";
+	const articleClassV = "flex flex-col justify-center space-y-2";
+	const articleClassH = "flex flex-row justify-stretch space-x-2";
 </script>
 
-<Modal />
+<!-- h-svh w-svw
+ size-dvw -->
+<Dialog>
+	<Dialog.Trigger class="btn"><h1 style="font-size: 3em">🧜‍♀️</h1></Dialog.Trigger>
+	<Portal>
+		<Dialog.Backdrop
+			class="fixed inset-0 z-50 bg-surface-50-950/50 transition transition-discrete {animBackdrop}"
+		/>
+		<Dialog.Positioner class="fixed inset-0 z-50 flex flex-col justify-center">
+			<Dialog.Content class="size-min space-y-4 card bg-surface-100-900 shadow-xl {animModal}">
+				<header class="flex justify-between">
+					<Dialog.Title class="text-2xl font-bold">Settings</Dialog.Title>
+					<Dialog.CloseTrigger onclick={updateCodeWords} class="btn preset-tonal"
+						>Save</Dialog.CloseTrigger
+					>
+				</header>
+				<article class="flex place-content-between gap-2">
+					<script>
+					</script>
 
-<h1 class="p-4">Settings</h1>
-<!-- <section class="grid grid-cols-1 sm:grid-cols-5 gap-2"> -->
-<section class="flex place-content-between gap-2">
-	<div class="card">
-		<header class="card-header">Source</header>
-		<div class="p-4">
-			<RadioGroup rounded="rounded-2xl" display="flex-col" active="variant-filled-primary" hover="hover:variant-soft-primary">
-				{#each SourceNames as name, i}
-					<RadioItem bind:group={$data.source} label={name} {name} value={i}>{name}</RadioItem>
-				{/each}
-				<RadioItem bind:group={$data.source} name="Code" value={OptionIndex.code_words}
-					>Code
-					<button class="btn h-0 px-0" on:click={modalCode}>⚙️</button>
-				</RadioItem>
-				<RadioItem bind:group={$data.source} name="Custom" value={OptionIndex.custom_words}
-					><span class="space-y-0">Custom</span>
-					<button class="btn h-0 px-0" on:click={modalCustom}>⚙️</button>
-				</RadioItem>
-			</RadioGroup>
-		</div>
-	</div>
-	<div class="card">
-		<header class="card-header">Scope</header>
-		<div class="p-4">
-			<RadioGroup rounded="rounded-2xl" display="flex-col" active="variant-filled-primary" hover="hover:variant-soft-primary">
-				{#each ScopeNames as name, i}
-					<RadioItem bind:group={$data.currentOptions.scope} {name} value={ScopeValues[i]}>Top&nbsp;{ScopeValues[i]}</RadioItem>
-				{/each}
-			</RadioGroup>
-		</div>
-	</div>
-	<div class="card">
-		<header class="card-header">Generate</header>
-		<div class="p-4">
-			<Counter name="Combination" bind:count={$data.currentOptions.combination} />
-			<Counter name="Repetition" bind:count={$data.currentOptions.repetition} />
-			<label class="label">
-				<span
-					>Filter
-					<button class="btn px-0" on:click={modalFilter}>⚙️</button>
-				</span>
-			</label>
-		</div>
-	</div>
-	<div class="card">
-		<header class="card-header">Goals</header>
-		<div class="p-4">
-			<Counter name="Minimum&nbsp;WPM" max={401} step={10} bind:count={$settings.minimumWPM} />
-			<Counter name="Minimum&nbsp;Accuracy" bind:count={$settings.minimumAccuracy} />
-		</div>
-	</div>
-	<div class="card">
-		<header class="card-header">Sounds</header>
-		<div class="p-4">
-			<div class="flex flex-col gap-2">
-				{#each SoundNames as name, i}
-					<SlideToggle active="variant-filled-primary" hover="hover:variant-soft-primary" {name} bind:checked={$settings.sounds[i]}>{name}</SlideToggle>
-				{/each}
-			</div>
-		</div>
-	</div>
-</section>
-<div class="card">
-	<header class="card-header" />
-	<div class="p-4">
-		<div class="flex gap-2">
-			<label class="label">
-				<span>Color</span>
-				<select
-					class="input"
-					bind:value={selectedColor}
-					on:change={() => {
-						setColor();
-					}}>
-					{#each ColorNames as s, i}
-						<option class="variant-filled-primary" value={i}>
-							{s}
-						</option>
-					{/each}
-				</select>
-			</label>
-			<button class="btn h-0 px-0" on:click={clearFont}>Clear Font {keyBackspace}</button>
-			<label class="label">
-				<span>Font Family</span>
-				<select
-					class="input"
-					bind:value={selectedFontFamily}
-					on:change={() => {
-						setFontFamily();
-					}}>
-					{#each fontFamilyCSS as s, i}
-						<option class="variant-filled-primary" value={s}>
-							{fontFamilyNames[i]}
-						</option>
-					{/each}
-				</select>
-			</label>
-			<label class="label">
-				<span>Font Size</span>
-				<select
-					class="input"
-					bind:value={selectedFontSize}
-					on:change={() => {
-						setFontSize();
-					}}>
-					{#each fontSizeCSS as s, i}
-						<option class="variant-filled-primary" value={s}>
-							{fontSizeNames[i]}
-						</option>
-					{/each}
-				</select>
-			</label>
-			<label class="label">
-				<span>Font Weight</span>
-				<select
-					class="input"
-					bind:value={selectedFontWeight}
-					on:change={() => {
-						setFontWeight();
-					}}>
-					{#each fontWeightCSS as s, i}
-						<option class="variant-filled-primary" value={s}>
-							{fontWeightNames[i]}
-						</option>
-					{/each}
-				</select>
-			</label>
-			<label class="label">
-				<span>Font Spacing</span>
-				<select
-					class="input"
-					bind:value={selectedFontSpacing}
-					on:change={() => {
-						setFontSpacing();
-					}}>
-					{#each fontSpacingCSS as s, i}
-						<option class="variant-filled-primary" value={s}>
-							{fontSpacingNames[i]}
-						</option>
-					{/each}
-				</select>
-			</label>
-			<label class="label">
-				<span>Keyboard</span>
-				<select
-					class="input"
-					bind:value={selectedKeyboard}
-					on:change={() => {
-						setKeyboard();
-					}}>
-					{#each KeyboardNames as s, i}
-						<option class="variant-filled-primary" value={i}>
-							{s}
-						</option>
-					{/each}
-				</select>
-			</label>
-			<label class="label">
-				<span>Layout</span>
-				<select
-					class="input"
-					bind:value={selectedLayout}
-					on:change={() => {
-						setLayout();
-					}}>
-					{#each LayoutNames as s, i}
-						<option class="variant-filled-primary" value={i}>
-							{s}
-						</option>
-					{/each}
-				</select>
-			</label>
-		</div>
-	</div>
-</div>
-<hr />
-<span class="bg-transparent {$settings.font}">il1IL1 dbdqpq DBQP ij., fgjty rnmrn RNMRN o0O</span>
-<span class="bg-transparent {$settings.font}">The quick brown fox jumps over the lazy dog</span>
-<section />
+					<div class={cardClass}>
+						<header class="card-header">Source</header>
+						<article class={articleClassV}>
+							<SegmentedControl
+								value={sourceValue}
+								onValueChange={(details) => (sourceValue = details.value)}
+								orientation="vertical"
+							>
+								<SegmentedControl.Control>
+									<SegmentedControl.Indicator />
+									{#each SourceNames as name (name)}
+										<SegmentedControl.Item value={name}>
+											{#if name === SourceNames[SourceIndex.codeWords]}
+												<SegmentedControl.ItemText
+													>Code <button
+														class={iconButtonClass}
+														onclick={() => {
+															conditionalDisplay = conditionalDisplay !== "code" ? "code" : "fonts";
+														}}
+														>🤖
+													</button>
+												</SegmentedControl.ItemText>
+											{:else if name === SourceNames[SourceIndex.customWords]}
+												<SegmentedControl.ItemText
+													>Custom <button
+														class={iconButtonClass}
+														onclick={() => {
+															conditionalDisplay =
+																conditionalDisplay !== "custom" ? "custom" : "fonts";
+														}}
+														>🛠️
+													</button>
+												</SegmentedControl.ItemText>
+											{:else}
+												<SegmentedControl.ItemText>{name}</SegmentedControl.ItemText>
+											{/if}
+											<SegmentedControl.ItemHiddenInput />
+										</SegmentedControl.Item>
+									{/each}
+								</SegmentedControl.Control>
+							</SegmentedControl>
+						</article>
+					</div>
+					<div class={cardClass}>
+						<header class="card-header">Scope</header>
+						<article class={articleClassV}>
+							<SegmentedControl
+								value={scopeValue}
+								onValueChange={(details) => (scopeValue = details.value)}
+								orientation="vertical"
+							>
+								<SegmentedControl.Control>
+									<SegmentedControl.Indicator />
+									{#each ScopeNames as name, i (name)}
+										<SegmentedControl.Item value={name}>
+											<SegmentedControl.ItemText
+												>Top&nbsp;{ScopeValues[i]}</SegmentedControl.ItemText
+											>
+											<SegmentedControl.ItemHiddenInput />
+										</SegmentedControl.Item>
+									{/each}
+								</SegmentedControl.Control>
+							</SegmentedControl>
+						</article>
+					</div>
+					<div class={cardClass}>
+						<header class="card-header">Generate</header>
+						<article class={articleClassV}>
+							<Counter
+								name="Combination"
+								minCounter={1}
+								stepCounter={1}
+								bind:count={$data.currentOptions.combination}
+							/>
+							<Counter
+								name="Repetition"
+								stepCounter={1}
+								minCounter={1}
+								bind:count={$data.currentOptions.repetition}
+							/>
+							<div>
+								Filter<button
+									class={iconButtonClass}
+									onclick={() => {
+										conditionalDisplay = conditionalDisplay !== "filter" ? "filter" : "fonts";
+									}}
+									>🌪️
+								</button>
+							</div>
+						</article>
+					</div>
+					<div class={cardClass}>
+						<header class="card-header">Goals</header>
+						<article class={articleClassV}>
+							<Counter
+								name="Minimum&nbsp;WPM"
+								minCounter={0}
+								maxCounter={400}
+								stepCounter={10}
+								bind:count={$settings.minimumWPM}
+							/>
+							<Counter
+								name="Minimum&nbsp;Accuracy"
+								minCounter={0}
+								maxCounter={100}
+								bind:count={$settings.minimumAccuracy}
+							/>
+						</article>
+					</div>
+					<div class={cardClass}>
+						<header class="card-header">Sounds</header>
+						<article class={articleClassV}>
+							{#each SoundNames as name, i (name)}
+								<Switch checked={$settings.sounds[i]} onchange={(e) => soundsChanged(e, i)}>
+									<Switch.Control
+										class="preset-filled-secondary-50-950 data-[state=checked]:preset-filled-secondary-500"
+									>
+										<Switch.Thumb>
+											<Switch.Context>
+												{#snippet children(switch_)}
+													{#if switch_().checked}
+														<MusicIcon class="size-3" />
+													{/if}
+												{/snippet}
+											</Switch.Context>
+										</Switch.Thumb>
+									</Switch.Control>
+									<Switch.Label class="pl-2">{name}</Switch.Label>
+
+									<Switch.HiddenInput />
+								</Switch>
+								<!-- <SlideToggle
+										active="variant-filled-primary"
+										hover="hover:variant-soft-primary"
+										{name}
+										bind:checked={$settings.sounds[i]}>{name}</SlideToggle
+									> -->
+							{/each}
+						</article>
+						<header class="card-header pt-3">Keyboard</header>
+						<article>
+							<select
+								class="select"
+								id="select-keyboard"
+								name="Keyboard Selection"
+								bind:value={selectedKeyboard}
+								onchange={() => {
+									setKeyboard();
+								}}
+							>
+								{#each KeyboardNames as name, i (name)}
+									<option value={i}>
+										{name}
+									</option>
+								{/each}
+							</select>
+						</article>
+						<header class="card-header pt-3">Layout</header>
+						<article>
+							<select
+								class="select"
+								id="select-keyboard-layout"
+								name="Keyboard Layout Selection"
+								bind:value={selectedLayout}
+								onchange={() => {
+									setLayout();
+								}}
+							>
+								{#each LayoutNames as name, i (name)}
+									<option value={i}>
+										{name}
+									</option>
+								{/each}
+							</select>
+						</article>
+					</div>
+				</article>
+				<article class="flex flex-col justify-stretch gap-2">
+					{#if conditionalDisplay === "fonts"}
+						<div class={cardClass}>
+							<header class="card-header">Font</header>
+							<article class={articleClassH}>
+								<label class="label" for="color-select">
+									<span>Color</span>
+									<select
+										class="select"
+										id="color-select"
+										name="Color Selection"
+										bind:value={selectedColor}
+										onchange={() => {
+											setColor();
+										}}
+									>
+										{#each ColorNames as name, i (name)}
+											<option value={i}>
+												{name}
+											</option>
+										{/each}
+									</select>
+								</label>
+								<button class="btn h-0 px-0" onclick={clearFont}>Clear Font {keyBackspace}</button>
+								<label class="label" for="font-family-select">
+									<span>Font Family</span>
+									<select
+										class="select"
+										id="font-family-select"
+										name="Font Family"
+										bind:value={selectedFontFamily}
+										onchange={() => {
+											setFontFamily();
+										}}
+									>
+										{#each fontFamilyCSS as name, i (name)}
+											<option value={name}>
+												{fontFamilyNames[i]}
+											</option>
+										{/each}
+									</select>
+								</label>
+								<label class="label" for="font-size-select">
+									<span>Font Size</span>
+									<select
+										class="select"
+										id="font-size-select"
+										name="Font Size"
+										bind:value={selectedFontSize}
+										onchange={() => {
+											setFontSize();
+										}}
+									>
+										{#each fontSizeCSS as name, i (name)}
+											<option value={name}>
+												{fontSizeNames[i]}
+											</option>
+										{/each}
+									</select>
+								</label>
+								<label class="label" for="font-weight-select">
+									<span>Font Weight</span>
+									<select
+										class="select"
+										id="font-weight-select"
+										name="Font Weight"
+										bind:value={selectedFontWeight}
+										onchange={() => {
+											setFontWeight();
+										}}
+									>
+										{#each fontWeightCSS as name, i (name)}
+											<option value={name}>
+												{fontWeightNames[i]}
+											</option>
+										{/each}
+									</select>
+								</label>
+								<label class="label" for="font-spacing-select">
+									<span>Font Spacing</span>
+									<select
+										class="select"
+										id="font-spacing-select"
+										name="Font Spacing"
+										bind:value={selectedFontSpacing}
+										onchange={() => {
+											setFontSpacing();
+										}}
+									>
+										{#each fontSpacingCSS as name, i (name)}
+											<option value={name}>
+												{fontSpacingNames[i]}
+											</option>
+										{/each}
+									</select>
+								</label>
+							</article>
+							<header class="card-header">Legibility Test</header>
+							<article class={articleClassV}>
+								<span class="bg-transparent {$settings.font}"
+									>il1IL1 dbdqpq DBDQPQ ij., fgjty rnmrn RNMRN o0O</span
+								>
+								<span class="bg-transparent {$settings.font}"
+									>Sphinx of black quartz, judge my vow!</span
+								>
+							</article>
+						</div>
+					{:else if conditionalDisplay === "filter"}
+						<section class="flex place-content-between gap-2">
+							<div class={cardClass}>
+								<header class="card-header">Filter</header>
+								<article class={articleClassH}>
+									<OptionsFilter></OptionsFilter>
+								</article>
+							</div>
+						</section>
+					{:else if conditionalDisplay === "code"}
+						<section class="flex place-content-between gap-2">
+							<div>
+								<div class={cardClass}>
+									<header class="card-header">Code</header>
+									<article class={articleClassH}>
+										<OptionsCode></OptionsCode>
+									</article>
+								</div>
+							</div>
+						</section>
+					{:else if conditionalDisplay === "custom"}
+						<section class="flex place-content-between gap-2">
+							<div>
+								<div class={cardClass}>
+									<header class="card-header">Custom</header>
+									<article class={articleClassH}>
+										<OptionsCustom></OptionsCustom>
+									</article>
+								</div>
+							</div>
+						</section>
+					{/if}
+				</article>
+			</Dialog.Content>
+		</Dialog.Positioner>
+	</Portal>
+</Dialog>

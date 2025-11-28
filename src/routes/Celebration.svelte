@@ -1,74 +1,125 @@
-<script lang="ts" context="module">
-	let characters = ['🥳', '🪅', '🎉', '🎊', '✨', '🎭', '🤩', '🫧', '🥳', '🥰', '❤️‍🔥', '🎁', '💫', '🌟', '🐣', '🌟', '🌜', '🌛', '🌝', '⚡'];
-	export let duration = 10000;
+<script module lang="ts">
+	import { browser } from "$app/environment";
+	// import { onMount, onDestroy } from 'svelte';
+	// import Worker from './CelebrationWorker.js?worker';
+	export let duration = 8000;
+	// export let duration = 10000;
 	export let fadeIn = 3000;
-	export let fadeOut = 3000;
-	export let confetti = new Array(97)
-		.fill('🥳')
-		.map((_, i) => {
-			return {
-				character: characters[i % characters.length],
-				x: Math.random() * 100,
-				y: -20 - Math.random() * 100,
-				r: 0.1 + Math.random() * 1.5,
-				d: 'emoj' + i,
-				o: 0,
-				e: null as any,
-			};
-		})
-		.sort((a, b) => a.r - b.r);
+	export let fadeOut = 4000;
 
-	function preCelebration() {
-		confetti = confetti.map((emoji) => {
-			var d = document.getElementById(emoji.d);
-			emoji.e = d;
-			return emoji;
-		});
+	let emojii = [
+		"🥳",
+		"🪅",
+		"🎉",
+		"🎊",
+		"✨",
+		"🎭",
+		"🤩",
+		"🫧",
+		"🥳",
+		"🥰",
+		"❤️‍🔥",
+		"🎁",
+		"💫",
+		"🌟",
+		"🐣",
+		"🌟",
+		"🌜",
+		"🌛",
+		"🌝",
+		"⚡",
+	];
+
+	class Confetti {
+		emoji: string = $state("⚡");
+		x: number = $state(Math.random() * 100);
+		y: number = $state(-20 - Math.random() * 100);
+		r: number = 0.1 + Math.random();
+		d: string = "";
+		opacity: number = $state(0.0);
+		constructor(emoji: string, x: number, y: number, r: number, d: string, opacity: number) {
+			this.emoji = emoji;
+			this.x = x;
+			this.y = y;
+			this.r = r;
+			this.d = d;
+			this.opacity = opacity;
+		}
 	}
 
-	let janitorial = false;
+	const confettiiMaxCount = 80;
+	let confettii = $state(
+		Array.from({ length: confettiiMaxCount }, (_, index) => {
+			return new Confetti(
+				emojii[index % emojii.length],
+				Math.random() * 100,
+				-20 - Math.random() * 100,
+				0.1 + Math.random(),
+				"",
+				0.0
+			);
+		})
+	);
+	const confettiMax = confettii.length;
+
+	/**
+	 * Prepare for celebration by linking DOM elements.
+	 */
+	function preCelebration(): void {
+		// console.log('preCelebration');
+		for (let i = 0; i < confettiMax; i++) {
+			var confetti = confettii[i];
+			confetti.d = "emoj" + i;
+			confetti.emoji = emojii[i % emojii.length];
+		}
+	}
+	if (browser) {
+		preCelebration();
+	}
+
+	let janitorial: boolean = true;
 	let frame: number;
-	export function startCelebration() {
-		if (!janitorial) {
-			preCelebration();
-			janitorial = true;
+	/**
+	 * Fade in and animate the celebration.
+	 */
+	export function startCelebration(): void {
+		console.log("\nstartCelebration");
+		if (janitorial) {
+			janitorial = false;
 		}
 		let done = false;
 		let start: DOMHighResTimeStamp, previousTimeStamp: DOMHighResTimeStamp;
-		function loop(timestamp: DOMHighResTimeStamp) {
+		function loop(timestamp: DOMHighResTimeStamp): void {
 			if (start === undefined) {
 				start = timestamp;
 			}
 			let elapsed = timestamp - start;
-			let delta = 0;
+			let deltaOpacity = 0;
 			if (elapsed < fadeIn) {
-				delta = 0.005;
+				deltaOpacity = 0.005;
 			} else if (elapsed > duration - fadeOut) {
-				delta = -0.01;
+				deltaOpacity = -0.005;
 			} else {
-				delta = 0.0;
+				deltaOpacity = 0.0;
 			}
 
 			if (previousTimeStamp !== timestamp) {
-				confetti = confetti.map((emoji) => {
+				for (let i = 0; i < confettiMax; i++) {
+					var emoji = confettii[i];
 					emoji.y += 0.4 * emoji.r;
 					if (emoji.y > 120) {
 						emoji.x = Math.random() * 100;
 						emoji.y = -20;
-						emoji.e.style.left = emoji.x + '%';
 					}
-					emoji.e.style.top = emoji.y + '%';
-					if (emoji.o < 1) {
-						if (delta > 0.00001) emoji.o = Math.min(emoji.o + delta, 1);
-						else if (delta < -0.00001) emoji.o = Math.max(emoji.o + delta, 0);
-						else emoji.o = Math.min(emoji.o + delta, 1);
-						emoji.e.style.opacity = emoji.o;
+					if (emoji.opacity < 1) {
+						if (deltaOpacity > 0.00001) emoji.opacity = Math.min(emoji.opacity + deltaOpacity, 1);
+						else if (deltaOpacity < -0.00001)
+							emoji.opacity = Math.max(emoji.opacity + deltaOpacity, 0);
+						else emoji.opacity = Math.min(emoji.opacity + deltaOpacity, 1);
 					}
-					return emoji;
-				});
+				}
 			}
 			if (elapsed < duration) {
-				// Stop the animation after 2 seconds
 				previousTimeStamp = timestamp;
 				if (!done) {
 					frame = window.requestAnimationFrame(loop);
@@ -81,30 +132,60 @@
 		window.requestAnimationFrame(loop);
 	}
 
+	/**
+	 * Fade out opacity and end the celebration.
+	 */
 	export function endCelebration() {
 		let done = true;
-		confetti = confetti.map((emoji) => {
-			if (emoji.o > 0) {
-				emoji.o = Math.max(emoji.o - 0.01, 0);
-				emoji.e.style.opacity = emoji.o;
+		for (let i = 0; i < confettiMax; i++) {
+			var emoji = confettii[i];
+			if (emoji.opacity > 0) {
+				emoji.opacity = 0;
 				done = false;
 			}
-			return emoji;
-		});
+		}
 		if (done) {
 			cancelAnimationFrame(frame);
-		} else if (!done) {
-			frame = window.requestAnimationFrame(endCelebration);
 		}
 	}
+
+	// TODO: Use Worker to animate confetti in background
+	// let result;
+	// let worker: Worker;
+	// if (browser) {
+	// 	worker = new Worker();
+	// 	// ... use the worker
+	// 	worker.onmessage = (event) => {
+	// 		result = event.data;
+	// 		console.log('Worker said: ', result);
+	// 	};
+	// }
+
+	// onMount(() => {
+	// 	console.log('onMount Celebration');
+	// });
+	// onDestroy(() => {
+	// 	if (worker) {
+	// 		worker.terminate();
+	// 	}
+	// });
+
+	// export function unleashWorker() {
+	// 	console.log('unleashWorker');
+	// 	worker.postMessage(6); // Send data to our heroic worker
+	// }
 </script>
 
 <div>
-	<slot>
-		{#each confetti as c}
-			<span id={c.d} style="left: {c.x}%; top: {c.y}%; transform: scale({c.r})">{c.character}</span>
-		{/each}
-	</slot>
+	{#each confettii as c (c.d)}
+		<span
+			id={c.d}
+			style:opacity={c.opacity}
+			style:left="{c.x}%"
+			style:top="{c.y}%"
+			style:transform="scale({c.r})">{c.emoji}</span
+		>
+	{/each}
 </div>
 
 <style>

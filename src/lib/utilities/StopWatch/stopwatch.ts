@@ -1,4 +1,4 @@
-import { get, writable } from 'svelte/store';
+import { get, writable } from "svelte/store";
 
 /** Elapsed time in milliseconds */
 export const elapsedTime = writable<number>(0);
@@ -13,7 +13,7 @@ let startTime = 0;
 let baseTime = 0;
 
 // The timer
-let timer: NodeJS.Timer | null = null;
+let timer: NodeJS.Timeout | null = null;
 
 /**
  * Reset timers and stop

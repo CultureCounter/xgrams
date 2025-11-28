@@ -4,9 +4,9 @@
 	https://colemakmods.github.io/mod-dh/keyboards.html
  -->
 <script lang="ts">
-	import KeyCap from './KeyCap.svelte';
-	import { myStore } from '$lib/store/data';
-	import { keyboards, getKeyCaps } from '$lib/store/keyboard';
+	import KeyCap from "./KeyCap.svelte";
+	import { myStore } from "$lib/store/data";
+	import { keyboards, getKeyCaps } from "$lib/store/keyboard";
 
 	const { settings } = myStore;
 
@@ -43,20 +43,20 @@
 	// }
 
 	let isLargeKey = true;
-	$: keyCaps = getKeyCaps($settings.keyboard, $settings.layout);
+	let keyCaps = $derived(getKeyCaps($settings.keyboard, $settings.layout));
 </script>
 
-<div class="flex flex-col justify-center relative overflow-hidden p-5">
+<div class="relative flex flex-col justify-center overflow-hidden p-5">
 	<div class="mx-auto">
-		{#each keyCaps as row, i}
+		{#each keyCaps as row, i (row)}
 			<div class="row flex {keyboards[$settings.keyboard].justify}">
-				{#if keyboards[$settings.keyboard].leftKeys[i] != ''}
+				{#if keyboards[$settings.keyboard].leftKeys[i] != ""}
 					<KeyCap letter={keyboards[$settings.keyboard].leftKeys[i]} {isLargeKey} />
 				{/if}
-				{#each row as letter, i}
+				{#each row as letter (letter)}
 					<KeyCap {letter} />
 				{/each}
-				{#if keyboards[$settings.keyboard].rightKeys[i] != ''}
+				{#if keyboards[$settings.keyboard].rightKeys[i] != ""}
 					<KeyCap letter={keyboards[$settings.keyboard].rightKeys[i]} {isLargeKey} />
 				{/if}
 			</div>

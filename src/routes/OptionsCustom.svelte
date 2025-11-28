@@ -1,28 +1,27 @@
 <script lang="ts">
-	import { myStore, OptionIndex } from '$lib/store/data';
-	import { modalStore } from '@skeletonlabs/skeleton';
+	import { myStore } from "$lib/store/data";
+	import { SourceIndex } from "$lib/store/xgramSources.svelte";
 
 	const { data } = myStore;
-
-	// Props
-	/** Exposes parent props to this component. */
-	export let parent: any;
-
-	// Handle Form Submission
-	function onFormSubmit(): void {
-		modalStore.close();
+	function customChanged() {
+		console.log("Custom changed:", $data.sourceOptions[SourceIndex.customWords].lines);
 	}
-
-	// Base Classes
-	const cBase = 'card p-4 w-modal shadow-xl space-y-4';
-	const cHeader = 'text-2xl font-bold';
 </script>
 
-<div class="modal-example-form {cBase}">
-	<header class={cHeader}>Custom Words</header>
-	<article>Add custom words, separated by spaces/newlines:</article>
-	<textarea class="textarea" rows="4" bind:value={$data.sourceOptions[OptionIndex.custom_words].lines} />
-	<footer class="modal-footer {parent.regionFooter}">
-		<button class="btn {parent.buttonPositive}" on:click={onFormSubmit}><slot /></button>
-	</footer>
-</div>
+<textarea
+	class="textarea"
+	id="custom-text"
+	name="Custom Text"
+	rows="10"
+	bind:value={$data.sourceOptions[SourceIndex.customWords].lines}
+></textarea>
+<button
+	onclick={() => {
+		customChanged();
+	}}
+	type="button"
+	class="btn preset-filled">Save</button
+>
+
+<!-- <Dialog initialFocusEl={() => document.querySelector('[name="custom text"]')}>
+</Dialog> -->

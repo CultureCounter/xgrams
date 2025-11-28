@@ -1,5 +1,5 @@
 // https://clagnut.com/blog/2380
-const pangrams = [
+const pangrams: string[] = [
 	'"Now fax quiz Jack!" my brave ghost pled.',
 	'A quick brown fox jumps over the lazy dog.',
 	'A quick movement of the enemy will jeopardize six gunboats.',
