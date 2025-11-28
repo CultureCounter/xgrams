@@ -71,7 +71,7 @@
 
 		// console.log('Generating lines with dataSource:', dataSource);
 		// console.log('Generating lines with scope:', scope);
-		console.log("Generating lines with source length:", source.length);
+		console.log("Generating lines with source length:",s,index, source.length);
 		if (source == null) {
 			console.log("Generating lines with source == null:");
 			console.log("idbSources.source:", idbSources);
@@ -347,6 +347,10 @@
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function onDataChange(_data: DataXG) {
 		console.log("onDataChange changed, initializeLesson", idbSources);
+		if (idbSources.bigrams == null) {
+			console.log("onDataChange idbSources.bigrams == null, return");
+			return;
+		}
 		initializeLesson();
 	}
 
@@ -357,6 +361,16 @@
 	$effect(() => {
 		// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 		idbSources;
+		if (idbSources.bigrams == null || idbSources.bigrams.length == 0) {
+			console.log("idbSources.bigrams == null, return");
+			return;
+		}
+		let source = idbSources[SourceKeys[$data.source]];
+		if (source == null 
+|| source.length == 0) {
+			console.log("idbSources[SourceKeys[$data.source]] == null, return");
+			return;
+		}
 		console.log("idbSources changed, initializeLesson", idbSources);
 		initializeLesson();
 	});

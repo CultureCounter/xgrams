@@ -47,15 +47,15 @@ export const SourceKeys = [
 export class SourceXG {
 	[key: string]: string[];
 
-	bigrams: string[] = [];
-	trigrams: string[] = [];
-	tetragrams: string[] = [];
-	pentagrams: string[] = [];
-	hexagrams: string[] = [];
-	pangrams: string[] = [];
-	words: string[] = [];
-	codeWords: string[] = [];
-	customWords: string[] = [];
+	bigrams: string[] = $state([]);
+	trigrams: string[] = $state([]);
+	tetragrams: string[] = $state([]);
+	pentagrams: string[] = $state([]);
+	hexagrams: string[] = $state([]);
+	pangrams: string[] = $state([]);
+	words: string[] = $state([]);
+	codeWords: string[] = $state([]);
+	customWords: string[] = $state([]);
 }
 
 // TODO switch to IDB completely

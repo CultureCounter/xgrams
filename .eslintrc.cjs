@@ -1,15 +1,12 @@
 module.exports = {
 	root: true,
-	parser: '@typescript-eslint/parser',
-	extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended', 'prettier'],
-	plugins: ['svelte3', '@typescript-eslint', 'prettier'],
-	ignorePatterns: ['*.cjs'],
-	overrides: [{ files: ['*.svelte'], processor: 'svelte3/svelte3' }],
-	settings: {
-		'svelte3/typescript': () => require('typescript'),
-	},
+	parser: "@typescript-eslint/parser",
+	extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended", "prettier"],
+	plugins: ["svelte3", "@typescript-eslint", "prettier"],
+	ignorePatterns: ["*.cjs"],
+	overrides: [{ files: ["*.svelte"], processor: "svelte3/svelte3" }],
 	parserOptions: {
-		sourceType: 'module',
+		sourceType: "module",
 		ecmaVersion: 2020,
 	},
 	env: {
@@ -18,13 +15,13 @@ module.exports = {
 		node: true,
 	},
 	rules: {
-		'no-unused-vars': 'off',
-		'@typescript-eslint/no-unused-vars': [
-			'warn', // or "error"
+		"no-unused-vars": "off",
+		"@typescript-eslint/no-unused-vars": [
+			"warn", // or "error"
 			{
-				argsIgnorePattern: '^_',
-				varsIgnorePattern: '^_',
-				caughtErrorsIgnorePattern: '^_',
+				argsIgnorePattern: "^_",
+				varsIgnorePattern: "^_",
+				caughtErrorsIgnorePattern: "^_",
 			},
 		],
 	},
