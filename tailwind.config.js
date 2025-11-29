@@ -1,9 +1,15 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+import path from "path";
+import forms from "@tailwindcss/forms";
+import typography from "@tailwindcss/typography";
+import lineClamp from "@tailwindcss/line-clamp";
+import skeleton from "@skeletonlabs/skeleton/tailwind/skeleton.cjs";
+
+export default {
 	darkMode: "class",
 	content: [
 		"./src/**/*.{html,js,svelte,ts}",
-		require("path").join(require.resolve("@skeletonlabs/skeleton"), "../**/*.{html,js,svelte,ts}"),
+		path.join(path.dirname(import.meta.resolve("@skeletonlabs/skeleton")), "../**/*.{html,js,svelte,ts}"),
 	],
 	theme: {
 		screens: {
@@ -112,9 +118,9 @@ module.exports = {
 		},
 	},
 	plugins: [
-		require("@tailwindcss/forms"),
-		require("@tailwindcss/typography"),
-		require("@tailwindcss/line-clamp"),
-		...require("@skeletonlabs/skeleton/tailwind/skeleton.cjs")(),
+		forms,
+		typography,
+		lineClamp,
+		...skeleton(),
 	],
 };

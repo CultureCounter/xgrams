@@ -3,7 +3,7 @@
 	import "../app.css";
 	// TODO: Re-enable xgtheme
 	// import '../xgtheme.postcss';
-	import favicon from "../../static/favicon.png";
+	import favicon from "$lib/images/favicon.png";
 </script>
 
 <svelte:head>

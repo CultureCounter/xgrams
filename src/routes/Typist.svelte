@@ -63,15 +63,15 @@
 		let dataSource = $data.currentOptions;
 		let scope = dataSource.scope;
 		let index = $data.source;
-		let s: string = SourceKeys[index];
+		let s: string = SourceKeys[index] ;
 		// console.log("generateLines idbSources:", idbSources);
 		// console.log("generateLines source key:", s);
-		let source = idbSources[s];
+		let source = idbSources[ s];
 		// console.log("generateLines source:", source);
 
 		// console.log('Generating lines with dataSource:', dataSource);
 		// console.log('Generating lines with scope:', scope);
-		console.log("Generating lines with source length:",s,index, source.length);
+		console.log("Generating lines with source length:",s   ,index, source.length);
 		if (source == null) {
 			console.log("Generating lines with source == null:");
 			console.log("idbSources.source:", idbSources);

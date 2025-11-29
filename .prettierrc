@@ -7,11 +7,24 @@
 			"options": {
 				"parser": "svelte"
 			}
+		},
+		{
+			"files": ".prettierrc",
+			"options": { "parser": "json" }
+		},
+		{
+			"files": ".postcss",
+			"options": { "parser": "css" }
 		}
 	],
-	"plugins": ["prettier-plugin-svelte", "prettier-plugin-tailwindcss"],
-	"singleQuote": false,
-	"printWidth": 100,
+
+	"printWidth": 120,
+	"quoteProps": "consistent",
+	"semi": true,
+	"singleQuote": true,
+	"svelteSortOrder": "options-scripts-markup-styles",
+	"svelteStrictMode": true,
+	"tabWidth": 4,
 	"tailwindStylesheet": "./src/app.css",
 	"trailingComma": "es5",
 	"useTabs": true

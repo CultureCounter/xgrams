@@ -1,5 +1,5 @@
 <script module lang="ts">
-	import { browser } from "$app/environment";
+	import { browser } from '$app/environment';
 	// import { onMount, onDestroy } from 'svelte';
 	// import Worker from './CelebrationWorker.js?worker';
 	export let duration = 8000;
@@ -8,34 +8,34 @@
 	export let fadeOut = 4000;
 
 	let emojii = [
-		"🥳",
-		"🪅",
-		"🎉",
-		"🎊",
-		"✨",
-		"🎭",
-		"🤩",
-		"🫧",
-		"🥳",
-		"🥰",
-		"❤️‍🔥",
-		"🎁",
-		"💫",
-		"🌟",
-		"🐣",
-		"🌟",
-		"🌜",
-		"🌛",
-		"🌝",
-		"⚡",
+		'🥳',
+		'🪅',
+		'🎉',
+		'🎊',
+		'✨',
+		'🎭',
+		'🤩',
+		'🫧',
+		'🥳',
+		'🥰',
+		'❤️‍🔥',
+		'🎁',
+		'💫',
+		'🌟',
+		'🐣',
+		'🌟',
+		'🌜',
+		'🌛',
+		'🌝',
+		'⚡',
 	];
 
 	class Confetti {
-		emoji: string = $state("⚡");
+		emoji: string = $state('⚡');
 		x: number = $state(Math.random() * 100);
 		y: number = $state(-20 - Math.random() * 100);
 		r: number = 0.1 + Math.random();
-		d: string = "";
+		d: string = '';
 		opacity: number = $state(0.0);
 		constructor(emoji: string, x: number, y: number, r: number, d: string, opacity: number) {
 			this.emoji = emoji;
@@ -55,7 +55,7 @@
 				Math.random() * 100,
 				-20 - Math.random() * 100,
 				0.1 + Math.random(),
-				"",
+				'',
 				0.0
 			);
 		})
@@ -69,7 +69,7 @@
 		// console.log('preCelebration');
 		for (let i = 0; i < confettiMax; i++) {
 			var confetti = confettii[i];
-			confetti.d = "emoj" + i;
+			confetti.d = 'emoj' + i;
 			confetti.emoji = emojii[i % emojii.length];
 		}
 	}
@@ -83,7 +83,7 @@
 	 * Fade in and animate the celebration.
 	 */
 	export function startCelebration(): void {
-		console.log("\nstartCelebration");
+		console.log('\nstartCelebration');
 		if (janitorial) {
 			janitorial = false;
 		}
@@ -113,8 +113,7 @@
 					}
 					if (emoji.opacity < 1) {
 						if (deltaOpacity > 0.00001) emoji.opacity = Math.min(emoji.opacity + deltaOpacity, 1);
-						else if (deltaOpacity < -0.00001)
-							emoji.opacity = Math.max(emoji.opacity + deltaOpacity, 0);
+						else if (deltaOpacity < -0.00001) emoji.opacity = Math.max(emoji.opacity + deltaOpacity, 0);
 						else emoji.opacity = Math.min(emoji.opacity + deltaOpacity, 1);
 					}
 				}
@@ -178,12 +177,8 @@
 
 <div>
 	{#each confettii as c (c.d)}
-		<span
-			id={c.d}
-			style:opacity={c.opacity}
-			style:left="{c.x}%"
-			style:top="{c.y}%"
-			style:transform="scale({c.r})">{c.emoji}</span
+		<span id={c.d} style:opacity={c.opacity} style:left="{c.x}%" style:top="{c.y}%" style:transform="scale({c.r})"
+			>{c.emoji}</span
 		>
 	{/each}
 </div>
