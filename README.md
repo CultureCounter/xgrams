@@ -1,6 +1,6 @@
 # Try It Out
 
-[`Live Xgrams`](https://xgrams-dirk-bester-culture-counter.vercel.app/)
+[`Live Xgrams`](https://xgrams.vercel.app/)
 
 # New keyboard
 
@@ -14,17 +14,17 @@ So then you may as well learn a new key layout. Colemak-DH, after some research,
 
 I searched for Mavis Beacon but she has left the building! RIP Mavis! I slowly discovered a collection of websites to train on:
 
-- [`Ben Vallack`](https://www.youtube.com/watch?v=sI-a64EVPPU) for general The Joy of Typing inspiration.
-- [`Hamaji Neo`](https://www.youtube.com/watch?v=7jtGYw22OBw) your keyboard needs an upgrade, or something.
-- [`Mechcables`](https://mechcables.com/products/samurai-aviator-cable) you kind of have to right?
+- [`Ben Vallack`](https://www.youtube.com/watch?v=sI-a64EVPPU) For general The Joy of Typing inspiration.
+- [`Hamaji Neo`](https://www.youtube.com/watch?v=7jtGYw22OBw) Your keyboard needs an upgrade, or something.
+- [`Mechcables`](https://mechcables.com/products/samurai-aviator-cable) You kind of have to right?
 - [`History`](https://www.smithsonianmag.com/arts-culture/fact-of-fiction-the-legend-of-the-qwerty-keyboard-49863249/) Enquiring minds want to know!
-- [`monkeytype`](https://monkeytype.com/) I get my baseline, graphed over time doing random timed texts, daily.
+- [`monkeytype`](https://monkeytype.com/) I get my WPM baseline, graphed over time doing random timed texts, daily.
 - [`ZTYPE`](https://zty.pe/) This is like 12 infinite monkeys typing, but with adrenaline.
 - [`keyzen`](https://github.com/wwwtyro/keyzen) The original keyzen, that spawned numerous others. I hacked several to taste as I regained the ability to code.
 - [`COLEMAK CLUB`](https://gnusenpai.net/colemakclub/) This taught me a few fingers at a time.
 - [`keyzen3`](https://adamgradzki.com/keyzen3/) A keyzen with an interesting UI.
 - [`Ngram Type`](https://ranelpadon.github.io/ngram-type/) More Keyzen, now with ngrams. I hacked this one so much I finally just rewrote it from scratch.
-- [`keybr`](https://www.keybr.com/) I mainlined this from a-z with the hacked Ranel Padon ngrams to focus around the new key.
+- [`keybr`](https://www.keybr.com/) I mainlined this from a-z with the hacked Ranel Padon ngrams aka Xgrams to focus around new key(s).
 
 # Xgrams
 
