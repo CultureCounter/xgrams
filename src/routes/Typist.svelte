@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { deepClone, myStore, DataXG, LessonXG } from "$lib/store/data";
+	import { deepClone, myStore, DataXG } from "$lib/store/data";
+	import { LessonXG } from "$lib/store/LessonXG";
 	import { SoundIndex } from "$lib/store/SettingsXG.svelte";
 	import { loadState, LoadIndex, LoadNames, idbCodes, idbSources, SourceKeys } from "$lib/store/xgramSources.svelte";
 	import Celebration, { startCelebration } from "./Celebration.svelte";

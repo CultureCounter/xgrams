@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { myStore, ScopeNames, ScopeValues } from "$lib/store/data";
+	import { myStore } from "$lib/store/data";
+	import { ScopeNames, ScopeValues } from "$lib/store/LessonXG";
 	import { ColorIndex, ColorNames, FontFamilyCSS, FontFamilyNames, SoundNames } from "$lib/store/SettingsXG.svelte";
 	import { idbCodes, idbSources, SourceIndex, SourceNames } from "$lib/store/xgramSources.svelte.ts";
 	import { CodeIndex } from "$lib/store/code";
