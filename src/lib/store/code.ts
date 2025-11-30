@@ -1,55 +1,35 @@
 export enum CodeIndex {
-	languageCpp = 0,
-	languageCs,
-	languageGo,
-	languageJava,
-	languageJavascript,
-	languagePython,
-	languageRust,
-	languageSwift,
-	languageTypescript,
+	cpp = 0,
+	cs,
+	go,
+	java,
+	javascript,
+	python,
+	rust,
+	swift,
+	typescript,
 }
 
-export const CodeNames: string[] = [
-	"C++",
-	"C#",
-	"Go",
-	"Java",
-	"Javascript",
-	"Python",
-	"Rust",
-	"Swift",
-	"Typescript",
-];
+export const CodeNames: string[] = ["C++", "C#", "Go", "Java", "Javascript", "Python", "Rust", "Swift", "Typescript"];
 
-export const CodeKeys: string[] = [
-	"languageCpp",
-	"languageCs",
-	"languageGo",
-	"languageJava",
-	"languageJavascript",
-	"languagePython",
-	"languageRust",
-	"languageSwift",
-	"languageTypescript",
-];
+export const CodeKeys: string[] = ["cpp", "cs", "go", "java", "javascript", "python", "rust", "swift", "typescript"];
 
 export class CodeXG {
 	[key: string]: string[];
 
-	languageCpp: string[] = [];
-	languageCs: string[] = [];
-	languageGo: string[] = [];
-	languageJava: string[] = [];
-	languageJavascript: string[] = [];
-	languagePython: string[] = [];
-	languageRust: string[] = [];
-	languageSwift: string[] = [];
-	languageTypescript: string[] = [];
+	cpp: string[] = [];
+	cs: string[] = [];
+	go: string[] = [];
+	java: string[] = [];
+	javascript: string[] = [];
+	python: string[] = [];
+	rust: string[] = [];
+	swift: string[] = [];
+	typescript: string[] = [];
 }
 
 const code: CodeXG = {
-	languageCpp: [
+	cpp: [
 		"alignas",
 		"alignof",
 		"and",
@@ -144,7 +124,7 @@ const code: CodeXG = {
 		"xor",
 		"xor_eq",
 	],
-	languageCs: [
+	cs: [
 		"abstract",
 		"add",
 		"alias",
@@ -266,7 +246,7 @@ const code: CodeXG = {
 		"with",
 		"yield",
 	],
-	languageGo: [
+	go: [
 		"break",
 		"default",
 		"func",
@@ -293,7 +273,7 @@ const code: CodeXG = {
 		"return",
 		"var",
 	],
-	languageJava: [
+	java: [
 		"abstract",
 		"assert",
 		"boolean",
@@ -349,7 +329,7 @@ const code: CodeXG = {
 		"volatile",
 		"while",
 	],
-	languageJavascript: [
+	javascript: [
 		"await",
 		"break",
 		"case",
@@ -397,7 +377,7 @@ const code: CodeXG = {
 		"with",
 		"yield",
 	],
-	languagePython: [
+	python: [
 		"and",
 		"as",
 		"assert",
@@ -432,7 +412,7 @@ const code: CodeXG = {
 		"with",
 		"yield",
 	],
-	languageRust: [
+	rust: [
 		"as",
 		"async",
 		"await",
@@ -473,7 +453,7 @@ const code: CodeXG = {
 		"where",
 		"while",
 	],
-	languageSwift: [
+	swift: [
 		"as",
 		"associativity",
 		"break",
@@ -542,7 +522,7 @@ const code: CodeXG = {
 		"while",
 		"willSet",
 	],
-	languageTypescript: [
+	typescript: [
 		"any",
 		"as",
 		"boolean",

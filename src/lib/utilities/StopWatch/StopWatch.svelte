@@ -1,13 +1,8 @@
 <script lang="ts">
 	import { onMount, onDestroy } from "svelte";
-	import {
-		elapsedTime,
-		destroyStopWatch,
-		resetStopWatch,
-		toggleStopWatch,
-		lapTime,
-	} from "./stopwatch";
-	import { ColorNames, myStore } from "$lib/store/data";
+	import { elapsedTime, destroyStopWatch, resetStopWatch, toggleStopWatch, lapTime } from "./stopwatch";
+	import { myStore } from "$lib/store/data";
+	import { ColorNames } from "$lib/store/SettingsXG.svelte";
 	const { settings } = myStore;
 
 	let hourStrokeColors = [
@@ -180,77 +175,59 @@
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <svg viewBox="-50 -50 100 100" onclick={onClick} onkeyup={onKeyDown}>
-	<circle
-		class="{hourStrokeColors[$settings.color]} {hourFillColors[$settings.color]} stroke-2"
-		r="40"
-	/>
-	<circle
-		class="{minuteStrokeColors[$settings.color]} {minuteFillColors[$settings.color]} stroke-1.5"
-		r="20"
-	/>
+	<circle class="{hourStrokeColors[$settings.color]} {hourFillColors[$settings.color]} stroke-2" r="40"></circle>
+	<circle class="{minuteStrokeColors[$settings.color]} {minuteFillColors[$settings.color]} stroke-1.5" r="20"
+	></circle>
 
 	<!-- markers -->
 	{#each [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55] as minute, i (i)}
 		<g transform="rotate({30 * minute})">
-			<line class="stroke-{ColorNames[$settings.color]}-900 stroke-2" y1="35" y2="45" />
-			<line class="stroke-{ColorNames[$settings.color]}-600 stroke-0.5" y1="20" y2="23" />
+			<line class="stroke-{ColorNames[$settings.color]}-900 stroke-2" y1="35" y2="45"></line>
+			<line class="stroke-{ColorNames[$settings.color]}-600 stroke-0.5" y1="20" y2="23"></line>
 		</g>
 
 		{#each [1, 2, 3, 4] as offset, i (i)}
 			<g transform="rotate({6 * (minute + offset)})">
-				<line class="stroke-{ColorNames[$settings.color]}-400 stroke-2" y1="35" y2="39" />
-				<line class="stroke-{ColorNames[$settings.color]}-600 stroke-0.5" y1="20" y2="23" />
+				<line class="stroke-{ColorNames[$settings.color]}-400 stroke-2" y1="35" y2="39"></line>
+				<line class="stroke-{ColorNames[$settings.color]}-600 stroke-0.5" y1="20" y2="23"></line>
 			</g>
 		{/each}
 	{/each}
 
 	<!-- hour hand -->
 	<g transform="rotate({30 * hours})">
-		<line class="stroke-clock-hour-50 stroke-2" y1="-33" y2="-40" />
-		<line class="stroke-clock-hour-50 fill-black stroke-6" y1="-45" y2="-50" />
-		<circle
-			class="stroke-clock-hour-50 fill-black stroke-2"
-			r="4"
-			cx="0"
-			cy="-29"
-			style="fill-opacity: .25;"
-		/>
+		<line class="stroke-clock-hour-50 stroke-2" y1="-33" y2="-40"></line>
+		<line class="stroke-clock-hour-50 fill-black stroke-6" y1="-45" y2="-50"></line>
+		<circle class="stroke-clock-hour-50 fill-black stroke-2" r="4" cx="0" cy="-29" style="fill-opacity: .25;"
+		></circle>
 	</g>
 
 	<!-- minute hand -->
 	<g transform="rotate({6 * minutes})">
 		<line
-			class="stroke-{ColorNames[$settings.color]}-600 fill-{ColorNames[
-				$settings.color
-			]}-100/10 stroke-0.5"
+			class="stroke-{ColorNames[$settings.color]}-600 fill-{ColorNames[$settings.color]}-100/10 stroke-0.5"
 			y1="0"
 			y2="-20"
-		/>
+		></line>
 		<circle
-			class="stroke-{ColorNames[$settings.color]}-600 fill-{ColorNames[
-				$settings.color
-			]}-100/10 stroke-0.5"
+			class="stroke-{ColorNames[$settings.color]}-600 fill-{ColorNames[$settings.color]}-100/10 stroke-0.5"
 			r={9 * (1 - Math.cos((seconds / 30) * Math.PI))}
 			cx="0"
 			cy="0"
 			style="fill-opacity: .05;"
-		/>
+		></circle>
 		<line
-			class="stroke-{ColorNames[$settings.color]}-600 fill-{ColorNames[
-				$settings.color
-			]}-100/10 stroke-2"
+			class="stroke-{ColorNames[$settings.color]}-600 fill-{ColorNames[$settings.color]}-100/10 stroke-2"
 			y1="-15"
 			y2="-17"
-		/>
+		></line>
 		<circle
-			class="stroke-{ColorNames[$settings.color]}-600 fill-{ColorNames[
-				$settings.color
-			]}-100/10 stroke-0.5"
+			class="stroke-{ColorNames[$settings.color]}-600 fill-{ColorNames[$settings.color]}-100/10 stroke-0.5"
 			r={3 * (1 + Math.cos((seconds / 30) * Math.PI))}
 			cx="0"
 			cy="-29"
 			style="fill-opacity: .25;"
-		/>
+		></circle>
 	</g>
 
 	<!-- second hand -->
@@ -259,15 +236,15 @@
 			class="{secondStrokeColors[$settings.color]} {secondFillColors[$settings.color]} stroke-2"
 			y1="-34"
 			y2="-45"
-		/>
-		<line class="{secondStrokeColors[$settings.color]} stroke-1" y1="-24" y2="-19.5" />
+		></line>
+		<line class="{secondStrokeColors[$settings.color]} stroke-1" y1="-24" y2="-19.5"></line>
 		<circle
 			class="{secondStrokeColors[$settings.color]} {secondFillColors[$settings.color]} 5 stroke-1"
 			r="5"
 			cx="0"
 			cy="-29"
 			style="fill-opacity: .25;"
-		/>
+		></circle>
 	</g>
 </svg>
 

@@ -2,25 +2,10 @@ import { browser } from "$app/environment";
 import type { Writable } from "svelte/store";
 import { writable } from "svelte/store";
 import typia, { tags } from "typia";
-import { KeyboardIndex, LayoutIndex } from "./keyboard";
 import { SourceIndex } from "./xgramSources.svelte";
+import { settingsParse, SettingsXG } from "./SettingsXG.svelte";
 
 export const currentVersion = 1; // increment for schema changes.
-
-export enum SoundIndex {
-	rightletter = 0,
-	wrongletter,
-	passedGoals,
-	failedGoals,
-	lessonsDone,
-}
-export const SoundNames = [
-	"Right Letter",
-	"Wrong Letter",
-	"Passed Goals",
-	"Failed Goals",
-	"Lessons Done",
-];
 
 export const ScopeNames = [
 	"Top 50",
@@ -35,57 +20,8 @@ export const ScopeNames = [
 ];
 export const ScopeValues = [50, 100, 200, 500, 1000, 2000, 4000, 8000, 16000];
 
-export enum ColorIndex {
-	red = 0,
-	orange,
-	amber,
-	yellow,
-	lime,
-	green,
-	emerald,
-	teal,
-	cyan,
-	sky,
-	blue,
-	indigo,
-	violet,
-	purple,
-	fuchsia,
-	pink,
-	rose,
-	slate,
-	gray,
-	zinc,
-	neutral,
-	stone,
-}
-export const ColorNames = [
-	"red",
-	"orange",
-	"amber",
-	"yellow",
-	"lime",
-	"green",
-	"emerald",
-	"teal",
-	"cyan",
-	"sky",
-	"blue",
-	"indigo",
-	"violet",
-	"purple",
-	"fuchsia",
-	"pink",
-	"rose",
-	"slate",
-	"gray",
-	"zinc",
-	"neutral",
-	"stone",
-];
-
-class SourceOptions {
-	scope: number & tags.Type<"int32"> & tags.Default<50> = 50;
+export class LessonXG {
+	scope: number & tags.Type<"int32"> & tags.Default<50> = ScopeValues[0];
 	combination: number & tags.Type<"int32"> & tags.Default<2> = 2;
 	repetition: number & tags.Type<"int32"> & tags.Default<20> = 20;
 	filter = "";
@@ -94,36 +30,25 @@ class SourceOptions {
 	linesCurrentIndex: number & tags.Type<"int32"> & tags.Default<0> = 0;
 }
 
-// These do not cause changes to typing lessons
-export class SettingsXG {
-	minimumWPM = 40;
-	minimumAccuracy = 100;
-	public sounds: boolean[] = [true, true, true, true, true];
-	font = " ";
-	color: ColorIndex = ColorIndex.fuchsia;
-	keyboard: KeyboardIndex = KeyboardIndex.matrix;
-	layout: LayoutIndex = LayoutIndex.colemakDH;
-}
-
 export class DataXG {
 	version: number & tags.Type<"int32"> = currentVersion;
 
 	public languages: boolean[] = [false, false, false, false, false, false, false, false, false];
 
-	public sourceOptions: SourceOptions[] = [
-		new SourceOptions(),
-		new SourceOptions(),
-		new SourceOptions(),
-		new SourceOptions(),
-		new SourceOptions(),
-		new SourceOptions(),
-		new SourceOptions(),
-		new SourceOptions(),
-		new SourceOptions(),
+	public sourceOptions: LessonXG[] = [
+		new LessonXG(),
+		new LessonXG(),
+		new LessonXG(),
+		new LessonXG(),
+		new LessonXG(),
+		new LessonXG(),
+		new LessonXG(),
+		new LessonXG(),
+		new LessonXG(),
 	];
 
 	public source: number & tags.Minimum<0> & tags.Maximum<8> = SourceIndex.bigrams;
-	public currentOptions: SourceOptions = new SourceOptions();
+	public currentOptions: LessonXG = new LessonXG();
 }
 
 function dataParse(): DataXG {
@@ -134,18 +59,6 @@ function dataParse(): DataXG {
 		aData = new DataXG();
 	}
 	return aData;
-}
-
-function settingsParse(): SettingsXG {
-	let aSettings: SettingsXG;
-	try {
-		aSettings = typia.json.assertParse<SettingsXG>(localStorage.getItem("settings") ?? "");
-	} catch {
-		aSettings = new SettingsXG();
-	}
-	// console.log('settingsParse aSettings.font:' + aSettings.font);
-
-	return aSettings;
 }
 
 class MyStore {

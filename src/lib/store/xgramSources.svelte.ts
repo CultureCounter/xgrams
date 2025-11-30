@@ -8,6 +8,15 @@ import typia from "typia";
 const clearDatabase = false;
 const traceDatabase = true;
 
+export enum LoadIndex {
+	checkingIDB = 0,
+	loadingServer,
+	retrievingIDB,
+	loaded,
+}
+export const LoadNames: string[] = ["Checking IndexedDB", "Loading from Server", "Retrieving from IndexedDB", "Loaded"];
+export const loadState = $state({ state: LoadIndex.checkingIDB });
+
 // Indexes both Sources and their options
 export enum SourceIndex {
 	bigrams = 0,
@@ -54,15 +63,15 @@ export class SourceXG {
 	hexagrams: string[] = $state([]);
 	pangrams: string[] = $state([]);
 	words: string[] = $state([]);
-	codeWords: string[] = $state([]);
-	customWords: string[] = $state([]);
+	codeWords: string[] = [];
+	customWords: string[] = [];
 }
 
 // TODO switch to IDB completely
 // TODO decompose the data structures
 // TODO async fetch example
 
-export const idbLanguages = $state(new CodeXG());
+export const idbCodes = $state(new CodeXG());
 export const idbSources = $state(new SourceXG());
 
 async function applyServerSources(data: SourceXG) {
@@ -93,41 +102,40 @@ async function applyServerSources(data: SourceXG) {
 		});
 }
 
-async function applyServerLanguages(code: CodeXG) {
+async function applyServerCodes(code: CodeXG) {
 	if (traceDatabase) {
-		console.log("applyServerLanguages code:", code);
-		const key: string = CodeKeys[CodeIndex.languageCpp];
-		// console.log("applyServerLanguages key:", key);
-		// console.log("applyServerLanguages code.languageCpp:", code[key]);
-		// console.log("applyServerLanguages code['languageCpp']:", code["languageCpp"]);
-		// console.log("applyServerLanguages code['languageCpp']:", code.languageCpp);
-		console.log("applyServerLanguages code.languageCpp.length:", code[key].length);
+		console.log("applyServerCodes code:", code);
+		const key: string = CodeKeys[CodeIndex.cpp];
+		// console.log("applyServerCodes key:", key);
+		// console.log("applyServerCodes code.cpp:", code[key]);
+		// console.log("applyServerCodes code['cpp']:", code["cpp"]);
+		// console.log("applyServerCodes code['cpp']:", code.cpp);
+		console.log("applyServerCodes code.cpp.length:", code[key].length);
 	}
 
 	setMany([
-		[CodeNames[CodeIndex.languageCpp], code.languageCpp],
-		[CodeNames[CodeIndex.languageCs], code.languageCs],
-		[CodeNames[CodeIndex.languageGo], code.languageGo],
-		[CodeNames[CodeIndex.languageJava], code.languageJava],
-		[CodeNames[CodeIndex.languageJavascript], code.languageJavascript],
-		[CodeNames[CodeIndex.languagePython], code.languagePython],
-		[CodeNames[CodeIndex.languageRust], code.languageRust],
-		[CodeNames[CodeIndex.languageSwift], code.languageSwift],
-		[CodeNames[CodeIndex.languageTypescript], code.languageTypescript],
+		[CodeNames[CodeIndex.cpp], code.cpp],
+		[CodeNames[CodeIndex.cs], code.cs],
+		[CodeNames[CodeIndex.go], code.go],
+		[CodeNames[CodeIndex.java], code.java],
+		[CodeNames[CodeIndex.javascript], code.javascript],
+		[CodeNames[CodeIndex.python], code.python],
+		[CodeNames[CodeIndex.rust], code.rust],
+		[CodeNames[CodeIndex.swift], code.swift],
+		[CodeNames[CodeIndex.typescript], code.typescript],
 	])
 		.then(() => {
-			if (traceDatabase) console.log("setMany idbLanguages succeeded");
+			if (traceDatabase) console.log("setMany idbCodes succeeded");
 		})
 		.catch((err) => {
-			if (traceDatabase) console.log("setMany idbLanguages failed!", err);
+			if (traceDatabase) console.log("setMany idbCodes failed!", err);
 		});
 }
 
 async function getServerSources() {
 	const response = await fetch("/api/sources");
 	if (!response.ok) {
-		if (traceDatabase)
-			console.log("Client getServerSources() failed: ", response.status, response.statusText);
+		if (traceDatabase) console.log("Client getServerSources() failed: ", response.status, response.statusText);
 		return;
 	}
 
@@ -150,8 +158,7 @@ async function getServerSources() {
 async function getServerLanguages() {
 	const response = await fetch("/api/code");
 	if (!response.ok) {
-		if (traceDatabase)
-			console.log("Client getServerLanguages() failed: ", response.status, response.statusText);
+		if (traceDatabase) console.log("Client getServerLanguages() failed: ", response.status, response.statusText);
 		return;
 	}
 
@@ -169,7 +176,7 @@ async function getServerLanguages() {
 	}
 	if (traceDatabase) console.log("Client getServerLanguages() data ->", data);
 
-	return applyServerLanguages(data);
+	return applyServerCodes(data);
 }
 
 if (browser) {
@@ -178,8 +185,11 @@ if (browser) {
 	} else {
 		keys().then((keys) => {
 			if (keys.length == 18) {
+				loadState.state = LoadIndex.retrievingIDB;
 				if (traceDatabase) console.log("IndexedDB 18 keys exists so it is initialized");
 			} else {
+				loadState.state = LoadIndex.loadingServer;
+				if (traceDatabase) console.log("IndexedDB missing keys, loading from server");
 				getServerSources();
 				getServerLanguages();
 			}
@@ -208,7 +218,6 @@ if (browser) {
 				languageSwiftIDB,
 				languageTypescriptIDB,
 			]) => {
-				// console.log('getMany retrieved');
 				idbSources.bigrams = bigramsIDB;
 				idbSources.trigrams = trigramsIDB;
 				idbSources.tetragrams = tetragramsIDB;
@@ -219,15 +228,17 @@ if (browser) {
 				idbSources.codeWords = codeWordsIDB;
 				idbSources.customWords = customWordsIDB;
 
-				idbLanguages.languageCpp = languageCppIDB;
-				idbLanguages.languageCs = languageCsIDB;
-				idbLanguages.languageGo = languageGoIDB;
-				idbLanguages.languageJava = languageJavaIDB;
-				idbLanguages.languageJavascript = languageJavascriptIDB;
-				idbLanguages.languagePython = languagePythonIDB;
-				idbLanguages.languageRust = languageRustIDB;
-				idbLanguages.languageSwift = languageSwiftIDB;
-				idbLanguages.languageTypescript = languageTypescriptIDB;
+				idbCodes.cpp = languageCppIDB;
+				idbCodes.cs = languageCsIDB;
+				idbCodes.go = languageGoIDB;
+				idbCodes.java = languageJavaIDB;
+				idbCodes.javascript = languageJavascriptIDB;
+				idbCodes.python = languagePythonIDB;
+				idbCodes.rust = languageRustIDB;
+				idbCodes.swift = languageSwiftIDB;
+				idbCodes.typescript = languageTypescriptIDB;
+				if (traceDatabase) console.log("getMany retrieved, loadState.state = LoadIndex.loaded");
+				loadState.state = LoadIndex.loaded;
 			}
 		);
 	}

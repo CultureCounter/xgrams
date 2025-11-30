@@ -1,17 +1,12 @@
 <script lang="ts">
-	import { deepClone, myStore, SoundIndex, DataXG } from "$lib/store/data";
-	import { idbLanguages, idbSources, SourceKeys } from "$lib/store/xgramSources.svelte";
+	import { deepClone, myStore, DataXG, LessonXG } from "$lib/store/data";
+	import { SoundIndex } from "$lib/store/SettingsXG.svelte";
+	import { loadState, LoadIndex, LoadNames, idbCodes, idbSources, SourceKeys } from "$lib/store/xgramSources.svelte";
 	import Celebration, { startCelebration } from "./Celebration.svelte";
 	// import Celebration, { startCelebration, unleashWorker } from './Celebration.svelte';
 	import PlaySounds, { playSound, Sounds } from "./PlaySounds.svelte";
 	import StopWatch from "../lib/utilities/StopWatch/StopWatch.svelte";
-	import {
-		lapTime,
-		resetStopWatch,
-		resetLap,
-		startLap,
-		endLap,
-	} from "../lib/utilities/StopWatch/stopwatch";
+	import { lapTime, resetStopWatch, resetLap, startLap, endLap } from "../lib/utilities/StopWatch/stopwatch";
 
 	const { data, settings } = myStore;
 
@@ -42,12 +37,8 @@
 	 * Lessons are a series of `lines`
 	 */
 	function initializeLesson() {
-		let dataSource = $data.currentOptions;
-		dataSource.lines = generateLines(
-			dataSource.combination,
-			dataSource.repetition,
-			dataSource.filter
-		);
+		let dataSource: LessonXG = $data.currentOptions;
+		dataSource.lines = generateLines(dataSource.combination, dataSource.repetition, dataSource.filter);
 		expectedLine = dataSource.lines[0] || "";
 		dataSource.linesCurrentIndex = 0;
 		initializeLine();
@@ -58,24 +49,25 @@
 	 * @param combinations how many words, ngrams, etc. to combine
 	 * @param repetitions how many sets of the combinations to create
 	 * @param filter reduce the available combinations
+	 * @returns lines to type
 	 */
-	function generateLines(combinations: number, repetitions: number, filter: string) {
+	function generateLines(combinations: number, repetitions: number, filter: string): string[] {
 		let dataSource = $data.currentOptions;
 		let scope = dataSource.scope;
 		let index = $data.source;
-		let s: string = SourceKeys[index] ;
+		let s: string = SourceKeys[index];
 		// console.log("generateLines idbSources:", idbSources);
 		// console.log("generateLines source key:", s);
-		let source = idbSources[ s];
+		let source = idbSources[s];
 		// console.log("generateLines source:", source);
 
 		// console.log('Generating lines with dataSource:', dataSource);
 		// console.log('Generating lines with scope:', scope);
-		console.log("Generating lines with source length:",s   ,index, source.length);
+		console.log("Generating lines with source length:", s, source.length);
 		if (source == null) {
 			console.log("Generating lines with source == null:");
 			console.log("idbSources.source:", idbSources);
-			console.log("idbLanguages:", $state.snapshot(idbLanguages));
+			console.log("idbCodes:", $state.snapshot(idbCodes));
 			source = idbSources.bigrams.slice(0, scope);
 		}
 
@@ -135,14 +127,7 @@
 	};
 	let colorLine: number[] = [];
 
-	const ClassSpan = [
-		"",
-		"normalChar",
-		"underline ",
-		"text-slate-400 ",
-		"text-red-600 ",
-		"text-orange-600 ",
-	] as const;
+	const ClassSpan = ["", "normalChar", "underline ", "text-slate-400 ", "text-red-600 ", "text-orange-600 "] as const;
 	type ClassLine = { class: string; chars: string; typing: boolean };
 	let classLine: ClassLine[] = $state([]);
 
@@ -344,14 +329,14 @@
 	// 	initializeLesson();
 	// });
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function onDataChange(_data: DataXG) {
-		console.log("onDataChange changed, initializeLesson", idbSources);
-		if (idbSources.bigrams == null) {
-			console.log("onDataChange idbSources.bigrams == null, return");
-			return;
-		}
-		initializeLesson();
+		console.log("onDataChange changed, generateLines", _data);
+		// if (idbSources.bigrams == null) {
+		// 	console.log("onDataChange idbSources.bigrams == null, return");
+		// 	return;
+		// }
+		let dataSource: LessonXG = $data.currentOptions;
+		dataSource.lines = generateLines(dataSource.combination, dataSource.repetition, dataSource.filter);
 	}
 
 	$effect(() => {
@@ -361,17 +346,11 @@
 	$effect(() => {
 		// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 		idbSources;
-		if (idbSources.bigrams == null || idbSources.bigrams.length == 0) {
-			console.log("idbSources.bigrams == null, return");
+		if (loadState.state != LoadIndex.loaded) {
+			console.log("effect loadState.state != LoadIndex.loaded, return");
 			return;
 		}
-		let source = idbSources[SourceKeys[$data.source]];
-		if (source == null 
-|| source.length == 0) {
-			console.log("idbSources[SourceKeys[$data.source]] == null, return");
-			return;
-		}
-		console.log("idbSources changed, initializeLesson", idbSources);
+		console.log("effect loadState.state == LoadIndex.loaded, initializeLesson", idbSources);
 		initializeLesson();
 	});
 
@@ -421,9 +400,15 @@
 			{/each}
 		</div>
 		<h4 class="mt-6 flex place-content-evenly gap-x-3">
-			<div>
-				<strong>Lesson {linesCurrentIndex} / {$data.currentOptions.lines.length}</strong>
-			</div>
+			{#if loadState.state == LoadIndex.loaded}
+				<div>
+					<strong>Lesson {linesCurrentIndex} / {$data.currentOptions.lines.length}</strong>
+				</div>
+			{:else}
+				<div>
+					<strong>{LoadNames[loadState.state]}</strong>
+				</div>
+			{/if}
 		</h4>
 		<h4 class="mt-0 flex place-content-evenly gap-x-3">
 			<div>WPM: {rawWPM}</div>

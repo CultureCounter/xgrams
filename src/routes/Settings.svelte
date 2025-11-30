@@ -1,18 +1,7 @@
 <script lang="ts">
-	import {
-		ColorIndex,
-		ColorNames,
-		myStore,
-		ScopeNames,
-		ScopeValues,
-		SoundNames,
-	} from "$lib/store/data";
-	import {
-		idbLanguages,
-		idbSources,
-		SourceIndex,
-		SourceNames,
-	} from "$lib/store/xgramSources.svelte.ts";
+	import { myStore, ScopeNames, ScopeValues } from "$lib/store/data";
+	import { ColorIndex, ColorNames, FontFamilyCSS, FontFamilyNames, SoundNames } from "$lib/store/SettingsXG.svelte";
+	import { idbCodes, idbSources, SourceIndex, SourceNames } from "$lib/store/xgramSources.svelte.ts";
 	import { CodeIndex } from "$lib/store/code";
 	import { KeyboardIndex, KeyboardNames, LayoutIndex, LayoutNames } from "$lib/store/keyboard";
 	import { Dialog, Portal, SegmentedControl, Switch } from "@skeletonlabs/skeleton-svelte";
@@ -27,20 +16,20 @@
 
 	function updateCodeWords() {
 		let codeWordsProccessed = [
-			...($data.languages[CodeIndex.languageCpp] ? idbLanguages.languageCpp : []),
-			...($data.languages[CodeIndex.languageCs] ? idbLanguages.languageCs : []),
-			...($data.languages[CodeIndex.languageGo] ? idbLanguages.languageGo : []),
-			...($data.languages[CodeIndex.languageJava] ? idbLanguages.languageJava : []),
-			...($data.languages[CodeIndex.languageJavascript] ? idbLanguages.languageJavascript : []),
-			...($data.languages[CodeIndex.languagePython] ? idbLanguages.languagePython : []),
-			...($data.languages[CodeIndex.languageRust] ? idbLanguages.languageRust : []),
-			...($data.languages[CodeIndex.languageSwift] ? idbLanguages.languageSwift : []),
-			...($data.languages[CodeIndex.languageTypescript] ? idbLanguages.languageTypescript : []),
+			...($data.languages[CodeIndex.cpp] ? idbCodes.cpp : []),
+			...($data.languages[CodeIndex.cs] ? idbCodes.cs : []),
+			...($data.languages[CodeIndex.go] ? idbCodes.go : []),
+			...($data.languages[CodeIndex.java] ? idbCodes.java : []),
+			...($data.languages[CodeIndex.javascript] ? idbCodes.javascript : []),
+			...($data.languages[CodeIndex.python] ? idbCodes.python : []),
+			...($data.languages[CodeIndex.rust] ? idbCodes.rust : []),
+			...($data.languages[CodeIndex.swift] ? idbCodes.swift : []),
+			...($data.languages[CodeIndex.typescript] ? idbCodes.typescript : []),
 		];
 
-		// console.log('Updating code words to:', codeWordsProccessed);
+		console.log("Updating code words to:", codeWordsProccessed);
 		idbSources.codeWords = codeWordsProccessed;
-		// console.log('Updated idbSources:', idbSources);
+		console.log("Updated idbSources:", idbSources);
 		$data = $data;
 	}
 
@@ -79,69 +68,9 @@
 	type ConditionalDisplay = "fonts" | "filter" | "code" | "custom";
 	let conditionalDisplay = $state<ConditionalDisplay>("fonts");
 
-	let fontFamilyCSS = [
-		"font-sans ",
-		"helveticaNeue ",
-		"calibri ",
-		"candara ",
-		"century ",
-		"dejavu ",
-		"notoSans ",
-		"optima ",
-		"roboto ",
-		"ubuntu ",
-		"verdana ",
-
-		"font-serif ",
-		"baskerville ",
-		"calistoMT ",
-		"cambria ",
-		"didot ",
-		"garamond ",
-		"georgia ",
-		"notoSerif ",
-		"palatino ",
-
-		"font-mono ",
-		"font-andaleMono ",
-		"font-consolas ",
-		"font-courierNew ",
-		"ubuntuMono ",
-		"font-luminari ",
-		"font-comicSansMS ",
-	];
-	let fontFamilyNames = [
-		"---Sans-Serif---",
-		"Helvetica Neue",
-		"Calibri",
-		"Candara",
-		"Century",
-		"Dejavu Sans",
-		"Noto Sans",
-		"Optima",
-		"Roboto",
-		"Ubuntu",
-		"Verdana",
-		"---Serif---",
-		"Baskerville",
-		"Calisto MT",
-		"Cambria",
-		"Didot",
-		"Garamond",
-		"Georgia",
-		"Noto Serif",
-		"Palatino",
-		"---Mono---",
-		"Andale Mono",
-		"Consolas",
-		"Courier New",
-		"Ubuntu Mono",
-		"Luminari",
-		"Comic Sans MS",
-	];
-	let selectedFontFamily: string = $state(findStrings($settings.font, fontFamilyCSS));
+	let selectedFontFamily: string = $state(findStrings($settings.font, FontFamilyCSS));
 	function setFontFamily(): void {
-		$settings.font = replaceStrings($settings.font, fontFamilyCSS, selectedFontFamily);
+		$settings.font = replaceStrings($settings.font, FontFamilyCSS, selectedFontFamily);
 		// console.log('setFontFamily():|' + $settings.font + '|');
 	}
 
@@ -160,21 +89,7 @@
 		"text-8xl ",
 		"text-9xl ",
 	];
-	let fontSizeNames = [
-		"xs",
-		"sm",
-		"base",
-		"lg",
-		"xl",
-		"2xl",
-		"3xl",
-		"4xl",
-		"5xl",
-		"6xl",
-		"7xl",
-		"8xl",
-		"9xl",
-	];
+	let fontSizeNames = ["xs", "sm", "base", "lg", "xl", "2xl", "3xl", "4xl", "5xl", "6xl", "7xl", "8xl", "9xl"];
 	let selectedFontSize: string = $state(findStrings($settings.font, fontSizeCSS));
 	function setFontSize(): void {
 		$settings.font = replaceStrings($settings.font, fontSizeCSS, selectedFontSize);
@@ -244,7 +159,7 @@
 
 	function clearFont(): void {
 		$settings.font = "";
-		selectedFontFamily = findStrings($settings.font, fontFamilyCSS);
+		selectedFontFamily = findStrings($settings.font, FontFamilyCSS);
 		selectedFontSize = findStrings($settings.font, fontSizeCSS);
 		selectedFontWeight = findStrings($settings.font, fontWeightCSS);
 		selectedFontSpacing = findStrings($settings.font, fontSpacingCSS);
@@ -293,9 +208,7 @@
 			<Dialog.Content class="size-min space-y-4 card bg-surface-100-900 shadow-xl {animModal}">
 				<header class="flex justify-between">
 					<Dialog.Title class="text-2xl font-bold">Settings</Dialog.Title>
-					<Dialog.CloseTrigger onclick={updateCodeWords} class="btn preset-tonal"
-						>Save</Dialog.CloseTrigger
-					>
+					<Dialog.CloseTrigger onclick={updateCodeWords} class="btn preset-tonal">Save</Dialog.CloseTrigger>
 				</header>
 				<article class="flex place-content-between gap-2">
 					<script>
@@ -318,7 +231,8 @@
 													>Code <button
 														class={iconButtonClass}
 														onclick={() => {
-															conditionalDisplay = conditionalDisplay !== "code" ? "code" : "fonts";
+															conditionalDisplay =
+																conditionalDisplay !== "code" ? "code" : "fonts";
 														}}
 														>🤖
 													</button>
@@ -513,9 +427,9 @@
 											setFontFamily();
 										}}
 									>
-										{#each fontFamilyCSS as name, i (name)}
+										{#each FontFamilyCSS as name, i (name)}
 											<option value={name}>
-												{fontFamilyNames[i]}
+												{FontFamilyNames[i]}
 											</option>
 										{/each}
 									</select>
