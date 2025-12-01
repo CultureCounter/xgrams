@@ -7,7 +7,7 @@
 
 	let currentPlayingSound: HTMLAudioElement = null as unknown as HTMLAudioElement;
 
-	let TheSounds: HTMLAudioElement[] = [];
+	let theSounds: HTMLAudioElement[] = [];
 
 	export const Sounds = {
 		rightLetter: 0,
@@ -39,20 +39,30 @@
 	}
 
 	export function playSound(sound: Sounds): void {
-		if (TheSounds.length == 0) {
-			TheSounds = [
-				rightLetterSound,
-				wrongLetterSound,
-				failedGoalsSound,
-				passedGoalsSound,
-				lessonsDoneSound,
-			];
-			// console.log(TheSounds);
+		if (theSounds.length === 0) {
+			theSounds = [rightLetterSound, wrongLetterSound, failedGoalsSound, passedGoalsSound, lessonsDoneSound];
 		}
 		stopPlayingSound();
-		let theSound = TheSounds[sound];
+		let theSound = theSounds[sound];
 		theSound.play();
 		currentPlayingSound = theSound;
+	}
+	export function setVolume(volume: number): void {
+		console.log("Volume changed to ", volume);
+		if (rightLetterSound === null) {
+			return;
+		}
+		console.log("setVolume theSounds.length ", theSounds.length);
+		if (theSounds.length === 0) {
+			theSounds = [rightLetterSound, wrongLetterSound, failedGoalsSound, passedGoalsSound, lessonsDoneSound];
+		}
+		let soundVolume = volume / 100;
+		console.log("Setting sound volume to ", soundVolume);
+		rightLetterSound.volume = soundVolume;
+		wrongLetterSound.volume = soundVolume;
+		failedGoalsSound.volume = soundVolume;
+		passedGoalsSound.volume = soundVolume;
+		lessonsDoneSound.volume = soundVolume;
 	}
 </script>
 

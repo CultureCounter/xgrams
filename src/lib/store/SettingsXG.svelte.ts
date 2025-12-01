@@ -7,6 +7,7 @@ export class SettingsXG {
 	minimumWPM: number & tags.Type<"int32"> & tags.Minimum<0> & tags.Maximum<400> & tags.Default<40> = 40;
 	minimumAccuracy: number & tags.Type<"int32"> & tags.Minimum<0> & tags.Maximum<100> & tags.Default<100> = 100;
 	public sounds: boolean[] = [true, true, true, true, true];
+	volume: number & tags.Type<"int32"> & tags.Minimum<0> & tags.Maximum<100> & tags.Default<100> = $state(100);
 	font: string = $state(" ");
 	color: ColorIndex = ColorIndex.fuchsia;
 	keyboard: KeyboardIndex = KeyboardIndex.matrix;

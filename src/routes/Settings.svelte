@@ -6,12 +6,14 @@
 	import { CodeIndex } from "$lib/store/code";
 	import { KeyboardIndex, KeyboardNames, LayoutIndex, LayoutNames } from "$lib/store/keyboard";
 	import { Dialog, Portal, SegmentedControl, Switch } from "@skeletonlabs/skeleton-svelte";
+	import { setVolume } from "./PlaySounds.svelte";
 	import MusicIcon from "@lucide/svelte/icons/music";
 
 	import Counter from "./Counter.svelte";
 	import OptionsCode from "./OptionsCode.svelte";
 	import OptionsCustom from "./OptionsCustom.svelte";
 	import OptionsFilter from "./OptionsFilter.svelte";
+	// import { set } from "idb-keyval";
 
 	const { data, settings } = myStore;
 
@@ -181,6 +183,12 @@
 		$data.currentOptions.scope = scopeValue ? ScopeValues[ScopeNames.indexOf(scopeValue)] : 50;
 	});
 
+	let volume = $state($settings.volume);
+	$effect(() => {
+		console.log("settings.volume changed to ", volume);
+		setVolume(volume);
+	});
+
 	const animBackdrop =
 		"transition transition-discrete opacity-0 starting:data-[state=open]:opacity-0 data-[state=open]:opacity-100";
 	const animModal =
@@ -328,6 +336,9 @@
 					<div class={cardClass}>
 						<header class="card-header">Sounds</header>
 						<article class={articleClassV}>
+							<Counter name="Volume" minCounter={0} maxCounter={100} stepCounter={5} bind:count={volume}
+							></Counter>
+
 							{#each SoundNames as name, i (name)}
 								<Switch checked={$settings.sounds[i]} onchange={(e) => soundsChanged(e, i)}>
 									<Switch.Control
