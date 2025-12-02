@@ -1,10 +1,8 @@
 <script lang="ts">
-	import { myStore } from "$lib/store/data";
-
-	const { data } = myStore;
+	import { idbData } from "$lib/store/data";
 
 	function filterChanged() {
-		console.log("Filter changed:", $data.currentOptions.filter);
+		console.log("Filter changed:", idbData.currentOptions.filter);
 	}
 </script>
 
@@ -17,12 +15,7 @@
 	><br />
 	Matches: <strong>exam empl mple mpel plem ...</strong>
 </article>
-<textarea
-	class="textarea"
-	id="filter-text"
-	name="Filter Text"
-	rows="10"
-	bind:value={$data.currentOptions.filter}
+<textarea class="textarea" id="filter-text" name="Filter Text" rows="10" bind:value={idbData.currentOptions.filter}
 ></textarea>
 <button
 	onclick={() => {

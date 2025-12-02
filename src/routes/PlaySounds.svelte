@@ -48,16 +48,16 @@
 		currentPlayingSound = theSound;
 	}
 	export function setVolume(volume: number): void {
-		console.log("Volume changed to ", volume);
+		// console.log("Volume changed to ", volume);
 		if (rightLetterSound === null) {
 			return;
 		}
-		console.log("setVolume theSounds.length ", theSounds.length);
+		// console.log("setVolume theSounds.length ", theSounds.length);
 		if (theSounds.length === 0) {
 			theSounds = [rightLetterSound, wrongLetterSound, failedGoalsSound, passedGoalsSound, lessonsDoneSound];
 		}
 		let soundVolume = volume / 100;
-		console.log("Setting sound volume to ", soundVolume);
+		// console.log("Setting sound volume to ", soundVolume);
 		rightLetterSound.volume = soundVolume;
 		wrongLetterSound.volume = soundVolume;
 		failedGoalsSound.volume = soundVolume;

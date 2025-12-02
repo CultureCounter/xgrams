@@ -1,10 +1,9 @@
 <script lang="ts">
-	import { myStore } from "$lib/store/data";
-	import { SourceIndex } from "$lib/store/xgramSources.svelte";
+	import { idbData } from "$lib/store/data";
+	import { SourceIndex } from "$lib/store/SourceXG.svelte";
 
-	const { data } = myStore;
 	function customChanged() {
-		console.log("Custom changed:", $data.sourceOptions[SourceIndex.customWords].lines);
+		console.log("Custom changed:", idbData.sourceOptions[SourceIndex.customWords].lines);
 	}
 </script>
 
@@ -13,7 +12,7 @@
 	id="custom-text"
 	name="Custom Text"
 	rows="10"
-	bind:value={$data.sourceOptions[SourceIndex.customWords].lines}
+	bind:value={idbData.sourceOptions[SourceIndex.customWords].lines}
 ></textarea>
 <button
 	onclick={() => {

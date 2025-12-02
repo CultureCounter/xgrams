@@ -6,7 +6,7 @@ import pentagrams from "$lib/store/pentagrams";
 import hexagrams from "$lib/store/hexagrams";
 import pangrams from "$lib/store/pangrams";
 import words from "$lib/store/words";
-import { SourceXG } from "$lib/store/xgramSources.svelte";
+import { SourceXG } from "$lib/store/SourceXG.svelte";
 import typia from "typia";
 
 const data: SourceXG = new SourceXG();

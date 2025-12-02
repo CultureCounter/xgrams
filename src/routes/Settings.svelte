@@ -1,8 +1,16 @@
 <script lang="ts">
-	import { myStore } from "$lib/store/data";
+	import { idbData } from "$lib/store/data";
 	import { ScopeNames, ScopeValues } from "$lib/store/LessonXG";
-	import { ColorIndex, ColorNames, FontFamilyCSS, FontFamilyNames, SoundNames } from "$lib/store/SettingsXG.svelte";
-	import { idbCodes, idbSources, SourceIndex, SourceNames } from "$lib/store/xgramSources.svelte.ts";
+	import {
+		idbSettings,
+		ColorIndex,
+		ColorNames,
+		FontFamilyCSS,
+		FontFamilyNames,
+		saveSettings,
+		SoundNames,
+	} from "$lib/store/SettingsXG.svelte";
+	import { idbCodes, idbSources, SourceIndex, SourceNames } from "$lib/store/SourceXG.svelte";
 	import { CodeIndex } from "$lib/store/code";
 	import { KeyboardIndex, KeyboardNames, LayoutIndex, LayoutNames } from "$lib/store/keyboard";
 	import { Dialog, Portal, SegmentedControl, Switch } from "@skeletonlabs/skeleton-svelte";
@@ -15,25 +23,22 @@
 	import OptionsFilter from "./OptionsFilter.svelte";
 	// import { set } from "idb-keyval";
 
-	const { data, settings } = myStore;
-
 	function updateCodeWords() {
 		let codeWordsProccessed = [
-			...($data.languages[CodeIndex.cpp] ? idbCodes.cpp : []),
-			...($data.languages[CodeIndex.cs] ? idbCodes.cs : []),
-			...($data.languages[CodeIndex.go] ? idbCodes.go : []),
-			...($data.languages[CodeIndex.java] ? idbCodes.java : []),
-			...($data.languages[CodeIndex.javascript] ? idbCodes.javascript : []),
-			...($data.languages[CodeIndex.python] ? idbCodes.python : []),
-			...($data.languages[CodeIndex.rust] ? idbCodes.rust : []),
-			...($data.languages[CodeIndex.swift] ? idbCodes.swift : []),
-			...($data.languages[CodeIndex.typescript] ? idbCodes.typescript : []),
+			...(idbData.languages[CodeIndex.cpp] ? idbCodes.cpp : []),
+			...(idbData.languages[CodeIndex.cs] ? idbCodes.cs : []),
+			...(idbData.languages[CodeIndex.go] ? idbCodes.go : []),
+			...(idbData.languages[CodeIndex.java] ? idbCodes.java : []),
+			...(idbData.languages[CodeIndex.javascript] ? idbCodes.javascript : []),
+			...(idbData.languages[CodeIndex.python] ? idbCodes.python : []),
+			...(idbData.languages[CodeIndex.rust] ? idbCodes.rust : []),
+			...(idbData.languages[CodeIndex.swift] ? idbCodes.swift : []),
+			...(idbData.languages[CodeIndex.typescript] ? idbCodes.typescript : []),
 		];
 
 		console.log("Updating code words to:", codeWordsProccessed);
 		idbSources.codeWords = codeWordsProccessed;
 		console.log("Updated idbSources:", idbSources);
-		$data = $data;
 	}
 
 	/**
@@ -71,10 +76,11 @@
 	type ConditionalDisplay = "fonts" | "filter" | "code" | "custom";
 	let conditionalDisplay = $state<ConditionalDisplay>("fonts");
 
-	let selectedFontFamily: string = $state(findStrings($settings.font, FontFamilyCSS));
+	let selectedFontFamily: string = $state(findStrings(idbSettings.font, FontFamilyCSS));
 	function setFontFamily(): void {
-		$settings.font = replaceStrings($settings.font, FontFamilyCSS, selectedFontFamily);
-		// console.log('setFontFamily():|' + $settings.font + '|');
+		idbSettings.font = replaceStrings(idbSettings.font, FontFamilyCSS, selectedFontFamily);
+		// console.log('setFontFamily():|' + idbSettings.font + '|');
+		saveSettings();
 	}
 
 	let fontSizeCSS = [
@@ -93,10 +99,11 @@
 		"text-9xl ",
 	];
 	let fontSizeNames = ["xs", "sm", "base", "lg", "xl", "2xl", "3xl", "4xl", "5xl", "6xl", "7xl", "8xl", "9xl"];
-	let selectedFontSize: string = $state(findStrings($settings.font, fontSizeCSS));
+	let selectedFontSize: string = $state(findStrings(idbSettings.font, fontSizeCSS));
 	function setFontSize(): void {
-		$settings.font = replaceStrings($settings.font, fontSizeCSS, selectedFontSize);
-		// console.log('setFontSize():|' + $settings.font + '|');
+		idbSettings.font = replaceStrings(idbSettings.font, fontSizeCSS, selectedFontSize);
+		// console.log('setFontSize():|' + idbSettings.font + '|');
+		saveSettings();
 	}
 
 	let fontWeightCSS = [
@@ -121,10 +128,11 @@
 		"extrabold",
 		"black",
 	];
-	let selectedFontWeight: string = $state(findStrings($settings.font, fontWeightCSS));
+	let selectedFontWeight: string = $state(findStrings(idbSettings.font, fontWeightCSS));
 	function setFontWeight(): void {
-		$settings.font = replaceStrings($settings.font, fontWeightCSS, selectedFontWeight);
-		// console.log('setFontWeight():|' + $settings.font + '|');
+		idbSettings.font = replaceStrings(idbSettings.font, fontWeightCSS, selectedFontWeight);
+		// console.log('setFontWeight():|' + idbSettings.font + '|');
+		saveSettings();
 	}
 
 	let fontSpacingCSS = [
@@ -136,57 +144,63 @@
 		"tracking-widest ",
 	];
 	let fontSpacingNames = ["tighter", "tight", "normal", "wide", "wider", "widest"];
-	let selectedFontSpacing: string = $state(findStrings($settings.font, fontSpacingCSS));
+	let selectedFontSpacing: string = $state(findStrings(idbSettings.font, fontSpacingCSS));
 	function setFontSpacing(): void {
-		$settings.font = replaceStrings($settings.font, fontSpacingCSS, selectedFontSpacing);
-		// console.log('setFontSpacing():|' + $settings.font + '|');
+		idbSettings.font = replaceStrings(idbSettings.font, fontSpacingCSS, selectedFontSpacing);
+		// console.log('setFontSpacing():|' + idbSettings.font + '|');
+		saveSettings();
 	}
 
-	let selectedColor: ColorIndex = $state($settings.color);
+	let selectedColor: ColorIndex = $state(idbSettings.color);
 	function setColor(): void {
-		$settings.color = selectedColor;
-		// console.log('setColor():|' + $settings.color + '|');
+		idbSettings.color = selectedColor;
+		// console.log('setColor():|' + idbSettings.color + '|');
+		saveSettings();
 	}
 
-	let selectedKeyboard: KeyboardIndex = $state($settings.keyboard);
+	let selectedKeyboard: KeyboardIndex = $state(idbSettings.keyboard);
 	function setKeyboard(): void {
-		$settings.keyboard = selectedKeyboard;
-		// console.log('setColor():|' + $settings.color + '|');
+		idbSettings.keyboard = selectedKeyboard;
+		// console.log('setColor():|' + idbSettings.color + '|');
+		saveSettings();
 	}
 
-	let selectedLayout: LayoutIndex = $state($settings.layout);
+	let selectedLayout: LayoutIndex = $state(idbSettings.layout);
 	function setLayout(): void {
-		$settings.layout = selectedLayout;
-		// console.log('setColor():|' + $settings.color + '|');
+		idbSettings.layout = selectedLayout;
+		// console.log('setColor():|' + idbSettings.color + '|');
+		saveSettings();
 	}
 
 	function clearFont(): void {
-		$settings.font = "";
-		selectedFontFamily = findStrings($settings.font, FontFamilyCSS);
-		selectedFontSize = findStrings($settings.font, fontSizeCSS);
-		selectedFontWeight = findStrings($settings.font, fontWeightCSS);
-		selectedFontSpacing = findStrings($settings.font, fontSpacingCSS);
-		// console.log('setFontSpacing():|' + $settings.font + '|');
+		idbSettings.font = "";
+		selectedFontFamily = findStrings(idbSettings.font, FontFamilyCSS);
+		selectedFontSize = findStrings(idbSettings.font, fontSizeCSS);
+		selectedFontWeight = findStrings(idbSettings.font, fontWeightCSS);
+		selectedFontSpacing = findStrings(idbSettings.font, fontSpacingCSS);
+		// console.log('setFontSpacing():|' + idbSettings.font + '|');
+		saveSettings();
 	}
 	let keyBackspace = `\u232B`;
 
 	let sourceValue = $state<string | null>(SourceNames[0]);
 	let scopeValue = $state<string | null>(ScopeNames[0]);
 	function soundsChanged(e: Event, i: number) {
-		$settings.sounds[i] = (e.target as HTMLInputElement).checked;
+		idbSettings.sounds[i] = (e.target as HTMLInputElement).checked;
+		saveSettings();
 	}
 
 	$effect(() => {
 		// console.log('sourceValue changed to ' + sourceValue);
 		// console.log('scopeValue changed to ' + scopeValue);
-		$data.source = sourceValue ? SourceNames.indexOf(sourceValue) : 0;
-		$data.currentOptions.scope = scopeValue ? ScopeValues[ScopeNames.indexOf(scopeValue)] : 50;
+		idbData.source = sourceValue ? SourceNames.indexOf(sourceValue) : 0;
+		idbData.currentOptions.scope = scopeValue ? ScopeValues[ScopeNames.indexOf(scopeValue)] : 50;
 	});
 
-	let volume = $state($settings.volume);
+	let volume = $state(idbSettings.volume);
 	$effect(() => {
-		console.log("settings.volume changed to ", volume);
 		setVolume(volume);
+		saveSettings();
 	});
 
 	const animBackdrop =
@@ -296,13 +310,13 @@
 								name="Combination"
 								minCounter={1}
 								stepCounter={1}
-								bind:count={$data.currentOptions.combination}
+								bind:count={idbData.currentOptions.combination}
 							/>
 							<Counter
 								name="Repetition"
 								stepCounter={1}
 								minCounter={1}
-								bind:count={$data.currentOptions.repetition}
+								bind:count={idbData.currentOptions.repetition}
 							/>
 							<div>
 								Filter<button
@@ -323,13 +337,13 @@
 								minCounter={0}
 								maxCounter={400}
 								stepCounter={10}
-								bind:count={$settings.minimumWPM}
+								bind:count={idbSettings.minimumWPM}
 							/>
 							<Counter
 								name="Minimum&nbsp;Accuracy"
 								minCounter={0}
 								maxCounter={100}
-								bind:count={$settings.minimumAccuracy}
+								bind:count={idbSettings.minimumAccuracy}
 							/>
 						</article>
 					</div>
@@ -340,7 +354,7 @@
 							></Counter>
 
 							{#each SoundNames as name, i (name)}
-								<Switch checked={$settings.sounds[i]} onchange={(e) => soundsChanged(e, i)}>
+								<Switch checked={idbSettings.sounds[i]} onchange={(e) => soundsChanged(e, i)}>
 									<Switch.Control
 										class="preset-filled-secondary-50-950 data-[state=checked]:preset-filled-secondary-500"
 									>
@@ -358,12 +372,6 @@
 
 									<Switch.HiddenInput />
 								</Switch>
-								<!-- <SlideToggle
-										active="variant-filled-primary"
-										hover="hover:variant-soft-primary"
-										{name}
-										bind:checked={$settings.sounds[i]}>{name}</SlideToggle
-									> -->
 							{/each}
 						</article>
 						<header class="card-header pt-3">Keyboard</header>
@@ -503,10 +511,10 @@
 							</article>
 							<header class="card-header">Legibility Test</header>
 							<article class={articleClassV}>
-								<span class="bg-transparent {$settings.font}"
+								<span class="bg-transparent {idbSettings.font}"
 									>il1IL1 dbdqpq DBDQPQ ij., fgjty rnmrn RNMRN o0O</span
 								>
-								<span class="bg-transparent {$settings.font}"
+								<span class="bg-transparent {idbSettings.font}"
 									>Sphinx of black quartz, judge my vow!</span
 								>
 							</article>

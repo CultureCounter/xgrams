@@ -1,15 +1,15 @@
 <script lang="ts">
-	import { deepClone, myStore, DataXG } from "$lib/store/data";
+	import { deepClone, DataXG, idbData } from "$lib/store/data";
 	import { LessonXG } from "$lib/store/LessonXG";
 	import { SoundIndex } from "$lib/store/SettingsXG.svelte";
-	import { loadState, LoadIndex, LoadNames, idbCodes, idbSources, SourceKeys } from "$lib/store/xgramSources.svelte";
+	import { idbCodes, idbSources, SourceKeys } from "$lib/store/SourceXG.svelte";
+	import { loadState, LoadIndex, LoadNames } from "$lib/store/loadState.svelte";
 	import Celebration, { startCelebration } from "./Celebration.svelte";
 	// import Celebration, { startCelebration, unleashWorker } from './Celebration.svelte';
 	import PlaySounds, { playSound, Sounds } from "./PlaySounds.svelte";
 	import StopWatch from "../lib/utilities/StopWatch/StopWatch.svelte";
 	import { lapTime, resetStopWatch, resetLap, startLap, endLap } from "../lib/utilities/StopWatch/stopwatch";
-
-	const { data, settings } = myStore;
+	import { idbSettings } from "$lib/store/SettingsXG.svelte";
 
 	function shuffle(array: string[]): void {
 		for (let i = array.length - 1; i > 0; i--) {
@@ -38,7 +38,7 @@
 	 * Lessons are a series of `lines`
 	 */
 	function initializeLesson() {
-		let dataSource: LessonXG = $data.currentOptions;
+		let dataSource: LessonXG = idbData.currentOptions;
 		dataSource.lines = generateLines(dataSource.combination, dataSource.repetition, dataSource.filter);
 		expectedLine = dataSource.lines[0] || "";
 		dataSource.linesCurrentIndex = 0;
@@ -53,9 +53,9 @@
 	 * @returns lines to type
 	 */
 	function generateLines(combinations: number, repetitions: number, filter: string): string[] {
-		let dataSource = $data.currentOptions;
+		let dataSource = idbData.currentOptions;
 		let scope = dataSource.scope;
-		let index = $data.source;
+		let index = idbData.source;
 		let s: string = SourceKeys[index];
 		// console.log("generateLines idbSources:", idbSources);
 		// console.log("generateLines source key:", s);
@@ -184,7 +184,7 @@
 		}
 		if (typedLine.length > expectedLine.length) {
 			typedLine = typedLine.slice(0, -1);
-			if ($settings.sounds[SoundIndex.wrongletter]) playSound(Sounds.wrongLetter);
+			if (idbSettings.sounds[SoundIndex.wrongletter]) playSound(Sounds.wrongLetter);
 			return;
 		}
 
@@ -240,10 +240,10 @@
 		startLap();
 
 		if (expectedLine.startsWith(typedLine)) {
-			if ($settings.sounds[SoundIndex.rightletter]) playSound(Sounds.rightLetter);
+			if (idbSettings.sounds[SoundIndex.rightletter]) playSound(Sounds.rightLetter);
 			rightLetters += 1;
 		} else if (expectedLine !== typedLine.trimEnd()) {
-			if ($settings.sounds[SoundIndex.wrongletter]) playSound(Sounds.wrongLetter);
+			if (idbSettings.sounds[SoundIndex.wrongletter]) playSound(Sounds.wrongLetter);
 			wrongLetters += 1;
 		}
 
@@ -259,21 +259,21 @@
 
 			endLap();
 			// Failed Goals
-			if (rawWPM < $settings.minimumWPM || accuracy < $settings.minimumAccuracy) {
-				if ($settings.sounds[SoundIndex.failedGoals]) playSound(Sounds.failedGoals);
+			if (rawWPM < idbSettings.minimumWPM || accuracy < idbSettings.minimumAccuracy) {
+				if (idbSettings.sounds[SoundIndex.failedGoals]) playSound(Sounds.failedGoals);
 				initializeLine();
 				return;
 			}
 
 			// Goals Achieved
-			let dataSource = $data.currentOptions;
+			let dataSource = idbData.currentOptions;
 			let newRoundStarted = dataSource.linesCurrentIndex == 0;
 			if (newRoundStarted) {
 				dataSource.WPMs = [];
 			}
 			dataSource.WPMs.push(rawWPM);
 
-			if ($settings.sounds[SoundIndex.passedGoals]) playSound(Sounds.passedGoals);
+			if (idbSettings.sounds[SoundIndex.passedGoals]) playSound(Sounds.passedGoals);
 			nextLine();
 		} else {
 			makeColorLine();
@@ -290,12 +290,12 @@
 		colorLine = colorLine.fill(ColorChars.normalChar, 0, expectedLine.length);
 		colorLine[0] = ColorChars.typingChar;
 		makeColorLine();
-		linesCurrentIndex = $data.currentOptions.linesCurrentIndex;
+		linesCurrentIndex = idbData.currentOptions.linesCurrentIndex;
 		// console.log('resetCurrentLine linesCurrentIndex:' + $data.currentOptions.linesCurrentIndex);
 	}
 
 	function nextLine() {
-		let dataSource = $data.currentOptions;
+		let dataSource = idbData.currentOptions;
 		let nextLineExists = dataSource.lines.length > dataSource.linesCurrentIndex + 1;
 		if (nextLineExists) {
 			// console.log('nextLine linesCurrentIndex:' + dataSource.linesCurrentIndex);
@@ -306,14 +306,14 @@
 			initializeLine();
 		} else {
 			// Start again from beginning, but generate new data.
-			if ($settings.sounds[SoundIndex.lessonsDone]) playSound(Sounds.lessonsDone);
+			if (idbSettings.sounds[SoundIndex.lessonsDone]) playSound(Sounds.lessonsDone);
 			startCelebration();
 			initializeLesson();
 		}
 	}
 
 	function averageWPM(): number {
-		let dataSource = $data.currentOptions;
+		let dataSource = idbData.currentOptions;
 		if (dataSource.WPMs.length == 0) {
 			return 0;
 		}
@@ -336,22 +336,22 @@
 		// 	console.log("onDataChange idbSources.bigrams == null, return");
 		// 	return;
 		// }
-		let dataSource: LessonXG = $data.currentOptions;
+		let dataSource: LessonXG = idbData.currentOptions;
 		dataSource.lines = generateLines(dataSource.combination, dataSource.repetition, dataSource.filter);
 	}
 
 	$effect(() => {
-		onDataChange($data);
+		onDataChange(idbData);
 	});
 
 	$effect(() => {
 		// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 		idbSources;
-		if (loadState.state != LoadIndex.loaded) {
-			console.log("effect loadState.state != LoadIndex.loaded, return");
+		if (loadState.sourceXG != LoadIndex.loaded) {
+			console.log("effect loadState.sourceXG != LoadIndex.loaded, return");
 			return;
 		}
-		console.log("effect loadState.state == LoadIndex.loaded, initializeLesson", idbSources);
+		console.log("effect loadState.sourceXG == LoadIndex.loaded, initializeLesson", idbSources);
 		initializeLesson();
 	});
 
@@ -391,7 +391,7 @@
 		onmouseleave={handleMouseLeave}
 		tabindex="-1"
 	>
-		<div class="p-2 {$settings.font}">
+		<div class="p-2 {idbSettings.font}">
 			{#each classLine as cp, i (cp.chars + i)}
 				{#if cp.typing}
 					<span class={cp.class + " " + ClassSpan[ColorChars.typingChar]}>{cp.chars}</span>
@@ -401,13 +401,13 @@
 			{/each}
 		</div>
 		<h4 class="mt-6 flex place-content-evenly gap-x-3">
-			{#if loadState.state == LoadIndex.loaded}
+			{#if loadState.sourceXG == LoadIndex.loaded}
 				<div>
-					<strong>Lesson {linesCurrentIndex} / {$data.currentOptions.lines.length}</strong>
+					<strong>Lesson {linesCurrentIndex} / {idbData.currentOptions.lines.length}</strong>
 				</div>
 			{:else}
 				<div>
-					<strong>{LoadNames[loadState.state]}</strong>
+					<strong>{LoadNames[loadState.sourceXG]}</strong>
 				</div>
 			{/if}
 		</h4>

@@ -1,18 +1,8 @@
-import typia, { tags } from "typia";
+import { get, set, keys, clear } from "idb-keyval";
+import { tags } from "typia";
 import { KeyboardIndex, LayoutIndex } from "./keyboard";
+import { loadState, LoadIndex } from "./loadState.svelte";
 
-// These do not cause changes to typing lessons
-
-export class SettingsXG {
-	minimumWPM: number & tags.Type<"int32"> & tags.Minimum<0> & tags.Maximum<400> & tags.Default<40> = 40;
-	minimumAccuracy: number & tags.Type<"int32"> & tags.Minimum<0> & tags.Maximum<100> & tags.Default<100> = 100;
-	public sounds: boolean[] = [true, true, true, true, true];
-	volume: number & tags.Type<"int32"> & tags.Minimum<0> & tags.Maximum<100> & tags.Default<100> = $state(100);
-	font: string = $state(" ");
-	color: ColorIndex = ColorIndex.fuchsia;
-	keyboard: KeyboardIndex = KeyboardIndex.matrix;
-	layout: LayoutIndex = LayoutIndex.colemakDH;
-}
 export enum SoundIndex {
 	rightletter = 0,
 	wrongletter,
@@ -133,13 +123,56 @@ export const ColorNames = [
 	"stone",
 ];
 
-export function settingsParse(): SettingsXG {
-	let aSettings: SettingsXG;
-	try {
-		aSettings = typia.json.assertParse<SettingsXG>(localStorage.getItem("settings") ?? "");
-	} catch {
-		aSettings = new SettingsXG();
+// These do not cause changes to typing lessons
+export class SettingsXG {
+	minimumWPM: number & tags.Type<"int32"> & tags.Minimum<0> & tags.Maximum<400> & tags.Default<40> = $state(40);
+	minimumAccuracy: number & tags.Type<"int32"> & tags.Minimum<0> & tags.Maximum<100> & tags.Default<100> =
+		$state(100);
+	public sounds: boolean[] = $state([true, true, true, true, true]);
+	volume: number & tags.Type<"int32"> & tags.Minimum<0> & tags.Maximum<100> & tags.Default<100> = $state(100);
+	font: string = $state(" ");
+	color: ColorIndex = $state(ColorIndex.fuchsia);
+	keyboard: KeyboardIndex = $state(KeyboardIndex.matrix);
+	layout: LayoutIndex = $state(LayoutIndex.colemakDH);
+}
+
+export const idbSettings = $state(new SettingsXG());
+const idbSettingsKey = "idbSettings";
+
+export async function loadSettings() {
+	// Detect if IndexedDB is available if not use localStorage
+	if (!("indexedDB" in window)) {
+		console.log("This browser does not support IndexedDB.");
+		return;
 	}
-	// console.log('settingsParse aSettings.font:' + aSettings.font);
-	return aSettings;
+
+	if (loadState.clearDatabase) {
+		clear().then(() => console.log("IndexedDB cleared"));
+		return;
+	}
+
+	loadState.settingsXG = LoadIndex.checkingIDB;
+	keys().then((keys) => {
+		if (keys.includes(idbSettingsKey)) {
+			if (loadState.traceDatabase) console.log("IndexedDB has idbSettings so it is initialized");
+			get(idbSettingsKey).then((value) => {
+				if (value) {
+					Object.assign(idbSettings, value);
+				} else {
+					console.log("loadSettings() did not find settings");
+					saveSettings();
+				}
+			});
+		} else {
+			loadState.settingsXG = LoadIndex.loadingServer;
+			if (loadState.traceDatabase) console.log("IndexedDB missing idbSettings, loading from server");
+		}
+	});
+}
+
+/** Saves the settings to IndexedDB
+ */
+export async function saveSettings(): Promise<void> {
+	console.log("saveSettings() idbSettings:" + idbSettings);
+	set(idbSettingsKey, idbSettings);
 }

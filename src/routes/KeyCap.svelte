@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { myStore } from "$lib/store/data";
-	const { settings } = myStore;
+	import { idbSettings } from "$lib/store/SettingsXG.svelte";
 
 	let { letter = "a", isLargeKey = false } = $props();
 	let glowColors = [
@@ -53,15 +52,15 @@
 	];
 	let glowCSS = $derived(
 		"absolute -inset-1 "
-			+ glowColors[$settings.color]
+			+ glowColors[idbSettings.color]
 			+ " rounded-lg blur opacity-20 group-hover:opacity-100 transition duration-700 group-hover:duration-200 "
 	);
 	let keyCSS = $derived(
-		keyColors[$settings.color]
+		keyColors[idbSettings.color]
 			+ " rounded-md text-black dark:text-white w-[min(8vw,4vh,40px)] h-[min(8vw,4vh,40px)] "
 	);
 	let keyLargeCSS = $derived(
-		keyColors[$settings.color]
+		keyColors[idbSettings.color]
 			+ " rounded-md text-black dark:text-white w-[min(12vw,6vh,60px)] h-[min(8vw,4vh,40px)] "
 	);
 
@@ -76,7 +75,7 @@
 		>
 			<div>
 				<button class={keyLargeCSS} data-key={letter} name="key" value={letter} aria-label={letter}>
-					<span class={$settings.font}>{spam}</span>
+					<span class={idbSettings.font}>{spam}</span>
 				</button>
 			</div>
 		</div>
@@ -89,7 +88,7 @@
 		>
 			<div>
 				<button class={keyCSS} data-key={letter} name="key" value={letter} aria-label={letter}>
-					<span class={$settings.font}>{spam}</span>
+					<span class={idbSettings.font}>{spam}</span>
 				</button>
 			</div>
 		</div>

@@ -2,20 +2,8 @@ import { browser } from "$app/environment";
 import { CodeXG, CodeIndex, CodeKeys, CodeNames } from "./code";
 import { keys, getMany, setMany, clear } from "idb-keyval";
 import typia from "typia";
+import { loadState, LoadIndex } from "./loadState.svelte";
 // import typia, { tags } from "typia";
-
-// Debugging flags
-const clearDatabase = false;
-const traceDatabase = true;
-
-export enum LoadIndex {
-	checkingIDB = 0,
-	loadingServer,
-	retrievingIDB,
-	loaded,
-}
-export const LoadNames: string[] = ["Checking IndexedDB", "Loading from Server", "Retrieving from IndexedDB", "Loaded"];
-export const loadState = $state({ state: LoadIndex.checkingIDB });
 
 // Indexes both Sources and their options
 export enum SourceIndex {
@@ -75,7 +63,7 @@ export const idbCodes = $state(new CodeXG());
 export const idbSources = $state(new SourceXG());
 
 async function applyServerSources(data: SourceXG) {
-	if (traceDatabase) {
+	if (loadState.traceDatabase) {
 		console.log("applyServerSources data:", data);
 		const key: string = SourceKeys[SourceIndex.bigrams];
 		console.log("applyServerSources key:", key);
@@ -95,15 +83,15 @@ async function applyServerSources(data: SourceXG) {
 		[SourceNames[SourceIndex.customWords], []],
 	])
 		.then(() => {
-			if (traceDatabase) console.log("setMany idbSources succeeded");
+			if (loadState.traceDatabase) console.log("setMany idbSources succeeded");
 		})
 		.catch((err) => {
-			if (traceDatabase) console.log("setMany idbSources failed!", err);
+			if (loadState.traceDatabase) console.log("setMany idbSources failed!", err);
 		});
 }
 
 async function applyServerCodes(code: CodeXG) {
-	if (traceDatabase) {
+	if (loadState.traceDatabase) {
 		console.log("applyServerCodes code:", code);
 		const key: string = CodeKeys[CodeIndex.cpp];
 		// console.log("applyServerCodes key:", key);
@@ -125,17 +113,18 @@ async function applyServerCodes(code: CodeXG) {
 		[CodeNames[CodeIndex.typescript], code.typescript],
 	])
 		.then(() => {
-			if (traceDatabase) console.log("setMany idbCodes succeeded");
+			if (loadState.traceDatabase) console.log("setMany idbCodes succeeded");
 		})
 		.catch((err) => {
-			if (traceDatabase) console.log("setMany idbCodes failed!", err);
+			if (loadState.traceDatabase) console.log("setMany idbCodes failed!", err);
 		});
 }
 
 async function getServerSources() {
 	const response = await fetch("/api/sources");
 	if (!response.ok) {
-		if (traceDatabase) console.log("Client getServerSources() failed: ", response.status, response.statusText);
+		if (loadState.traceDatabase)
+			console.log("Client getServerSources() failed: ", response.status, response.statusText);
 		return;
 	}
 
@@ -145,10 +134,10 @@ async function getServerSources() {
 
 	try {
 		data = typia.json.assertParse<SourceXG>(preString);
-		if (traceDatabase) console.log("Client getServerSources() <SourceXG>(preString) ->", data);
+		if (loadState.traceDatabase) console.log("Client getServerSources() <SourceXG>(preString) ->", data);
 	} catch (e) {
 		data = new SourceXG();
-		if (traceDatabase) console.log("Client getServerSources() typia failure ->", e);
+		if (loadState.traceDatabase) console.log("Client getServerSources() typia failure ->", e);
 		return;
 	}
 
@@ -158,38 +147,39 @@ async function getServerSources() {
 async function getServerLanguages() {
 	const response = await fetch("/api/code");
 	if (!response.ok) {
-		if (traceDatabase) console.log("Client getServerLanguages() failed: ", response.status, response.statusText);
+		if (loadState.traceDatabase)
+			console.log("Client getServerLanguages() failed: ", response.status, response.statusText);
 		return;
 	}
 
 	let data: CodeXG;
 	const preString = await response.text();
-	if (traceDatabase) console.log("Client getServerLanguages() preString ->", preString);
+	if (loadState.traceDatabase) console.log("Client getServerLanguages() preString ->", preString);
 
 	try {
 		data = typia.json.assertParse<CodeXG>(preString);
-		if (traceDatabase) console.log("Client getServerLanguages() typia data ->", data);
+		if (loadState.traceDatabase) console.log("Client getServerLanguages() typia data ->", data);
 	} catch {
 		data = new CodeXG();
-		if (traceDatabase) console.log("Client getServerLanguages() typia failure ->", data);
+		if (loadState.traceDatabase) console.log("Client getServerLanguages() typia failure ->", data);
 		return;
 	}
-	if (traceDatabase) console.log("Client getServerLanguages() data ->", data);
+	if (loadState.traceDatabase) console.log("Client getServerLanguages() data ->", data);
 
 	return applyServerCodes(data);
 }
 
 if (browser) {
-	if (clearDatabase) {
+	if (loadState.clearDatabase) {
 		clear().then(() => console.log("IndexedDB cleared"));
 	} else {
 		keys().then((keys) => {
-			if (keys.length == 18) {
-				loadState.state = LoadIndex.retrievingIDB;
-				if (traceDatabase) console.log("IndexedDB 18 keys exists so it is initialized");
+			if (keys.length >= 18) {
+				loadState.sourceXG = LoadIndex.retrievingIDB;
+				if (loadState.traceDatabase) console.log("IndexedDB 18 keys exists so it is initialized");
 			} else {
-				loadState.state = LoadIndex.loadingServer;
-				if (traceDatabase) console.log("IndexedDB missing keys, loading from server");
+				loadState.sourceXG = LoadIndex.loadingServer;
+				if (loadState.traceDatabase) console.log("IndexedDB missing keys, loading from server");
 				getServerSources();
 				getServerLanguages();
 			}
@@ -237,8 +227,8 @@ if (browser) {
 				idbCodes.rust = languageRustIDB;
 				idbCodes.swift = languageSwiftIDB;
 				idbCodes.typescript = languageTypescriptIDB;
-				if (traceDatabase) console.log("getMany retrieved, loadState.state = LoadIndex.loaded");
-				loadState.state = LoadIndex.loaded;
+				if (loadState.traceDatabase) console.log("getMany retrieved, loadState.sourceXG = LoadIndex.loaded");
+				loadState.sourceXG = LoadIndex.loaded;
 			}
 		);
 	}
