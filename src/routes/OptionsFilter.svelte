@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { idbData } from "$lib/store/data";
+	import { idbData } from "$lib/store/LessonsXG.svelte";
 
 	function filterChanged() {
 		console.log("Filter changed:", idbData.currentOptions.filter);

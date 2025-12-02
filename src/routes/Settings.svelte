@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { idbData } from "$lib/store/data";
+	import { idbData } from "$lib/store/LessonsXG.svelte";
 	import { ScopeNames, ScopeValues } from "$lib/store/LessonXG";
 	import {
 		idbSettings,

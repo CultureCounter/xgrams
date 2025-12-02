@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { idbData } from "$lib/store/data";
+	import { idbData } from "$lib/store/LessonsXG.svelte";
 	import { SourceIndex } from "$lib/store/SourceXG.svelte";
 
 	function customChanged() {

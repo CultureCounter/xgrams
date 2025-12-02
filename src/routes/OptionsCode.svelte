@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { idbData } from "$lib/store/data";
+	import { idbData } from "$lib/store/LessonsXG.svelte";
 	import { CodeNames } from "$lib/store/code";
 	import { Switch } from "@skeletonlabs/skeleton-svelte";
 

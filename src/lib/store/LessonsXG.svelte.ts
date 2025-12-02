@@ -1,4 +1,4 @@
-// import { browser } from "$app/environment";
+import { browser } from "$app/environment";
 // import type { Writable } from "svelte/store";
 // import { writable } from "svelte/store";
 import { tags } from "typia";
@@ -16,7 +16,7 @@ export const currentVersion = 1; // increment for schema changes.
 export class DataXG {
 	version: number & tags.Type<"int32"> = currentVersion;
 
-	public languages: boolean[] = [false, false, false, false, false, false, false, false, false];
+	public languages: boolean[] = $state([false, false, false, false, false, false, false, false, false]);
 
 	public sourceOptions: LessonXG[] = [
 		new LessonXG(),
@@ -31,13 +31,15 @@ export class DataXG {
 	];
 
 	public source: number & tags.Minimum<0> & tags.Maximum<8> = SourceIndex.bigrams;
-	public currentOptions: LessonXG = new LessonXG();
+	public currentOptions: LessonXG = $state(new LessonXG());
 }
 
 export const idbData = $state(new DataXG());
 const idbDataKey = "idbData";
 
 export async function loadData() {
+	if (!browser) return;
+
 	if (!("indexedDB" in window)) {
 		console.log("This browser does not support IndexedDB.");
 		return;
@@ -72,6 +74,7 @@ export async function saveData(): Promise<void> {
 	console.log("saveData() idbData:" + idbData);
 	set(idbDataKey, idbData);
 }
+loadData();
 
 // function dataParse(): DataXG {
 // 	let aData: DataXG;
