@@ -3,7 +3,7 @@ import { browser } from "$app/environment";
 // import { writable } from "svelte/store";
 import { tags } from "typia";
 import { SourceIndex } from "./SourceXG.svelte";
-import { LessonXG } from "./LessonXG";
+import { LessonXG } from "./LessonXG.svelte.ts";
 import { clear, get, keys, set } from "idb-keyval";
 import { LoadIndex, loadState } from "./loadState.svelte";
 
@@ -31,11 +31,11 @@ export class DataXG {
 	];
 
 	public source: number & tags.Minimum<0> & tags.Maximum<8> = SourceIndex.bigrams;
-	public currentOptions: LessonXG = $state(new LessonXG());
+	public currentOptions: LessonXG = new LessonXG();
 }
 
-export const idbData = $state(new DataXG());
-const idbDataKey = "idbData";
+export const idbLessons = $state(new DataXG());
+const idbLessonsKey = "idbLessons";
 
 export async function loadData() {
 	if (!browser) return;
@@ -52,12 +52,12 @@ export async function loadData() {
 
 	loadState.idbLessons = LoadIndex.checkingIDB;
 	keys().then((keys) => {
-		if (keys.includes(idbDataKey)) {
-			if (loadState.traceDatabase) console.log("IndexedDB has idbData so it is initialized");
-			get(idbDataKey).then((value) => {
+		if (keys.includes(idbLessonsKey)) {
+			if (loadState.traceDatabase) console.log("IndexedDB has idbLessons so it is initialized");
+			get(idbLessonsKey).then((value) => {
 				if (value) {
 					loadState.idbLessons = LoadIndex.loaded;
-					Object.assign(idbData, value);
+					Object.assign(idbLessons, value);
 				} else {
 					console.log("loadData() did not find data");
 					saveData();
@@ -65,14 +65,14 @@ export async function loadData() {
 			});
 		} else {
 			loadState.idbLessons = LoadIndex.loadingServer;
-			if (loadState.traceDatabase) console.log("IndexedDB missing idbData, loading from server");
+			if (loadState.traceDatabase) console.log("IndexedDB missing idbLessons, loading from server");
 		}
 	});
 }
 
 export async function saveData(): Promise<void> {
-	console.log("saveData() idbData:" + idbData);
-	set(idbDataKey, idbData);
+	console.log("saveData() idbLessons:" + idbLessons);
+	set(idbLessonsKey, idbLessons);
 }
 loadData();
 

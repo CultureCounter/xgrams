@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { idbData } from "$lib/store/LessonsXG.svelte";
+	import { idbLessons } from "$lib/store/LessonsXG.svelte";
 	import { CodeNames } from "$lib/store/code";
 	import { Switch } from "@skeletonlabs/skeleton-svelte";
 
 	const onCheckedChange = (event: { checked: boolean; i: number }) => {
 		var checked = !event.checked;
-		idbData.languages[event.i] = checked;
+		idbLessons.languages[event.i] = checked;
 		console.log(`Language ${CodeNames[event.i]} set to ${checked}`);
 	};
 </script>
@@ -13,9 +13,9 @@
 {#each CodeNames as name, i (name)}
 	<Switch
 		{name}
-		checked={idbData.languages[i]}
+		checked={idbLessons.languages[i]}
 		onchange={() => {
-			onCheckedChange({ checked: idbData.languages[i], i });
+			onCheckedChange({ checked: idbLessons.languages[i], i });
 		}}
 	>
 		<Switch.Control class="preset-filled-secondary-50-950 data-[state=checked]:preset-filled-secondary-500">

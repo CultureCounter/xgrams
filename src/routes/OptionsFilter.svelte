@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { idbData } from "$lib/store/LessonsXG.svelte";
+	import { idbLessons } from "$lib/store/LessonsXG.svelte";
 
 	function filterChanged() {
-		console.log("Filter changed:", idbData.currentOptions.filter);
+		console.log("Filter changed:", idbLessons.currentOptions.filter);
 	}
 </script>
 
@@ -15,7 +15,7 @@
 	><br />
 	Matches: <strong>exam empl mple mpel plem ...</strong>
 </article>
-<textarea class="textarea" id="filter-text" name="Filter Text" rows="10" bind:value={idbData.currentOptions.filter}
+<textarea class="textarea" id="filter-text" name="Filter Text" rows="10" bind:value={idbLessons.currentOptions.filter}
 ></textarea>
 <button
 	onclick={() => {

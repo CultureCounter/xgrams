@@ -31,9 +31,7 @@ export class LocalStorage<T> {
 		this.#version;
 
 		const root =
-			typeof localStorage !== "undefined" ?
-				JSON.parse(localStorage.getItem(this.#key) as string)
-			:	this.#value;
+			typeof localStorage !== "undefined" ? JSON.parse(localStorage.getItem(this.#key) as string) : this.#value;
 		// if (typeof localStorage !== 'undefined') {
 		// 	console.log(`localStorage.getItem(this.#key) =`, localStorage.getItem(this.#key));
 		// 	console.log(`LocalStorage: Get ${this.#key} =`, root);

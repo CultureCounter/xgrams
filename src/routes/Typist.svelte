@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { deepClone, DataXG, idbData } from "$lib/store/LessonsXG.svelte";
-	import { LessonXG } from "$lib/store/LessonXG";
+	import { deepClone, DataXG, idbLessons } from "$lib/store/LessonsXG.svelte";
+	import { LessonXG } from "$lib/store/LessonXG.svelte";
 	import { SoundIndex } from "$lib/store/SettingsXG.svelte";
 	import { idbCodes, idbSources, SourceKeys } from "$lib/store/SourceXG.svelte";
 	import { loadState, LoadIndex, LoadNames } from "$lib/store/loadState.svelte";
@@ -38,7 +38,7 @@
 	 * Lessons are a series of `lines`
 	 */
 	function initializeLesson() {
-		let dataSource: LessonXG = idbData.currentOptions;
+		let dataSource: LessonXG = idbLessons.currentOptions;
 		dataSource.lines = generateLines(dataSource.combination, dataSource.repetition, dataSource.filter);
 		expectedLine = dataSource.lines[0] || "";
 		dataSource.linesCurrentIndex = 0;
@@ -53,9 +53,9 @@
 	 * @returns lines to type
 	 */
 	function generateLines(combinations: number, repetitions: number, filter: string): string[] {
-		let dataSource = idbData.currentOptions;
+		let dataSource = idbLessons.currentOptions;
 		let scope = dataSource.scope;
-		let index = idbData.source;
+		let index = idbLessons.source;
 		let s: string = SourceKeys[index];
 		// console.log("generateLines idbSources:", idbSources);
 		// console.log("generateLines source key:", s);
@@ -266,7 +266,7 @@
 			}
 
 			// Goals Achieved
-			let dataSource = idbData.currentOptions;
+			let dataSource = idbLessons.currentOptions;
 			let newRoundStarted = dataSource.linesCurrentIndex == 0;
 			if (newRoundStarted) {
 				dataSource.WPMs = [];
@@ -290,12 +290,12 @@
 		colorLine = colorLine.fill(ColorChars.normalChar, 0, expectedLine.length);
 		colorLine[0] = ColorChars.typingChar;
 		makeColorLine();
-		linesCurrentIndex = idbData.currentOptions.linesCurrentIndex;
+		linesCurrentIndex = idbLessons.currentOptions.linesCurrentIndex;
 		// console.log('resetCurrentLine linesCurrentIndex:' + $data.currentOptions.linesCurrentIndex);
 	}
 
 	function nextLine() {
-		let dataSource = idbData.currentOptions;
+		let dataSource = idbLessons.currentOptions;
 		let nextLineExists = dataSource.lines.length > dataSource.linesCurrentIndex + 1;
 		if (nextLineExists) {
 			// console.log('nextLine linesCurrentIndex:' + dataSource.linesCurrentIndex);
@@ -313,7 +313,7 @@
 	}
 
 	function averageWPM(): number {
-		let dataSource = idbData.currentOptions;
+		let dataSource = idbLessons.currentOptions;
 		if (dataSource.WPMs.length == 0) {
 			return 0;
 		}
@@ -336,12 +336,12 @@
 		// 	console.log("onDataChange idbSources.bigrams == null, return");
 		// 	return;
 		// }
-		let dataSource: LessonXG = idbData.currentOptions;
+		let dataSource: LessonXG = idbLessons.currentOptions;
 		dataSource.lines = generateLines(dataSource.combination, dataSource.repetition, dataSource.filter);
 	}
 
 	$effect(() => {
-		onDataChange(idbData);
+		onDataChange(idbLessons);
 	});
 
 	$effect(() => {
@@ -403,7 +403,7 @@
 		<h4 class="mt-6 flex place-content-evenly gap-x-3">
 			{#if loadState.sourceXG == LoadIndex.loaded}
 				<div>
-					<strong>Lesson {linesCurrentIndex} / {idbData.currentOptions.lines.length}</strong>
+					<strong>Lesson {linesCurrentIndex} / {idbLessons.currentOptions.lines.length}</strong>
 				</div>
 			{:else}
 				<div>

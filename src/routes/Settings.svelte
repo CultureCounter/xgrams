@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { idbData } from "$lib/store/LessonsXG.svelte";
-	import { ScopeNames, ScopeValues } from "$lib/store/LessonXG";
+	import { idbLessons } from "$lib/store/LessonsXG.svelte";
+	import { ScopeNames, ScopeValues } from "$lib/store/LessonXG.svelte.ts";
 	import {
 		idbSettings,
 		ColorIndex,
@@ -25,15 +25,15 @@
 
 	function updateCodeWords() {
 		let codeWordsProccessed = [
-			...(idbData.languages[CodeIndex.cpp] ? idbCodes.cpp : []),
-			...(idbData.languages[CodeIndex.cs] ? idbCodes.cs : []),
-			...(idbData.languages[CodeIndex.go] ? idbCodes.go : []),
-			...(idbData.languages[CodeIndex.java] ? idbCodes.java : []),
-			...(idbData.languages[CodeIndex.javascript] ? idbCodes.javascript : []),
-			...(idbData.languages[CodeIndex.python] ? idbCodes.python : []),
-			...(idbData.languages[CodeIndex.rust] ? idbCodes.rust : []),
-			...(idbData.languages[CodeIndex.swift] ? idbCodes.swift : []),
-			...(idbData.languages[CodeIndex.typescript] ? idbCodes.typescript : []),
+			...(idbLessons.languages[CodeIndex.cpp] ? idbCodes.cpp : []),
+			...(idbLessons.languages[CodeIndex.cs] ? idbCodes.cs : []),
+			...(idbLessons.languages[CodeIndex.go] ? idbCodes.go : []),
+			...(idbLessons.languages[CodeIndex.java] ? idbCodes.java : []),
+			...(idbLessons.languages[CodeIndex.javascript] ? idbCodes.javascript : []),
+			...(idbLessons.languages[CodeIndex.python] ? idbCodes.python : []),
+			...(idbLessons.languages[CodeIndex.rust] ? idbCodes.rust : []),
+			...(idbLessons.languages[CodeIndex.swift] ? idbCodes.swift : []),
+			...(idbLessons.languages[CodeIndex.typescript] ? idbCodes.typescript : []),
 		];
 
 		console.log("Updating code words to:", codeWordsProccessed);
@@ -193,8 +193,8 @@
 	$effect(() => {
 		// console.log('sourceValue changed to ' + sourceValue);
 		// console.log('scopeValue changed to ' + scopeValue);
-		idbData.source = sourceValue ? SourceNames.indexOf(sourceValue) : 0;
-		idbData.currentOptions.scope = scopeValue ? ScopeValues[ScopeNames.indexOf(scopeValue)] : 50;
+		idbLessons.source = sourceValue ? SourceNames.indexOf(sourceValue) : 0;
+		idbLessons.currentOptions.scope = scopeValue ? ScopeValues[ScopeNames.indexOf(scopeValue)] : 50;
 	});
 
 	let volume = $state(idbSettings.volume);
@@ -310,13 +310,13 @@
 								name="Combination"
 								minCounter={1}
 								stepCounter={1}
-								bind:count={idbData.currentOptions.combination}
+								bind:count={idbLessons.currentOptions.combination}
 							/>
 							<Counter
 								name="Repetition"
 								stepCounter={1}
 								minCounter={1}
-								bind:count={idbData.currentOptions.repetition}
+								bind:count={idbLessons.currentOptions.repetition}
 							/>
 							<div>
 								Filter<button

@@ -55,9 +55,7 @@ export class SourceXG {
 	customWords: string[] = [];
 }
 
-// TODO switch to IDB completely
 // TODO decompose the data structures
-// TODO async fetch example
 
 export const idbCodes = $state(new CodeXG());
 export const idbSources = $state(new SourceXG());

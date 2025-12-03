@@ -19,6 +19,6 @@ export class LessonXG {
 	repetition: number & tags.Type<"int32"> & tags.Default<20> = $state(20);
 	filter: string = $state("");
 	WPMs: number[] = $state([]);
-	lines: string[] = $state([]);
-	linesCurrentIndex: number & tags.Type<"int32"> & tags.Default<0> = $state(0);
+	lines: string[] = [];
+	linesCurrentIndex: number & tags.Type<"int32"> & tags.Default<0> = 0;
 }

@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { idbData } from "$lib/store/LessonsXG.svelte";
+	import { idbLessons } from "$lib/store/LessonsXG.svelte";
 	import { SourceIndex } from "$lib/store/SourceXG.svelte";
 
 	function customChanged() {
-		console.log("Custom changed:", idbData.sourceOptions[SourceIndex.customWords].lines);
+		console.log("Custom changed:", idbLessons.sourceOptions[SourceIndex.customWords].lines);
 	}
 </script>
 
@@ -12,7 +12,7 @@
 	id="custom-text"
 	name="Custom Text"
 	rows="10"
-	bind:value={idbData.sourceOptions[SourceIndex.customWords].lines}
+	bind:value={idbLessons.sourceOptions[SourceIndex.customWords].lines}
 ></textarea>
 <button
 	onclick={() => {
