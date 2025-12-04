@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { idbLessons } from "$lib/store/LessonsXG.svelte";
+	import { idbCodeWords, idbLessons } from "$lib/store/LessonsXG.svelte";
 	import { ScopeNames, ScopeValues } from "$lib/store/LessonXG.svelte.ts";
 	import {
 		idbSettings,
@@ -25,21 +25,25 @@
 
 	function updateCodeWords() {
 		let codeWordsProccessed = [
-			...(idbLessons.languages[CodeIndex.cpp] ? idbCodes.cpp : []),
-			...(idbLessons.languages[CodeIndex.cs] ? idbCodes.cs : []),
-			...(idbLessons.languages[CodeIndex.go] ? idbCodes.go : []),
-			...(idbLessons.languages[CodeIndex.java] ? idbCodes.java : []),
-			...(idbLessons.languages[CodeIndex.javascript] ? idbCodes.javascript : []),
-			...(idbLessons.languages[CodeIndex.python] ? idbCodes.python : []),
-			...(idbLessons.languages[CodeIndex.rust] ? idbCodes.rust : []),
-			...(idbLessons.languages[CodeIndex.swift] ? idbCodes.swift : []),
-			...(idbLessons.languages[CodeIndex.typescript] ? idbCodes.typescript : []),
+			...(idbCodeWords.current[CodeIndex.cpp] ? idbCodes.current.cpp : []),
+			...(idbCodeWords.current[CodeIndex.cs] ? idbCodes.current.cs : []),
+			...(idbCodeWords.current[CodeIndex.go] ? idbCodes.current.go : []),
+			...(idbCodeWords.current[CodeIndex.java] ? idbCodes.current.java : []),
+			...(idbCodeWords.current[CodeIndex.javascript] ? idbCodes.current.javascript : []),
+			...(idbCodeWords.current[CodeIndex.python] ? idbCodes.current.python : []),
+			...(idbCodeWords.current[CodeIndex.rust] ? idbCodes.current.rust : []),
+			...(idbCodeWords.current[CodeIndex.swift] ? idbCodes.current.swift : []),
+			...(idbCodeWords.current[CodeIndex.typescript] ? idbCodes.current.typescript : []),
 		];
 
-		console.log("Updating code words to:", codeWordsProccessed);
-		idbSources.codeWords = codeWordsProccessed;
-		console.log("Updated idbSources:", idbSources);
+		console.log("updateCodeWords():", codeWordsProccessed);
+		idbSources.current.codeWords = codeWordsProccessed;
 	}
+	$effect(() => {
+		// eslint-disable-next-line @typescript-eslint/no-unused-expressions
+		idbCodeWords;
+		updateCodeWords();
+	});
 
 	/**
 	 * Remove from space delimited `target` all `removals` and leave one `add`
@@ -231,7 +235,7 @@
 			<Dialog.Content class="size-min space-y-4 card bg-surface-100-900 shadow-xl {animModal}">
 				<header class="flex justify-between">
 					<Dialog.Title class="text-2xl font-bold">Settings</Dialog.Title>
-					<Dialog.CloseTrigger onclick={updateCodeWords} class="btn preset-tonal">Save</Dialog.CloseTrigger>
+					<Dialog.CloseTrigger class="btn preset-tonal">Save</Dialog.CloseTrigger>
 				</header>
 				<article class="flex place-content-between gap-2">
 					<script>

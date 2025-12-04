@@ -2,7 +2,7 @@
 	import { onMount } from "svelte";
 	// DarkLight Service
 	import { TrinaryValue } from "./trinary";
-	import { LocalStorage } from "$lib/storage.svelte.ts";
+	import { LocalStorage } from "$lib/LocalStorage.svelte.ts";
 
 	let { dark, light, os } = $props();
 	let userDarkLight = $state(new LocalStorage<TrinaryValue>("userDarkLight", TrinaryValue.neither));

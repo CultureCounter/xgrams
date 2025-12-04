@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { deepClone, DataXG, idbLessons } from "$lib/store/LessonsXG.svelte";
+	import { deepClone, DataXG, idbLessons, idbCodeWords } from "$lib/store/LessonsXG.svelte";
 	import { LessonXG } from "$lib/store/LessonXG.svelte";
 	import { SoundIndex } from "$lib/store/SettingsXG.svelte";
 	import { idbCodes, idbSources, SourceKeys } from "$lib/store/SourceXG.svelte";
@@ -59,7 +59,7 @@
 		let s: string = SourceKeys[index];
 		// console.log("generateLines idbSources:", idbSources);
 		// console.log("generateLines source key:", s);
-		let source = idbSources[s];
+		let source = idbSources.current[s];
 		// console.log("generateLines source:", source);
 
 		// console.log('Generating lines with dataSource:', dataSource);
@@ -69,7 +69,7 @@
 			console.log("Generating lines with source == null:");
 			console.log("idbSources.source:", idbSources);
 			console.log("idbCodes:", $state.snapshot(idbCodes));
-			source = idbSources.bigrams.slice(0, scope);
+			source = idbSources.current.bigrams.slice(0, scope);
 		}
 
 		// Use indexing to limit scope of Xgrams.
@@ -117,6 +117,13 @@
 
 		return lines;
 	}
+	$effect(() => {
+		// eslint-disable-next-line @typescript-eslint/no-unused-expressions
+		idbCodeWords;
+		let dataSource: LessonXG = idbLessons.currentOptions;
+		console.log("generateLines idbLessons.currentOptions:", idbLessons.currentOptions);
+		dataSource.lines = generateLines(dataSource.combination, dataSource.repetition, dataSource.filter);
+	});
 
 	const ColorChars = {
 		untoldChar: 0,
@@ -346,12 +353,12 @@
 
 	$effect(() => {
 		// eslint-disable-next-line @typescript-eslint/no-unused-expressions
-		idbSources;
+		idbSources.current;
 		if (loadState.sourceXG != LoadIndex.loaded) {
 			console.log("effect loadState.sourceXG != LoadIndex.loaded, return");
 			return;
 		}
-		console.log("effect loadState.sourceXG == LoadIndex.loaded, initializeLesson", idbSources);
+		console.log("effect loadState.sourceXG == LoadIndex.loaded, initializeLesson", idbSources.current);
 		initializeLesson();
 	});
 
