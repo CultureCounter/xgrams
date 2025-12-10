@@ -1,28 +1,29 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import { tick } from "svelte";
+import { LoadState, LoadIndex } from "./store/loadState.svelte";
 
 export class LocalStorage<T> {
 	#key: string;
 	#version = $state(0);
-	#listeners = 0;
-	#value: T | undefined;
+	#value: T;
+	#loadState: LoadState;
 
-	#handler = (e: StorageEvent) => {
-		if (e.storageArea !== localStorage) return;
-		if (e.key !== this.#key) return;
-
-		this.#version += 1;
-	};
-
-	constructor(key: string, initial?: T) {
+	constructor(key: string, loadState: LoadState, initial: T) {
 		this.#key = key;
+		this.#loadState = loadState;
 		this.#value = initial;
 
 		if (typeof localStorage !== "undefined") {
+			this.#loadState.setState(LoadIndex.loadingLocal);
 			const oldkey = localStorage.getItem(key);
-			if ((oldkey === null || oldkey === undefined) && initial !== undefined) {
-				localStorage.setItem(key, JSON.stringify(initial));
-				// console.log(`LocalStorage: Setting initial value for ${this.#key}`, initial);
+			if (oldkey === null || oldkey === undefined) {
+				this.#loadState.setState(LoadIndex.default);
+				try {
+					localStorage.setItem(key, JSON.stringify(initial));
+					this.#loadState.setState(LoadIndex.loaded);
+				} catch (e) {
+					console.error(`LocalStorage: Error setting initial value for ${this.#key}`, e);
+					this.#loadState.setState(LoadIndex.error);
+				}
 			}
 		}
 	}
@@ -68,25 +69,6 @@ export class LocalStorage<T> {
 
 			return p;
 		};
-
-		if ($effect.tracking()) {
-			$effect(() => {
-				if (this.#listeners === 0) {
-					window.addEventListener("storage", this.#handler);
-				}
-
-				this.#listeners += 1;
-
-				return () => {
-					tick().then(() => {
-						this.#listeners -= 1;
-						if (this.#listeners === 0) {
-							window.removeEventListener("storage", this.#handler);
-						}
-					});
-				};
-			});
-		}
 
 		return proxy(root);
 	}

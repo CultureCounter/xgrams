@@ -4,13 +4,7 @@ export class KeyboardSettings {
 	rightKeys: string[] = [];
 	keyMaps: number[][] = [];
 	justify = "justify-center";
-	constructor(
-		keyCaps: string[],
-		leftKeys: string[],
-		rightKeys: string[],
-		keyMaps: number[][],
-		justify: string
-	) {
+	constructor(keyCaps: string[], leftKeys: string[], rightKeys: string[], keyMaps: number[][], justify: string) {
 		this.keyCaps = keyCaps;
 		this.leftKeys = leftKeys;
 		this.rightKeys = rightKeys;
@@ -35,15 +29,7 @@ export enum LayoutIndex {
 	norman,
 	workman,
 }
-export const LayoutNames = [
-	"Colemak-DH",
-	"Dvorak",
-	"Qwerty",
-	"Carpalx",
-	"Halmak",
-	"Norman",
-	"Workman",
-];
+export const LayoutNames = ["Colemak-DH", "Dvorak", "Qwerty", "Carpalx", "Halmak", "Norman", "Workman"];
 
 const keyAlt = `\u2387`;
 const keyBackspace = `\u232B`;
@@ -123,6 +109,9 @@ export const layouts = [
  * @returns string[]
  */
 export function getKeyCaps(keyboardIndex: KeyboardIndex, layoutIndex: LayoutIndex): string[] {
+	if (keyboardIndex === undefined || layoutIndex === undefined) {
+		return [];
+	}
 	const keyboardSettings = keyboards[keyboardIndex];
 	const keyCaps = keyboardSettings.keyCaps;
 	const layout = layouts[layoutIndex];

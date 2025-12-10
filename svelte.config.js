@@ -7,7 +7,7 @@ const config = {
 	// for more information about preprocessors
 	preprocess: vitePreprocess(),
 	kit: { adapter: adapter() },
-	compilerOptions: { runes: true },
+	compilerOptions: { runes: true, experimental: { async: true } },
 };
 
 export default config;

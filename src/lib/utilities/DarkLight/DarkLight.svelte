@@ -3,9 +3,14 @@
 	// DarkLight Service
 	import { TrinaryValue } from "./trinary";
 	import { LocalStorage } from "$lib/LocalStorage.svelte.ts";
+	import { LoadState } from "$lib/store/loadState.svelte";
 
 	let { dark, light, os } = $props();
-	let userDarkLight = $state(new LocalStorage<TrinaryValue>("userDarkLight", TrinaryValue.neither));
+
+	let userDarkLightLoadState = $state(new LoadState("userDarkLight", false));
+	let userDarkLight = $state(
+		new LocalStorage<TrinaryValue>("userDarkLight", userDarkLightLoadState, TrinaryValue.neither)
+	);
 
 	/** Get the OS Preference for light/dark mode */
 	function getOSDarkLight(): boolean {
@@ -22,8 +27,9 @@
 	}
 
 	/** Adjust the final dark light mode from combined user and OS preferences */
-	export function adjustFinalDarkLight(): boolean {
+	export function adjustFinalDarkLight() {
 		let finalDarkLight;
+
 		if (!("userDarkLight" in localStorage)) {
 			userDarkLight.current = TrinaryValue.neither;
 		}
@@ -50,7 +56,6 @@
 				document.documentElement.classList.toggle("dark", false);
 				break;
 		}
-		return finalDarkLight;
 	}
 
 	onMount(async () => {

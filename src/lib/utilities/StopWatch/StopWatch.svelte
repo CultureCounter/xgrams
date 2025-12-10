@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { onMount, onDestroy } from "svelte";
 	import { elapsedTime, destroyStopWatch, resetStopWatch, toggleStopWatch, lapTime } from "./stopwatch";
-	import { ColorNames, idbSettings } from "$lib/store/SettingsXG.svelte";
+	import { ColorNames, ColorIndex } from "$lib/store/SettingsXG.svelte";
+
+	let { color = ColorNames[ColorIndex.fuchsia] } = $props();
 
 	let hourStrokeColors = [
 		"stroke-red-900 dark:stroke-red-400",
@@ -173,21 +175,20 @@
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <svg viewBox="-50 -50 100 100" onclick={onClick} onkeyup={onKeyDown}>
-	<circle class="{hourStrokeColors[idbSettings.color]} {hourFillColors[idbSettings.color]} stroke-2" r="40"></circle>
-	<circle class="{minuteStrokeColors[idbSettings.color]} {minuteFillColors[idbSettings.color]} stroke-1.5" r="20"
-	></circle>
+	<circle class="{hourStrokeColors[color]} {hourFillColors[color]} stroke-2" r="40"></circle>
+	<circle class="{minuteStrokeColors[color]} {minuteFillColors[color]} stroke-1.5" r="20"></circle>
 
 	<!-- markers -->
 	{#each [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55] as minute, i (i)}
 		<g transform="rotate({30 * minute})">
-			<line class="stroke-{ColorNames[idbSettings.color]}-900 stroke-2" y1="35" y2="45"></line>
-			<line class="stroke-{ColorNames[idbSettings.color]}-600 stroke-0.5" y1="20" y2="23"></line>
+			<line class="stroke-{ColorNames[color]}-900 stroke-2" y1="35" y2="45"></line>
+			<line class="stroke-{ColorNames[color]}-600 stroke-0.5" y1="20" y2="23"></line>
 		</g>
 
 		{#each [1, 2, 3, 4] as offset, i (i)}
 			<g transform="rotate({6 * (minute + offset)})">
-				<line class="stroke-{ColorNames[idbSettings.color]}-400 stroke-2" y1="35" y2="39"></line>
-				<line class="stroke-{ColorNames[idbSettings.color]}-600 stroke-0.5" y1="20" y2="23"></line>
+				<line class="stroke-{ColorNames[color]}-400 stroke-2" y1="35" y2="39"></line>
+				<line class="stroke-{ColorNames[color]}-600 stroke-0.5" y1="20" y2="23"></line>
 			</g>
 		{/each}
 	{/each}
@@ -202,25 +203,17 @@
 
 	<!-- minute hand -->
 	<g transform="rotate({6 * minutes})">
-		<line
-			class="stroke-{ColorNames[idbSettings.color]}-600 fill-{ColorNames[idbSettings.color]}-100/10 stroke-0.5"
-			y1="0"
-			y2="-20"
-		></line>
+		<line class="stroke-{ColorNames[color]}-600 fill-{ColorNames[color]}-100/10 stroke-0.5" y1="0" y2="-20"></line>
 		<circle
-			class="stroke-{ColorNames[idbSettings.color]}-600 fill-{ColorNames[idbSettings.color]}-100/10 stroke-0.5"
+			class="stroke-{ColorNames[color]}-600 fill-{ColorNames[color]}-100/10 stroke-0.5"
 			r={9 * (1 - Math.cos((seconds / 30) * Math.PI))}
 			cx="0"
 			cy="0"
 			style="fill-opacity: .05;"
 		></circle>
-		<line
-			class="stroke-{ColorNames[idbSettings.color]}-600 fill-{ColorNames[idbSettings.color]}-100/10 stroke-2"
-			y1="-15"
-			y2="-17"
-		></line>
+		<line class="stroke-{ColorNames[color]}-600 fill-{ColorNames[color]}-100/10 stroke-2" y1="-15" y2="-17"></line>
 		<circle
-			class="stroke-{ColorNames[idbSettings.color]}-600 fill-{ColorNames[idbSettings.color]}-100/10 stroke-0.5"
+			class="stroke-{ColorNames[color]}-600 fill-{ColorNames[color]}-100/10 stroke-0.5"
 			r={3 * (1 + Math.cos((seconds / 30) * Math.PI))}
 			cx="0"
 			cy="-29"
@@ -230,14 +223,10 @@
 
 	<!-- second hand -->
 	<g transform="rotate({6 * seconds})">
-		<line
-			class="{secondStrokeColors[idbSettings.color]} {secondFillColors[idbSettings.color]} stroke-2"
-			y1="-34"
-			y2="-45"
-		></line>
-		<line class="{secondStrokeColors[idbSettings.color]} stroke-1" y1="-24" y2="-19.5"></line>
+		<line class="{secondStrokeColors[color]} {secondFillColors[color]} stroke-2" y1="-34" y2="-45"></line>
+		<line class="{secondStrokeColors[color]} stroke-1" y1="-24" y2="-19.5"></line>
 		<circle
-			class="{secondStrokeColors[idbSettings.color]} {secondFillColors[idbSettings.color]} 5 stroke-1"
+			class="{secondStrokeColors[color]} {secondFillColors[color]} 5 stroke-1"
 			r="5"
 			cx="0"
 			cy="-29"

@@ -14,11 +14,19 @@ export const ScopeNames = [
 export const ScopeValues = [50, 100, 200, 500, 1000, 2000, 4000, 8000, 16000];
 
 export class LessonXG {
-	scope: number & tags.Type<"int32"> & tags.Default<50> = $state(ScopeValues[0]);
-	combination: number & tags.Type<"int32"> & tags.Default<2> = $state(2);
-	repetition: number & tags.Type<"int32"> & tags.Default<20> = $state(20);
-	filter: string = $state("");
-	WPMs: number[] = $state([]);
-	lines: string[] = [];
-	linesCurrentIndex: number & tags.Type<"int32"> & tags.Default<0> = 0;
+	scope: number & tags.Type<"int32"> & tags.Default<50> = ScopeValues[0];
+	combination: number & tags.Type<"int32"> & tags.Default<2> = 2;
+	repetition: number & tags.Type<"int32"> & tags.Default<20> = 20;
+	filter: string = "";
+	WPMs: number[] = [];
+
+	constructor(init?: Partial<LessonXG>) {
+		if (init) {
+			if (init.scope !== undefined) this.scope = init.scope;
+			if (init.combination !== undefined) this.combination = init.combination;
+			if (init.repetition !== undefined) this.repetition = init.repetition;
+			if (init.filter !== undefined) this.filter = init.filter;
+			if (init.WPMs !== undefined) this.WPMs = init.WPMs;
+		}
+	}
 }

@@ -1,31 +1,59 @@
 <script lang="ts">
-	import Darklight from '$lib/utilities/DarkLight/DarkLight.svelte';
+	import Darklight from "$lib/utilities/DarkLight/DarkLight.svelte";
 
-	import iconTailwind from '$lib/images/tailwindcss.svg';
-	import githubDark from '$lib/images/github-mark-white.svg';
-	import iconSvelte from '$lib/images/svelte-logo.svg';
-	import iconX from '$lib/images/x.svg';
+	import iconTailwind from "$lib/images/tailwindcss.svg";
+	import githubDark from "$lib/images/github-mark-white.svg";
+	import iconSvelte from "$lib/images/svelte-logo.svg";
+	import iconX from "$lib/images/x.svg";
 
-	import { onMount } from 'svelte';
-	import Settings from './Settings.svelte';
-	import Typist from './Typist.svelte';
-	import Keyboard from './Keyboard.svelte';
+	import { onMount } from "svelte";
+	import Settings from "./Settings.svelte";
+	import Typist from "./Typist.svelte";
+	import Keyboard from "./Keyboard.svelte";
+	import { IDBStore } from "$lib/store/IDBStore.svelte";
+	import { LessonsXG } from "$lib/store/LessonsXG.svelte";
+	import { LessonXG } from "$lib/store/LessonXG.svelte";
+	import { SettingsXG } from "$lib/store/SettingsXG.svelte";
 
 	let darkLight: Darklight;
 
+	let idbLessons = $state<LessonsXG>(new LessonsXG());
+	let idbSettings = $state<SettingsXG>(new SettingsXG());
+	let idbCustomWords = $state<string[]>([]);
+	let idbCodeWords = $state<boolean[]>([false, false, false, false, false, false, false, false, false]);
+
+	let currentLesson = $state(new LessonXG());
+
+	let idbStore = new IDBStore();
+	let values = await idbStore.getValues(
+		["idbLessons", "idbSettings", "customWords", "idbCodeWords"],
+		[
+			new LessonsXG(),
+			new SettingsXG(),
+			[] as string[],
+			[false, false, false, false, false, false, false, false, false] as boolean[],
+		],
+		false
+	);
+	idbLessons = new LessonsXG(values[0] as LessonsXG);
+	idbSettings = new SettingsXG(values[1] as SettingsXG);
+	let idbLessonsLoadState = idbStore.getLoadState("idbLessons");
+	let idbSettingsLoadState = idbStore.getLoadState("idbSettings");
+	let idbCustomWordsLoadState = idbStore.getLoadState("customWords");
+	let idbCodeWordsLoadState = idbStore.getLoadState("idbCodeWords");
+
 	onMount(() => {
-		// Initialize
-		darkLight.adjustFinalDarkLight();
+		// idbStore.clearDatabase(); // For testing purposes only, clear the database on each load
 
 		// Respond to OS color scheme changes
-		let prefersDarkSchemeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+		let prefersDarkSchemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
 		function handleColorSchemeChange() {
-			if (darkLight !== null) darkLight?.adjustFinalDarkLight();
+			if (darkLight !== null) darkLight.adjustFinalDarkLight();
 		}
-		prefersDarkSchemeQuery.addEventListener('change', handleColorSchemeChange);
+		prefersDarkSchemeQuery.addEventListener("change", handleColorSchemeChange);
 
 		return () => {
-			prefersDarkSchemeQuery.removeEventListener('change', handleColorSchemeChange);
+			prefersDarkSchemeQuery.removeEventListener("change", handleColorSchemeChange);
 		};
 	});
 </script>
@@ -55,11 +83,21 @@
 			</h1>
 		</div>
 		<div class="object-right">
-			<Settings></Settings>
+			<Settings
+				bind:idbLessons
+				bind:currentLesson
+				bind:idbSettings
+				bind:idbCustomWords
+				bind:idbCodeWords
+				{idbLessonsLoadState}
+				{idbSettingsLoadState}
+				{idbCustomWordsLoadState}
+				{idbCodeWordsLoadState}
+			></Settings>
 		</div>
 	</div>
-	<Typist />
-	<Keyboard />
+	<Typist bind:idbLessons bind:currentLesson bind:idbSettings></Typist>
+	<Keyboard bind:idbSettings {idbSettingsLoadState}></Keyboard>
 
 	<div class="flex items-center justify-center gap-8 p-4">
 		<a

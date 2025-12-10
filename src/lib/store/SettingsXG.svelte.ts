@@ -1,7 +1,5 @@
-import { get, set, keys, clear } from "idb-keyval";
 import { tags } from "typia";
 import { KeyboardIndex, LayoutIndex } from "./keyboard";
-import { loadState, LoadIndex } from "./loadState.svelte";
 
 export enum SoundIndex {
 	rightletter = 0,
@@ -125,54 +123,45 @@ export const ColorNames = [
 
 // These do not cause changes to typing lessons
 export class SettingsXG {
-	minimumWPM: number & tags.Type<"int32"> & tags.Minimum<0> & tags.Maximum<400> & tags.Default<40> = $state(40);
-	minimumAccuracy: number & tags.Type<"int32"> & tags.Minimum<0> & tags.Maximum<100> & tags.Default<100> =
-		$state(100);
-	public sounds: boolean[] = $state([true, true, true, true, true]);
-	volume: number & tags.Type<"int32"> & tags.Minimum<0> & tags.Maximum<100> & tags.Default<100> = $state(100);
-	font: string = $state(" ");
-	color: ColorIndex = $state(ColorIndex.fuchsia);
-	keyboard: KeyboardIndex = $state(KeyboardIndex.matrix);
-	layout: LayoutIndex = $state(LayoutIndex.colemakDH);
-}
+	minimumWPM: number & tags.Type<"int32"> & tags.Minimum<0> & tags.Maximum<400> & tags.Default<40> = 40;
+	minimumAccuracy: number & tags.Type<"int32"> & tags.Minimum<0> & tags.Maximum<100> & tags.Default<100> = 100;
+	sounds: boolean[] = [true, true, true, true, true];
+	volume: number & tags.Type<"int32"> & tags.Minimum<0> & tags.Maximum<100> & tags.Default<100> = 100;
+	font: string = " ";
+	color: ColorIndex = ColorIndex.fuchsia;
+	keyboard: KeyboardIndex = KeyboardIndex.matrix;
+	layout: LayoutIndex = LayoutIndex.colemakDH;
 
-export const idbSettings = $state(new SettingsXG());
-const idbSettingsKey = "idbSettings";
-
-export async function loadSettings() {
-	// Detect if IndexedDB is available if not use localStorage
-	if (!("indexedDB" in window)) {
-		console.log("This browser does not support IndexedDB.");
-		return;
-	}
-
-	if (loadState.clearDatabase) {
-		clear().then(() => console.log("IndexedDB cleared"));
-		return;
-	}
-
-	loadState.settingsXG = LoadIndex.checkingIDB;
-	keys().then((keys) => {
-		if (keys.includes(idbSettingsKey)) {
-			if (loadState.traceDatabase) console.log("IndexedDB has idbSettings so it is initialized");
-			get(idbSettingsKey).then((value) => {
-				if (value) {
-					Object.assign(idbSettings, value);
-				} else {
-					console.log("loadSettings() did not find settings");
-					saveSettings();
-				}
-			});
-		} else {
-			loadState.settingsXG = LoadIndex.loadingServer;
-			if (loadState.traceDatabase) console.log("IndexedDB missing idbSettings, loading from server");
+	constructor(init?: Partial<SettingsXG>) {
+		if (init) {
+			if (init.minimumWPM !== undefined) this.minimumWPM = init.minimumWPM;
+			if (init.minimumAccuracy !== undefined) this.minimumAccuracy = init.minimumAccuracy;
+			if (init.sounds !== undefined) this.sounds = init.sounds;
+			if (init.volume !== undefined) this.volume = init.volume;
+			if (init.font !== undefined) this.font = init.font;
+			if (init.color !== undefined) this.color = init.color;
+			if (init.keyboard !== undefined) this.keyboard = init.keyboard;
+			if (init.layout !== undefined) this.layout = init.layout;
 		}
-	});
+	}
 }
 
-/** Saves the settings to IndexedDB
- */
-export async function saveSettings(): Promise<void> {
-	console.log("saveSettings() idbSettings:" + idbSettings);
-	set(idbSettingsKey, idbSettings);
-}
+// const key = "idbSettings";
+// const idbSettingsLoadState: LoadState = new LoadState("idbSettings", true);
+// export const idbSettings: SettingsXG =
+// 	!browser ?
+// 		$state(new SettingsXG())
+// 	:	$state(
+// 			get(key).then((val: SettingsXG | undefined): SettingsXG => {
+// 				if (val === undefined) {
+// 					idbSettingsLoadState.setState(LoadIndex.default);
+// 					const settings = new SettingsXG();
+// 					set(key, settings);
+// 					idbSettingsLoadState.setState(LoadIndex.loaded);
+// 					return settings;
+// 				} else {
+// 					idbSettingsLoadState.setState(LoadIndex.loaded);
+// 					return val;
+// 				}
+// 			})
+// 		);

@@ -17,8 +17,6 @@ data.pentagrams = pentagrams;
 data.hexagrams = hexagrams;
 data.pangrams = pangrams;
 data.words = words;
-data.codeWords = [];
-data.customWords = [];
 
 const jsonString = typia.json.stringify<SourceXG>(data);
 

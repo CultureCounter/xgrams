@@ -1,28 +1,14 @@
-import { browser } from "$app/environment";
-// import type { Writable } from "svelte/store";
-// import { writable } from "svelte/store";
 import { tags } from "typia";
 import { SourceIndex } from "./SourceXG.svelte";
 import { LessonXG } from "./LessonXG.svelte.ts";
-import { clear, get, keys, set } from "idb-keyval";
-import { LoadIndex, loadState } from "./loadState.svelte";
-import { IDBStorage } from "$lib/IDBStorage.svelte.ts";
 
-export const currentVersion = 1; // increment for schema changes.
+export const currentVersion = 2; // increment for schema changes.
 
 /**
- * The language mix for the code source option.
+ * LessonsXG stores LessonXG for each datasource.
  * Changes cause the lesson or lines to regenerate.
  */
-export const idbCodeWords = $state(
-	new IDBStorage<boolean[]>("idbCodeWords", [false, false, false, false, false, false, false, false, false])
-);
-
-/**
- * DataXG stores LessonXG for each datasource.
- * Changes cause the lesson or lines to regenerate.
- */
-export class DataXG {
+export class LessonsXG {
 	version: number & tags.Type<"int32"> = currentVersion;
 
 	public sourceOptions: LessonXG[] = [
@@ -38,50 +24,17 @@ export class DataXG {
 	];
 
 	public source: number & tags.Minimum<0> & tags.Maximum<8> = SourceIndex.bigrams;
-	public currentOptions: LessonXG = new LessonXG();
-}
+	public lessonIndex: number & tags.Minimum<0> & tags.Maximum<8> = 0;
 
-export const idbLessons = $state(new DataXG());
-const idbLessonsKey = "idbLessons";
-
-export async function loadData() {
-	if (!browser) return;
-
-	if (!("indexedDB" in window)) {
-		console.log("This browser does not support IndexedDB.");
-		return;
-	}
-
-	if (loadState.clearDatabase) {
-		clear().then(() => console.log("IndexedDB cleared"));
-		return;
-	}
-
-	loadState.idbLessons = LoadIndex.checkingIDB;
-	keys().then((keys) => {
-		if (keys.includes(idbLessonsKey)) {
-			if (loadState.traceDatabase) console.log("IndexedDB has idbLessons so it is initialized");
-			get(idbLessonsKey).then((value) => {
-				if (value) {
-					loadState.idbLessons = LoadIndex.loaded;
-					Object.assign(idbLessons, value);
-				} else {
-					console.log("loadData() did not find data");
-					saveData();
-				}
-			});
-		} else {
-			loadState.idbLessons = LoadIndex.loadingServer;
-			if (loadState.traceDatabase) console.log("IndexedDB missing idbLessons, loading from server");
+	constructor(init?: Partial<LessonsXG>) {
+		if (init) {
+			if (init.version !== undefined) this.version = init.version;
+			if (init.sourceOptions !== undefined) this.sourceOptions = init.sourceOptions;
+			if (init.source !== undefined) this.source = init.source;
+			if (init.lessonIndex !== undefined) this.lessonIndex = init.lessonIndex;
 		}
-	});
+	}
 }
-
-export async function saveData(): Promise<void> {
-	console.log("saveData() idbLessons:" + idbLessons);
-	set(idbLessonsKey, idbLessons);
-}
-loadData();
 
 /**
  * Creates a deep clone of an object.

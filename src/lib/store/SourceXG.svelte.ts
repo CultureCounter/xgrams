@@ -1,9 +1,9 @@
-import { browser } from "$app/environment";
 import { CodeXG, CodeKeys, CodeNames } from "./code";
-import { clear } from "idb-keyval";
 import typia from "typia";
-import { loadState } from "./loadState.svelte";
+import { LoadState } from "./loadState.svelte";
 import { ServerStorage } from "$lib/ServerStorage.svelte";
+
+// TODO add rolls sfbs etc.
 
 // Indexes both Sources and their options
 export enum SourceIndex {
@@ -14,8 +14,6 @@ export enum SourceIndex {
 	hexagrams,
 	pangrams,
 	words,
-	codeWords,
-	customWords,
 }
 export const SourceNames: string[] = [
 	"Bigrams",
@@ -29,17 +27,7 @@ export const SourceNames: string[] = [
 	"Custom",
 ];
 
-export const SourceKeys = [
-	"bigrams",
-	"trigrams",
-	"tetragrams",
-	"pentagrams",
-	"hexagrams",
-	"pangrams",
-	"words",
-	"codeWords",
-	"customWords",
-];
+export const SourceKeys = ["bigrams", "trigrams", "tetragrams", "pentagrams", "hexagrams", "pangrams", "words"];
 
 export class SourceXG {
 	[key: string]: string[];
@@ -51,12 +39,11 @@ export class SourceXG {
 	hexagrams: string[] = $state([]);
 	pangrams: string[] = $state([]);
 	words: string[] = $state([]);
-	codeWords: string[] = [];
-	customWords: string[] = [];
 }
 
 // TODO decompose the data structures
 
+export const idbCodesLoadState = new LoadState("idbCodes", false);
 export const idbCodes = $state(
 	new ServerStorage<CodeXG>(
 		"idbCodes",
@@ -64,10 +51,12 @@ export const idbCodes = $state(
 		CodeKeys as (keyof CodeXG)[],
 		"/api/code",
 		(text) => typia.json.assertParse<CodeXG>(text),
-		new CodeXG()
+		new CodeXG(),
+		idbCodesLoadState
 	)
 );
 
+export const idbSourcesLoadState = new LoadState("idbSources", false);
 export const idbSources = $state(
 	new ServerStorage<SourceXG>(
 		"idbSources",
@@ -75,12 +64,10 @@ export const idbSources = $state(
 		SourceKeys as (keyof SourceXG)[],
 		"/api/sources",
 		(text) => typia.json.assertParse<SourceXG>(text),
-		new SourceXG()
+		new SourceXG(),
+		idbSourcesLoadState
 	)
 );
 
-if (browser) {
-	if (loadState.clearDatabase) {
-		clear().then(() => console.log("IndexedDB cleared"));
-	}
-}
+// TODO: move this to a test file
+LoadState.clearDatabase = false;

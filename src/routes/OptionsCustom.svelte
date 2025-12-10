@@ -1,18 +1,19 @@
 <script lang="ts">
-	import { idbLessons } from "$lib/store/LessonsXG.svelte";
-	import { SourceIndex } from "$lib/store/SourceXG.svelte";
+	import { OtherIndex, OtherNames } from "$lib/store/otherWords.svelte";
+
+	let { currentLesson } = $props();
 
 	function customChanged() {
-		console.log("Custom changed:", idbLessons.sourceOptions[SourceIndex.customWords].lines);
+		console.log("Custom changed:", currentLesson.custom);
 	}
 </script>
 
 <textarea
 	class="textarea"
 	id="custom-text"
-	name="Custom Text"
+	name={OtherNames[OtherIndex.custom]}
 	rows="10"
-	bind:value={idbLessons.sourceOptions[SourceIndex.customWords].lines}
+	bind:value={currentLesson.custom}
 ></textarea>
 <button
 	onclick={() => {

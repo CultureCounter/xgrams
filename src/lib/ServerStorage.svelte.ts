@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import { tick } from "svelte";
-import { getMany, setMany } from "idb-keyval";
-import { loadState } from "./store/loadState.svelte";
+import { clear, getMany, setMany } from "idb-keyval";
+import { LoadIndex, LoadState } from "./store/loadState.svelte";
 
 export class ServerStorage<T extends object> {
 	#name: string;
@@ -10,21 +9,8 @@ export class ServerStorage<T extends object> {
 	#url: string;
 	#parser: (text: string) => T;
 	#version = $state(0);
-	#listeners = 0;
 	#value: T;
-	#channel: BroadcastChannel | undefined;
-
-	#handler = (event: MessageEvent) => {
-		if (event.data?.name !== this.#name) return;
-
-		// Reload from IDB when another tab updates it
-		getMany(this.#keys).then((vals) => {
-			if (vals.every((v) => v !== undefined)) {
-				this.#updateValueFromIDB(vals);
-				this.#version += 1;
-			}
-		});
-	};
+	#loadState: LoadState;
 
 	constructor(
 		name: string,
@@ -32,7 +18,8 @@ export class ServerStorage<T extends object> {
 		props: (keyof T)[],
 		url: string,
 		parser: (text: string) => T,
-		initial: T
+		initial: T,
+		loadState: LoadState
 	) {
 		this.#name = name;
 		this.#keys = keys;
@@ -40,29 +27,36 @@ export class ServerStorage<T extends object> {
 		this.#url = url;
 		this.#parser = parser;
 		this.#value = initial;
+		this.#loadState = loadState;
 
-		if (typeof window !== "undefined") {
-			this.#channel = new BroadcastChannel("xgrams_server_storage_sync");
-
-			// Initial load
-			getMany(this.#keys).then((vals) => {
-				// Check if we have data for all keys
-				const hasAllData = vals.every((v) => v !== undefined);
-
-				if (hasAllData) {
-					if (loadState.traceDatabase) console.log(`ServerStorage[${this.#name}] loaded from IDB`);
-					this.#updateValueFromIDB(vals);
-					this.#version += 1;
-					// We might want to update loadState here, but it's shared global state.
-					// For now, we'll let the caller handle global loadState or add a callback if needed.
-					// But based on SourceXG, it updates loadState.sourceXG.
-				} else {
-					if (loadState.traceDatabase)
-						console.log(`ServerStorage[${this.#name}] missing data in IDB, fetching from server`);
-					this.#fetchFromServer();
-				}
-			});
+		if (typeof window === "undefined") {
+			return;
 		}
+		if (LoadState.clearDatabase) {
+			this.#loadState.setState(LoadIndex.clearing);
+			clear().then(() => {
+				this.#loadState.setState(LoadIndex.cleared);
+			});
+			return;
+		}
+
+		this.#loadState.setState(LoadIndex.loadingIDB);
+		getMany(this.#keys).then((vals) => {
+			// Check if we have data for all keys
+			const hasAllData = vals.every((v) => v !== undefined);
+			if (hasAllData) {
+				this.#updateValueFromIDB(vals);
+				this.#version += 1;
+				this.#loadState.setState(LoadIndex.loaded);
+			} else {
+				this.#loadState.setState(LoadIndex.loadingServer);
+				this.#fetchFromServer();
+			}
+		});
+	}
+
+	isLoaded(): boolean {
+		return this.#value !== undefined && this.#loadState.state == LoadIndex.loaded;
 	}
 
 	#updateValueFromIDB(vals: T[keyof T][]) {
@@ -71,6 +65,7 @@ export class ServerStorage<T extends object> {
 			const val = vals[i];
 			this.#value[prop] = val;
 		}
+		this.#loadState.setState(LoadIndex.loaded);
 	}
 
 	async #fetchFromServer() {
@@ -105,12 +100,13 @@ export class ServerStorage<T extends object> {
 				entries.push([key, data[prop]]);
 			}
 
-			await setMany(entries);
-			if (loadState.traceDatabase) console.log(`ServerStorage[${this.#name}] saved to IDB`);
-
-			this.#channel?.postMessage({ name: this.#name });
+			this.#loadState.setState(LoadIndex.savingIDB);
+			await setMany(entries).then(() => {
+				this.#loadState.setState(LoadIndex.loaded);
+			});
 		} catch (e) {
 			console.error(`ServerStorage[${this.#name}] error:`, e);
+			this.#loadState.setState(LoadIndex.error);
 		}
 	}
 
@@ -153,9 +149,7 @@ export class ServerStorage<T extends object> {
 								const index = this.#props.indexOf(property as keyof T);
 								if (index !== -1) {
 									const key = this.#keys[index];
-									setMany([[key, value]]).then(() => {
-										this.#channel?.postMessage({ name: this.#name });
-									});
+									setMany([[key, value]]);
 									return true;
 								}
 							}
@@ -178,9 +172,7 @@ export class ServerStorage<T extends object> {
 								const key = this.#keys[i];
 								entries.push([key, this.#value[prop]]);
 							}
-							setMany(entries).then(() => {
-								this.#channel?.postMessage({ name: this.#name });
-							});
+							setMany(entries);
 						}
 
 						return true;
@@ -192,25 +184,6 @@ export class ServerStorage<T extends object> {
 
 			return p;
 		};
-
-		if ($effect.tracking()) {
-			$effect(() => {
-				if (this.#listeners === 0) {
-					this.#channel?.addEventListener("message", this.#handler);
-				}
-
-				this.#listeners += 1;
-
-				return () => {
-					tick().then(() => {
-						this.#listeners -= 1;
-						if (this.#listeners === 0) {
-							this.#channel?.removeEventListener("message", this.#handler);
-						}
-					});
-				};
-			});
-		}
 
 		return proxy(root) as T;
 	}
@@ -226,9 +199,7 @@ export class ServerStorage<T extends object> {
 				const key = this.#keys[i];
 				entries.push([key, value[prop]]);
 			}
-			setMany(entries).then(() => {
-				this.#channel?.postMessage({ name: this.#name });
-			});
+			setMany(entries);
 		}
 	}
 }

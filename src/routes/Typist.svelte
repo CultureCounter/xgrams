@@ -1,15 +1,13 @@
 <script lang="ts">
-	import { deepClone, DataXG, idbLessons, idbCodeWords } from "$lib/store/LessonsXG.svelte";
-	import { LessonXG } from "$lib/store/LessonXG.svelte";
-	import { SoundIndex } from "$lib/store/SettingsXG.svelte";
-	import { idbCodes, idbSources, SourceKeys } from "$lib/store/SourceXG.svelte";
-	import { loadState, LoadIndex, LoadNames } from "$lib/store/loadState.svelte";
+	import { deepClone, LessonsXG } from "$lib/store/LessonsXG.svelte";
+	import { ColorIndex, ColorNames, SettingsXG, SoundIndex } from "$lib/store/SettingsXG.svelte";
+	import { idbCodes, idbSources, idbSourcesLoadState, SourceKeys, SourceXG } from "$lib/store/SourceXG.svelte";
+	import { LoadNames } from "$lib/store/loadState.svelte";
 	import Celebration, { startCelebration } from "./Celebration.svelte";
 	// import Celebration, { startCelebration, unleashWorker } from './Celebration.svelte';
 	import PlaySounds, { playSound, Sounds } from "./PlaySounds.svelte";
 	import StopWatch from "../lib/utilities/StopWatch/StopWatch.svelte";
 	import { lapTime, resetStopWatch, resetLap, startLap, endLap } from "../lib/utilities/StopWatch/stopwatch";
-	import { idbSettings } from "$lib/store/SettingsXG.svelte";
 
 	function shuffle(array: string[]): void {
 		for (let i = array.length - 1; i > 0; i--) {
@@ -31,17 +29,20 @@
 	let wrongLetters = 0;
 	let rawWPM = $state(0);
 	let accuracy = $state(0);
-	let linesCurrentIndex = $state(0);
 	let isMouseInside = $state(false);
 
+	let { currentLesson = $bindable(), idbLessons = $bindable(), idbSettings = $bindable() } = $props();
+
+	let lines: string[] = $state([]);
+	let linesIndex = $state(0);
 	/**
 	 * Lessons are a series of `lines`
 	 */
 	function initializeLesson() {
-		let dataSource: LessonXG = idbLessons.currentOptions;
-		dataSource.lines = generateLines(dataSource.combination, dataSource.repetition, dataSource.filter);
-		expectedLine = dataSource.lines[0] || "";
-		dataSource.linesCurrentIndex = 0;
+		debugger;
+		lines = generateLines(currentLesson.combination, currentLesson.repetition, currentLesson.filter);
+		expectedLine = lines[0] || "";
+		linesIndex = 0;
 		initializeLine();
 		resetStopWatch();
 	}
@@ -53,17 +54,11 @@
 	 * @returns lines to type
 	 */
 	function generateLines(combinations: number, repetitions: number, filter: string): string[] {
-		let dataSource = idbLessons.currentOptions;
-		let scope = dataSource.scope;
+		let scope = currentLesson.scope;
 		let index = idbLessons.source;
 		let s: string = SourceKeys[index];
-		// console.log("generateLines idbSources:", idbSources);
-		// console.log("generateLines source key:", s);
 		let source = idbSources.current[s];
-		// console.log("generateLines source:", source);
 
-		// console.log('Generating lines with dataSource:', dataSource);
-		// console.log('Generating lines with scope:', scope);
 		console.log("Generating lines with source length:", s, source.length);
 		if (source == null) {
 			console.log("Generating lines with source == null:");
@@ -117,13 +112,96 @@
 
 		return lines;
 	}
-	$effect(() => {
-		// eslint-disable-next-line @typescript-eslint/no-unused-expressions
-		idbCodeWords;
-		let dataSource: LessonXG = idbLessons.currentOptions;
-		console.log("generateLines idbLessons.currentOptions:", idbLessons.currentOptions);
-		dataSource.lines = generateLines(dataSource.combination, dataSource.repetition, dataSource.filter);
-	});
+
+	function isFinishedLoading(vidbSettings: SettingsXG, vidbLessons: LessonsXG, vidbSources: SourceXG): boolean {
+		let finishedLoading =
+			idbSettings !== undefined && idbLessons !== undefined && idbSources !== undefined && idbSources.isLoaded();
+		if (vidbSettings === undefined || vidbLessons === undefined || vidbSources === undefined) {
+			finishedLoading = false;
+		}
+		if (finishedLoading) {
+			console.log("isFinishedLoading:", finishedLoading);
+			// initializeLesson();
+		}
+		return finishedLoading;
+	}
+	let finishedLoading = $derived(isFinishedLoading(idbSettings, idbLessons, idbSources?.current ?? undefined));
+	// $effect(() => {
+	// 	console.log("idbLessons.currentOptions => currentLesson", idbLessons.currentOptions);
+	// });
+
+	// TODO: Today we are going to async load the data and nothing but the data.
+	// We will cache these results, especially getmany.
+	// We will assign them to client objects by returning the actual goddamn data.
+	// If the cache does not have it we go and goddamned get it.
+	// Fuck the reactivity for now, manual updates.
+
+	let oldLessonIndex = -1;
+	// $effect(() => {
+	// 	debugger;
+	// 	if (finishedLoading) {
+	// 		console.log("finishedLoading => initializeLesson");
+	// 		console.assert(idbLessons.lessonIndex >= 0);
+	// 		console.assert(idbLessons.sourceOptions[idbLessons.lessonIndex] != null);
+	// 		if (oldLessonIndex == -1) {
+	// 			oldLessonIndex = idbLessons.lessonIndex;
+	// 			console.log("oldLessonIndex -1 => ", idbLessons.lessonIndex);
+	// 			currentLesson = idbLessons.sourceOptions[idbLessons.lessonIndex];
+	// 			console.log(
+	// 				"currentLesson idbLessons.sourceOptions.length ",
+	// 				idbLessons.sourceOptions.length
+	// 			);
+	// 			debugger;
+	// 		} else if (oldLessonIndex != idbLessons.lessonIndex) {
+	// 			console.log("oldLessonIndex => ", oldLessonIndex, idbLessons.lessonIndex);
+	// 			oldLessonIndex = idbLessons.lessonIndex;
+	// 			currentLesson = idbLessons.sourceOptions[idbLessons.lessonIndex];
+	// 			debugger;
+	// 		}
+	// 		console.assert(currentLesson != null);
+	// 		console.assert(currentLesson.combination > 0);
+	// 		console.assert(currentLesson.repetition > 0);
+	// 		console.assert(currentLesson.scope > 0);
+	// 		console.assert(currentLesson.filter.length > 0);
+	// 		initializeLesson();
+	// 	}
+	// });
+
+	// $effect(() => {
+	// 	// eslint-disable-next-line @typescript-eslint/no-unused-expressions
+	// 	idbLessons;
+	// 	if (finishedLoading && idbLessons !== undefined) {
+	// 		console.log("idbCodeWords => generateLines currentLesson:", $state.snapshot(currentLesson));
+	// 		lines = generateLines(
+	// 			currentLesson.combination,
+	// 			currentLesson.repetition,
+	// 			currentLesson.filter
+	// 		);
+	// 	}
+	// });
+
+	// $effect(() => {
+	// 	if (finishedLoading) {
+	// 		console.log("codeWords => updateCodeWords with", codeWords);
+	// 		if (codeWords.length > 0) {
+	// 			updateCodeWords();
+	// 		}
+	// 	}
+	// });
+
+	// $effect(() => {
+	// 	if (finishedLoading) {
+	// 		console.log("idbSources.current => initializeLesson", idbSources.current);
+	// 		initializeLesson();
+	// 	}
+	// });
+
+	// $effect(() => {
+	// 	if (finishedLoading) {
+	// 		console.log("idbLessons => onLessonsChanged", idbLessons);
+	// 		onLessonsChanged(idbLessons);
+	// 	}
+	// });
 
 	const ColorChars = {
 		untoldChar: 0,
@@ -273,12 +351,11 @@
 			}
 
 			// Goals Achieved
-			let dataSource = idbLessons.currentOptions;
-			let newRoundStarted = dataSource.linesCurrentIndex == 0;
+			let newRoundStarted = linesIndex == 0;
 			if (newRoundStarted) {
-				dataSource.WPMs = [];
+				currentLesson.WPMs = [];
 			}
-			dataSource.WPMs.push(rawWPM);
+			currentLesson.WPMs.push(rawWPM);
 
 			if (idbSettings.sounds[SoundIndex.passedGoals]) playSound(Sounds.passedGoals);
 			nextLine();
@@ -297,18 +374,13 @@
 		colorLine = colorLine.fill(ColorChars.normalChar, 0, expectedLine.length);
 		colorLine[0] = ColorChars.typingChar;
 		makeColorLine();
-		linesCurrentIndex = idbLessons.currentOptions.linesCurrentIndex;
-		// console.log('resetCurrentLine linesCurrentIndex:' + $data.currentOptions.linesCurrentIndex);
 	}
 
 	function nextLine() {
-		let dataSource = idbLessons.currentOptions;
-		let nextLineExists = dataSource.lines.length > dataSource.linesCurrentIndex + 1;
+		let nextLineExists = lines.length > linesIndex + 1;
 		if (nextLineExists) {
-			// console.log('nextLine linesCurrentIndex:' + dataSource.linesCurrentIndex);
-			dataSource.linesCurrentIndex += 1;
-			// console.log('nextLine linesCurrentIndex:' + dataSource.linesCurrentIndex);
-			expectedLine = dataSource.lines[dataSource.linesCurrentIndex];
+			linesIndex += 1;
+			expectedLine = lines[linesIndex];
 			// unleashWorker();
 			initializeLine();
 		} else {
@@ -320,47 +392,25 @@
 	}
 
 	function averageWPM(): number {
-		let dataSource = idbLessons.currentOptions;
-		if (dataSource.WPMs.length == 0) {
+		if (currentLesson.WPMs?.length == 0) {
 			return 0;
 		}
 
-		let sum = dataSource.WPMs.reduce(function (a, b) {
+		let sum = currentLesson.WPMs?.reduce(function (a: number, b: number) {
 			return a + b;
 		}, 0);
-		let average = sum / dataSource.WPMs.length;
+		let average = sum / currentLesson.WPMs?.length;
 		return Math.round(average);
 	}
 
-	// $effect(() => {
-	// 	idbSources;
-	// 	initializeLesson();
-	// });
-
-	function onDataChange(_data: DataXG) {
-		console.log("onDataChange changed, generateLines", _data);
+	function onLessonsChanged(lessons: LessonsXG) {
+		console.log("onLessonsChanged, generateLines", lessons);
 		// if (idbSources.bigrams == null) {
-		// 	console.log("onDataChange idbSources.bigrams == null, return");
+		// 	console.log("onLessonsChanged idbSources.bigrams == null, return");
 		// 	return;
 		// }
-		let dataSource: LessonXG = idbLessons.currentOptions;
-		dataSource.lines = generateLines(dataSource.combination, dataSource.repetition, dataSource.filter);
+		lines = generateLines(currentLesson.combination, currentLesson.repetition, currentLesson.filter);
 	}
-
-	$effect(() => {
-		onDataChange(idbLessons);
-	});
-
-	$effect(() => {
-		// eslint-disable-next-line @typescript-eslint/no-unused-expressions
-		idbSources.current;
-		if (loadState.sourceXG != LoadIndex.loaded) {
-			console.log("effect loadState.sourceXG != LoadIndex.loaded, return");
-			return;
-		}
-		console.log("effect loadState.sourceXG == LoadIndex.loaded, initializeLesson", idbSources.current);
-		initializeLesson();
-	});
 
 	function handleMouseOver() {
 		isMouseInside = true;
@@ -389,44 +439,48 @@
 </script>
 
 <div class="mx-2">
-	<div
-		role="textbox"
-		class={isMouseInside ? "textFocus textZone" : "textBlur textZone"}
-		onfocus={handleFocus}
-		onblur={handleBlur}
-		onmouseover={handleMouseOver}
-		onmouseleave={handleMouseLeave}
-		tabindex="-1"
-	>
-		<div class="p-2 {idbSettings.font}">
-			{#each classLine as cp, i (cp.chars + i)}
-				{#if cp.typing}
-					<span class={cp.class + " " + ClassSpan[ColorChars.typingChar]}>{cp.chars}</span>
-				{:else}
-					<span class={cp.class}>{cp.chars}</span>
-				{/if}
-			{/each}
+	{#if finishedLoading}
+		<div
+			role="textbox"
+			class={isMouseInside ? "textFocus textZone" : "textBlur textZone"}
+			onfocus={handleFocus}
+			onblur={handleBlur}
+			onmouseover={handleMouseOver}
+			onmouseleave={handleMouseLeave}
+			tabindex="-1"
+		>
+			<div class="p-2 {idbSettings.font}">
+				{#each classLine as cp, i (cp.chars + i)}
+					{#if cp.typing}
+						<span class={cp.class + " " + ClassSpan[ColorChars.typingChar]}>{cp.chars}</span>
+					{:else}
+						<span class={cp.class}>{cp.chars}</span>
+					{/if}
+				{/each}
+			</div>
+			<h4 class="mt-6 flex place-content-evenly gap-x-3">
+				<div>
+					<strong>Lesson {linesIndex} / {lines.length}</strong>
+				</div>
+			</h4>
+			<h4 class="mt-0 flex place-content-evenly gap-x-3">
+				<div>WPM: {rawWPM}</div>
+				<div>Accuracy: {accuracy}%</div>
+				<div>Average WPM: {averageWPM()}</div>
+			</h4>
 		</div>
-		<h4 class="mt-6 flex place-content-evenly gap-x-3">
-			{#if loadState.sourceXG == LoadIndex.loaded}
-				<div>
-					<strong>Lesson {linesCurrentIndex} / {idbLessons.currentOptions.lines.length}</strong>
-				</div>
-			{:else}
-				<div>
-					<strong>{LoadNames[loadState.sourceXG]}</strong>
-				</div>
-			{/if}
-		</h4>
-		<h4 class="mt-0 flex place-content-evenly gap-x-3">
-			<div>WPM: {rawWPM}</div>
-			<div>Accuracy: {accuracy}%</div>
-			<div>Average WPM: {averageWPM()}</div>
-		</h4>
-	</div>
+	{:else}
+		<div>
+			<strong>{LoadNames[idbSourcesLoadState.state]}</strong>
+		</div>
+	{/if}
 </div>
 <div class="flex justify-center">
-	<div class="w-4/12"><StopWatch /></div>
+	{#if finishedLoading}
+		<div class="w-4/12"><StopWatch color={idbSettings.color} /></div>
+	{:else}
+		<div class="w-4/12"><StopWatch color={ColorNames[ColorIndex.fuchsia]} /></div>
+	{/if}
 </div>
 <svelte:window on:keydown={onKeyDown} />
 <!-- on:keyup={on_key_up} -->
