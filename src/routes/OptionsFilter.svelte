@@ -1,8 +1,9 @@
 <script lang="ts">
 	let { currentLesson } = $props();
 
+	let myTextArea: HTMLTextAreaElement;
 	function filterChanged() {
-		console.log("Filter changed:", currentLesson.filter);
+		currentLesson.filter = myTextArea.value;
 	}
 </script>
 
@@ -15,7 +16,14 @@
 	><br />
 	Matches: <strong>exam empl mple mpel plem ...</strong>
 </article>
-<textarea class="textarea" id="filter-text" name="Filter Text" rows="10" bind:value={currentLesson.filter}></textarea>
+<textarea
+	class="textarea"
+	id="filter-text"
+	name="Filter Text"
+	rows="10"
+	value={currentLesson.filter}
+	bind:this={myTextArea}
+></textarea>
 <button
 	onclick={() => {
 		filterChanged();

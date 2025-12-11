@@ -166,12 +166,6 @@
 		scopeValue = newScope;
 		idbLessons.sourceOptions[idbLessons.lessonIndex].scope = ScopeValues[ScopeNames.indexOf(scopeValue ?? "")];
 	}
-	function setMinimumAccuracy(value: number) {
-		idbSettings.minimumAccuracy = value;
-	}
-	function setMinimumWPM(value: number) {
-		idbSettings.minimumWPM = value;
-	}
 
 	let volume = idbSettings?.volume ?? 50;
 	function setNewVolume(newVolume: number): void {
@@ -245,37 +239,43 @@
 									<SegmentedControl.Control>
 										<SegmentedControl.Indicator />
 										{#each SourceNames as name (name)}
-											<SegmentedControl.Item value={name}>
-												<SegmentedControl.ItemText>{name}</SegmentedControl.ItemText>
-												<SegmentedControl.ItemHiddenInput />
-											</SegmentedControl.Item>
+											{#if name == OtherNames[OtherIndex.code]}
+												<SegmentedControl.Item value={name}>
+													<SegmentedControl.ItemText
+														>Code <button
+															class={iconButtonClass}
+															onclick={() => {
+																conditionalDisplay =
+																	conditionalDisplay !== "code" ? "code" : "fonts";
+															}}
+															>🤖
+														</button>
+													</SegmentedControl.ItemText>
+													<SegmentedControl.ItemHiddenInput />
+												</SegmentedControl.Item>
+											{:else if name == OtherNames[OtherIndex.custom]}
+												<SegmentedControl.Item value={name}>
+													<SegmentedControl.ItemText
+														>Custom <button
+															class={iconButtonClass}
+															onclick={() => {
+																conditionalDisplay =
+																	conditionalDisplay !== "custom" ? "custom" : (
+																		"fonts"
+																	);
+															}}
+															>🛠️
+														</button>
+													</SegmentedControl.ItemText>
+													<SegmentedControl.ItemHiddenInput />
+												</SegmentedControl.Item>
+											{:else}
+												<SegmentedControl.Item value={name}>
+													<SegmentedControl.ItemText>{name}</SegmentedControl.ItemText>
+													<SegmentedControl.ItemHiddenInput />
+												</SegmentedControl.Item>
+											{/if}
 										{/each}
-										<SegmentedControl.Item value={OtherNames[OtherIndex.code]}>
-											<SegmentedControl.ItemText
-												>Code <button
-													class={iconButtonClass}
-													onclick={() => {
-														conditionalDisplay =
-															conditionalDisplay !== "code" ? "code" : "fonts";
-													}}
-													>🤖
-												</button>
-											</SegmentedControl.ItemText>
-											<SegmentedControl.ItemHiddenInput />
-										</SegmentedControl.Item>
-										<SegmentedControl.Item value={OtherNames[OtherIndex.custom]}>
-											<SegmentedControl.ItemText
-												>Custom <button
-													class={iconButtonClass}
-													onclick={() => {
-														conditionalDisplay =
-															conditionalDisplay !== "custom" ? "custom" : "fonts";
-													}}
-													>🛠️
-												</button>
-											</SegmentedControl.ItemText>
-											<SegmentedControl.ItemHiddenInput />
-										</SegmentedControl.Item>
 									</SegmentedControl.Control>
 								</SegmentedControl>
 							</article>
@@ -310,8 +310,8 @@
 									minCounter={1}
 									stepCounter={1}
 									count={currentLesson.combination}
-									onchange={(e: CustomEvent) => {
-										currentLesson.combination = e.detail.valueOf() as number;
+									onChange={(e: CustomEvent) => {
+										currentLesson.combination = e.detail as number;
 									}}
 								/>
 								<Counter
@@ -319,8 +319,8 @@
 									stepCounter={1}
 									minCounter={1}
 									count={currentLesson.repetition}
-									onchange={(e: CustomEvent) => {
-										currentLesson.repetition = e.detail.valueOf() as number;
+									onChange={(e: CustomEvent) => {
+										currentLesson.repetition = e.detail as number;
 									}}
 								/>
 								<div>
@@ -342,14 +342,18 @@
 									minCounter={0}
 									maxCounter={400}
 									stepCounter={10}
-									onchange={setMinimumWPM}
+									onChange={(e: CustomEvent) => {
+										idbSettings.minimumWPM = e.detail as number;
+									}}
 									count={idbSettings.minimumWPM}
 								/>
 								<Counter
 									name="Minimum&nbsp;Accuracy"
 									minCounter={0}
 									maxCounter={100}
-									onchange={setMinimumAccuracy}
+									onChange={(e: CustomEvent) => {
+										idbSettings.minimumAccuracy = e.detail as number;
+									}}
 									count={idbSettings.minimumAccuracy}
 								/>
 							</article>
@@ -363,7 +367,7 @@
 									maxCounter={100}
 									stepCounter={5}
 									count={volume}
-									onchange={setNewVolume}
+									onChange={setNewVolume}
 								></Counter>
 
 								{#each SoundNames as name, i (name)}

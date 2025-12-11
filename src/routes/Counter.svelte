@@ -3,14 +3,7 @@
 	import PlusIcon from "@lucide/svelte/icons/plus";
 	import MinusIcon from "@lucide/svelte/icons/minus";
 
-	let {
-		minCounter = 1,
-		maxCounter = 100,
-		stepCounter = 5,
-		count = $bindable(),
-		name = "name",
-		onchange = () => {},
-	} = $props();
+	let { minCounter = 1, maxCounter = 100, stepCounter = 5, count = $bindable(), name = "name", onChange } = $props();
 
 	// let displayed_count = $derived(count);
 	const offset = $derived(modulo(count, 1));
@@ -22,21 +15,15 @@
 
 	function onMouseUp() {
 		count = Math.max(count - 1, minCounter);
-		if (onchange) {
-			onchange(count);
-		}
+		onChange?.(count);
 	}
 	function onMouseDown() {
 		count = Math.min(count + 1, maxCounter);
-		if (onchange) {
-			onchange(count);
-		}
+		onChange?.(count);
 	}
 	function onValueChange(values: { value: number[] }) {
 		count = values.value[0];
-		if (onchange) {
-			onchange(count);
-		}
+		onChange?.(count);
 	}
 </script>
 

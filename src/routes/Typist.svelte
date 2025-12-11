@@ -120,13 +120,16 @@
 		}
 		if (finishedLoading) {
 			console.log("isFinishedLoading:", finishedLoading);
-			// initializeLesson();
 		}
 		return finishedLoading;
 	}
 	let finishedLoading = $derived(isFinishedLoading(idbSettings, idbLessons, idbSources?.current ?? undefined));
 	// $effect(() => {
-	// 	console.log("idbLessons.currentOptions => currentLesson", idbLessons.currentOptions);
+	// 	idbSettings;
+	// 	if (idbSettings.isLoaded()) {
+	// 		console.log("finishedLoading => initializeLesson");
+	// 		initializeLesson();
+	// 	}
 	// });
 
 	// TODO: Today we are going to async load the data and nothing but the data.
@@ -435,6 +438,8 @@
 	// }
 	// 	onclick={handleClick}
 	// 	onkeyup={handleClick}
+
+	initializeLesson();
 </script>
 
 <div class="mx-2">

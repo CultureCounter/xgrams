@@ -3,9 +3,11 @@
 
 	let { currentLesson } = $props();
 
+	let myTextArea: HTMLTextAreaElement;
 	function customChanged() {
-		console.log("Custom changed:", currentLesson.custom);
+		currentLesson.filter = myTextArea.value;
 	}
+	console.log("Custom changed:", currentLesson.custom);
 </script>
 
 <textarea
@@ -13,7 +15,8 @@
 	id="custom-text"
 	name={OtherNames[OtherIndex.custom]}
 	rows="10"
-	bind:value={currentLesson.custom}
+	value={currentLesson.custom}
+	bind:this={myTextArea}
 ></textarea>
 <button
 	onclick={() => {
