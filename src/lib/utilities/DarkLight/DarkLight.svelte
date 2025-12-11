@@ -3,7 +3,7 @@
 	// DarkLight Service
 	import { TrinaryValue } from "./trinary";
 	import { LocalStore } from "$lib/store/LocalStore.svelte";
-	import { LoadState } from "$lib/store/loadState.svelte";
+	import { LoadState } from "$lib/store/LoadState.svelte";
 
 	let { dark, light, os } = $props();
 

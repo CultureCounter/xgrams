@@ -12,7 +12,7 @@
 	import OptionsCode from "./OptionsCode.svelte";
 	import OptionsCustom from "./OptionsCustom.svelte";
 	import OptionsFilter from "./OptionsFilter.svelte";
-	import { LoadIndex } from "$lib/store/loadState.svelte";
+	import { LoadIndex } from "$lib/store/LoadState.svelte";
 
 	let {
 		currentLesson = $bindable(),

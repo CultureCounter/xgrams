@@ -1,7 +1,7 @@
 import { browser } from "$app/environment";
 // import { tick } from "svelte";
 import { clear, getMany, set, setMany } from "idb-keyval";
-import { LoadIndex, LoadState } from "./loadState.svelte";
+import { LoadIndex, LoadState } from "./LoadState.svelte";
 
 export class IDBStore {
 	// eslint-disable-next-line svelte/prefer-svelte-reactivity

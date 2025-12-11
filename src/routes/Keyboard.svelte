@@ -7,7 +7,7 @@
 	import KeyCap from "./KeyCap.svelte";
 	import { keyboards, getKeyCaps, KeyboardIndex, LayoutIndex } from "$lib/store/keyboard";
 	import { SettingsXG } from "$lib/store/SettingsXG.svelte";
-	import { LoadIndex } from "$lib/store/loadState.svelte";
+	import { LoadIndex } from "$lib/store/LoadState.svelte";
 
 	let { idbSettings = $bindable(), idbSettingsLoadState } = $props();
 

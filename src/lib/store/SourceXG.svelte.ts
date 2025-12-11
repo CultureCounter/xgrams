@@ -1,6 +1,6 @@
 import { CodeXG, CodeKeys, CodeNames } from "./code";
 import typia from "typia";
-import { LoadState } from "./loadState.svelte";
+import { LoadState } from "./LoadState.svelte";
 import { ServerStorage } from "$lib/ServerStorage.svelte";
 
 // TODO add rolls sfbs etc.

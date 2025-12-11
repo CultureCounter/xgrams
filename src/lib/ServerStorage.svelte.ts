@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { clear, getMany, setMany } from "idb-keyval";
-import { LoadIndex, LoadState } from "./store/loadState.svelte";
+import { LoadIndex, LoadState } from "./store/LoadState.svelte.ts";
 
 export class ServerStorage<T extends object> {
 	#name: string;
