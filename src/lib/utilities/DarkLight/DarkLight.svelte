@@ -2,7 +2,7 @@
 	import { onMount } from "svelte";
 	// DarkLight Service
 	import { TrinaryValue } from "./trinary";
-	import { LocalStore } from "$lib/LocalStore.svelte";
+	import { LocalStore } from "$lib/store/LocalStore.svelte";
 	import { LoadState } from "$lib/store/loadState.svelte";
 
 	let { dark, light, os } = $props();
@@ -62,8 +62,18 @@
 		}
 	}
 
-	onMount(async () => {
+	onMount(() => {
 		adjustFinalDarkLight();
+		// Respond to OS color scheme changes
+		let prefersDarkSchemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
+		function handleColorSchemeChange() {
+			adjustFinalDarkLight();
+		}
+		prefersDarkSchemeQuery.addEventListener("change", handleColorSchemeChange);
+
+		return () => {
+			prefersDarkSchemeQuery.removeEventListener("change", handleColorSchemeChange);
+		};
 	});
 
 	function onToggleHandler(): void {

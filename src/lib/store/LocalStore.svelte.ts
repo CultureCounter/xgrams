@@ -1,5 +1,4 @@
-import { LoadState, LoadIndex } from "./store/loadState.svelte";
-import typia from "typia";
+import { LoadState, LoadIndex } from "./LoadState.svelte";
 
 export class LocalStore<T> {
 	#key: string;
@@ -31,7 +30,7 @@ export class LocalStore<T> {
 			// parse stored value
 			try {
 				// TODO: skanky, upgrade with an extraction to a real T if we ever store non pojo objects.
-				const value: T = typia.json.assertParse<T>(currentValue) as T;
+				const value: T = JSON.parse(currentValue) as T;
 				this.#value = value;
 			} catch (error) {
 				// Parsing error, use default/current value
@@ -48,7 +47,7 @@ export class LocalStore<T> {
 		this.#value = val;
 		if (typeof localStorage !== "undefined") {
 			try {
-				const value = typia.json.stringify<T>(val);
+				const value = JSON.stringify(val);
 				localStorage.setItem(this.#key, value);
 				this.#loadState.setState(LoadIndex.loaded);
 			} catch (e) {

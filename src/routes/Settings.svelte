@@ -166,6 +166,12 @@
 		scopeValue = newScope;
 		idbLessons.sourceOptions[idbLessons.lessonIndex].scope = ScopeValues[ScopeNames.indexOf(scopeValue ?? "")];
 	}
+	function setMinimumAccuracy(value: number) {
+		idbSettings.minimumAccuracy = value;
+	}
+	function setMinimumWPM(value: number) {
+		idbSettings.minimumWPM = value;
+	}
 
 	let volume = idbSettings?.volume ?? 50;
 	function setNewVolume(newVolume: number): void {
@@ -336,13 +342,15 @@
 									minCounter={0}
 									maxCounter={400}
 									stepCounter={10}
-									bind:count={idbSettings.minimumWPM}
+									onchange={setMinimumWPM}
+									count={idbSettings.minimumWPM}
 								/>
 								<Counter
 									name="Minimum&nbsp;Accuracy"
 									minCounter={0}
 									maxCounter={100}
-									bind:count={idbSettings.minimumAccuracy}
+									onchange={setMinimumAccuracy}
+									count={idbSettings.minimumAccuracy}
 								/>
 							</article>
 						</div>

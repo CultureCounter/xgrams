@@ -44,17 +44,6 @@
 
 	onMount(() => {
 		// idbStore.clearDatabase(); // For testing purposes only, clear the database on each load
-
-		// Respond to OS color scheme changes
-		let prefersDarkSchemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
-		function handleColorSchemeChange() {
-			if (darkLight !== null) darkLight.adjustFinalDarkLight();
-		}
-		prefersDarkSchemeQuery.addEventListener("change", handleColorSchemeChange);
-
-		return () => {
-			prefersDarkSchemeQuery.removeEventListener("change", handleColorSchemeChange);
-		};
 	});
 </script>
 

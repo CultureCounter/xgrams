@@ -39,7 +39,6 @@
 	 * Lessons are a series of `lines`
 	 */
 	function initializeLesson() {
-		debugger;
 		lines = generateLines(currentLesson.combination, currentLesson.repetition, currentLesson.filter);
 		expectedLine = lines[0] || "";
 		linesIndex = 0;
@@ -136,7 +135,7 @@
 	// If the cache does not have it we go and goddamned get it.
 	// Fuck the reactivity for now, manual updates.
 
-	let oldLessonIndex = -1;
+	// let oldLessonIndex = -1;
 	// $effect(() => {
 	// 	debugger;
 	// 	if (finishedLoading) {
@@ -403,14 +402,14 @@
 		return Math.round(average);
 	}
 
-	function onLessonsChanged(lessons: LessonsXG) {
-		console.log("onLessonsChanged, generateLines", lessons);
-		// if (idbSources.bigrams == null) {
-		// 	console.log("onLessonsChanged idbSources.bigrams == null, return");
-		// 	return;
-		// }
-		lines = generateLines(currentLesson.combination, currentLesson.repetition, currentLesson.filter);
-	}
+	// function onLessonsChanged(lessons: LessonsXG) {
+	// 	console.log("onLessonsChanged, generateLines", lessons);
+	// 	// if (idbSources.bigrams == null) {
+	// 	// 	console.log("onLessonsChanged idbSources.bigrams == null, return");
+	// 	// 	return;
+	// 	// }
+	// 	lines = generateLines(currentLesson.combination, currentLesson.repetition, currentLesson.filter);
+	// }
 
 	function handleMouseOver() {
 		isMouseInside = true;
