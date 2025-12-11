@@ -7,25 +7,15 @@ export class ServerStorage<T extends object> {
 	#keys: string[];
 	#props: (keyof T)[];
 	#url: string;
-	#parser: (text: string) => T;
 	#version = $state(0);
 	#value: T;
 	#loadState: LoadState;
 
-	constructor(
-		name: string,
-		keys: string[],
-		props: (keyof T)[],
-		url: string,
-		parser: (text: string) => T,
-		initial: T,
-		loadState: LoadState
-	) {
+	constructor(name: string, keys: string[], props: (keyof T)[], url: string, initial: T, loadState: LoadState) {
 		this.#name = name;
 		this.#keys = keys;
 		this.#props = props;
 		this.#url = url;
-		this.#parser = parser;
 		this.#value = initial;
 		this.#loadState = loadState;
 
@@ -79,7 +69,7 @@ export class ServerStorage<T extends object> {
 			const text = await response.text();
 			let data: T;
 			try {
-				data = this.#parser(text);
+				data = JSON.parse(text);
 			} catch (e) {
 				console.error(`ServerStorage[${this.#name}] parse failed:`, e);
 				// Fallback to initial or empty?

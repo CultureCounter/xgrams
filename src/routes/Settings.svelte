@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { ScopeNames, ScopeValues } from "$lib/store/LessonXG.svelte.ts";
 	import { ColorIndex, ColorNames, FontFamilyCSS, FontFamilyNames, SoundNames } from "$lib/store/SettingsXG.svelte";
-	import { idbSourcesLoadState, SourceNames } from "$lib/store/SourceXG.svelte";
+	import { SourceNames } from "$lib/store/SourceXG.svelte";
 	import { OtherIndex, OtherNames } from "$lib/store/otherWords.svelte";
 	import { KeyboardIndex, KeyboardNames, LayoutIndex, LayoutNames } from "$lib/store/keyboard";
 	import { Dialog, Portal, SegmentedControl, Switch } from "@skeletonlabs/skeleton-svelte";
@@ -12,7 +12,6 @@
 	import OptionsCode from "./OptionsCode.svelte";
 	import OptionsCustom from "./OptionsCustom.svelte";
 	import OptionsFilter from "./OptionsFilter.svelte";
-	import { LoadIndex } from "$lib/store/LoadState.svelte";
 
 	let {
 		currentLesson = $bindable(),
@@ -20,10 +19,6 @@
 		idbSettings = $bindable(),
 		idbCustomWords = $bindable(),
 		idbCodeWords = $bindable(),
-		idbLessonsLoadState,
-		idbSettingsLoadState,
-		idbCustomWordsLoadState,
-		idbCodeWordsLoadState,
 	} = $props();
 
 	/**
@@ -173,15 +168,8 @@
 		setVolume(newVolume);
 		idbSettings.volume = newVolume;
 	}
-	// $effect(() => {
-	// 	setNewVolume(volume);
-	// });
-
 	function getSoundChecked(i: number): boolean {
-		if (idbSettingsLoadState.state === LoadIndex.loaded && idbSettings && idbSettings.sounds) {
-			return idbSettings.sounds[i];
-		}
-		return true;
+		return idbSettings.sounds[i];
 	}
 
 	const animBackdrop =
@@ -198,18 +186,6 @@
 		"focus:ring-opacity-50 rounded-full text-white hover:bg-blue-600 focus:ring-2 focus:ring-blue-900 focus:outline-none";
 	const articleClassV = "flex flex-col justify-center space-y-2";
 	const articleClassH = "flex flex-row justify-stretch space-x-2";
-
-	let finishedLoading = $derived(
-		idbSourcesLoadState.state == LoadIndex.loaded
-			&& idbLessonsLoadState.state == LoadIndex.loaded
-			&& idbLessons !== undefined
-			&& idbSettingsLoadState.state == LoadIndex.loaded
-			&& idbSettings !== undefined
-			&& idbCodeWordsLoadState.state == LoadIndex.loaded
-			&& idbCodeWords !== undefined
-			&& idbCustomWordsLoadState.state == LoadIndex.loaded
-			&& idbCustomWords !== undefined
-	);
 </script>
 
 <!-- h-svh w-svw
@@ -226,354 +202,349 @@
 					<Dialog.Title class="text-2xl font-bold">Settings</Dialog.Title>
 					<Dialog.CloseTrigger class="btn preset-tonal">Save</Dialog.CloseTrigger>
 				</header>
-				{#if finishedLoading}
-					<article class="flex place-content-between gap-2">
-						<div class={cardClass}>
-							<header class="card-header">Source</header>
-							<article class={articleClassV}>
-								<SegmentedControl
-									value={sourceValue}
-									onValueChange={(details) => setSource(details.value)}
-									orientation="vertical"
-								>
-									<SegmentedControl.Control>
-										<SegmentedControl.Indicator />
-										{#each SourceNames as name (name)}
-											{#if name == OtherNames[OtherIndex.code]}
-												<SegmentedControl.Item value={name}>
-													<SegmentedControl.ItemText
-														>Code <button
-															class={iconButtonClass}
-															onclick={() => {
-																conditionalDisplay =
-																	conditionalDisplay !== "code" ? "code" : "fonts";
-															}}
-															>🤖
-														</button>
-													</SegmentedControl.ItemText>
-													<SegmentedControl.ItemHiddenInput />
-												</SegmentedControl.Item>
-											{:else if name == OtherNames[OtherIndex.custom]}
-												<SegmentedControl.Item value={name}>
-													<SegmentedControl.ItemText
-														>Custom <button
-															class={iconButtonClass}
-															onclick={() => {
-																conditionalDisplay =
-																	conditionalDisplay !== "custom" ? "custom" : (
-																		"fonts"
-																	);
-															}}
-															>🛠️
-														</button>
-													</SegmentedControl.ItemText>
-													<SegmentedControl.ItemHiddenInput />
-												</SegmentedControl.Item>
-											{:else}
-												<SegmentedControl.Item value={name}>
-													<SegmentedControl.ItemText>{name}</SegmentedControl.ItemText>
-													<SegmentedControl.ItemHiddenInput />
-												</SegmentedControl.Item>
-											{/if}
-										{/each}
-									</SegmentedControl.Control>
-								</SegmentedControl>
-							</article>
-						</div>
-						<div class={cardClass}>
-							<header class="card-header">Scope</header>
-							<article class={articleClassV}>
-								<SegmentedControl
-									value={scopeValue}
-									onValueChange={(details) => setScope(details.value)}
-									orientation="vertical"
-								>
-									<SegmentedControl.Control>
-										<SegmentedControl.Indicator />
-										{#each ScopeNames as name, i (name)}
+				<article class="flex place-content-between gap-2">
+					<div class={cardClass}>
+						<header class="card-header">Source</header>
+						<article class={articleClassV}>
+							<SegmentedControl
+								value={sourceValue}
+								onValueChange={(details) => setSource(details.value)}
+								orientation="vertical"
+							>
+								<SegmentedControl.Control>
+									<SegmentedControl.Indicator />
+									{#each SourceNames as name (name)}
+										{#if name == OtherNames[OtherIndex.code]}
 											<SegmentedControl.Item value={name}>
 												<SegmentedControl.ItemText
-													>Top&nbsp;{ScopeValues[i]}</SegmentedControl.ItemText
-												>
+													>Code <button
+														class={iconButtonClass}
+														onclick={() => {
+															conditionalDisplay =
+																conditionalDisplay !== "code" ? "code" : "fonts";
+														}}
+														>🤖
+													</button>
+												</SegmentedControl.ItemText>
 												<SegmentedControl.ItemHiddenInput />
 											</SegmentedControl.Item>
-										{/each}
-									</SegmentedControl.Control>
-								</SegmentedControl>
-							</article>
-						</div>
-						<div class={cardClass}>
-							<header class="card-header">Generate</header>
-							<article class={articleClassV}>
-								<Counter
-									name="Combination"
-									minCounter={1}
-									stepCounter={1}
-									count={currentLesson.combination}
-									onChange={(e: CustomEvent) => {
-										currentLesson.combination = e.detail as number;
+										{:else if name == OtherNames[OtherIndex.custom]}
+											<SegmentedControl.Item value={name}>
+												<SegmentedControl.ItemText
+													>Custom <button
+														class={iconButtonClass}
+														onclick={() => {
+															conditionalDisplay =
+																conditionalDisplay !== "custom" ? "custom" : "fonts";
+														}}
+														>🛠️
+													</button>
+												</SegmentedControl.ItemText>
+												<SegmentedControl.ItemHiddenInput />
+											</SegmentedControl.Item>
+										{:else}
+											<SegmentedControl.Item value={name}>
+												<SegmentedControl.ItemText>{name}</SegmentedControl.ItemText>
+												<SegmentedControl.ItemHiddenInput />
+											</SegmentedControl.Item>
+										{/if}
+									{/each}
+								</SegmentedControl.Control>
+							</SegmentedControl>
+						</article>
+					</div>
+					<div class={cardClass}>
+						<header class="card-header">Scope</header>
+						<article class={articleClassV}>
+							<SegmentedControl
+								value={scopeValue}
+								onValueChange={(details) => setScope(details.value)}
+								orientation="vertical"
+							>
+								<SegmentedControl.Control>
+									<SegmentedControl.Indicator />
+									{#each ScopeNames as name, i (name)}
+										<SegmentedControl.Item value={name}>
+											<SegmentedControl.ItemText
+												>Top&nbsp;{ScopeValues[i]}</SegmentedControl.ItemText
+											>
+											<SegmentedControl.ItemHiddenInput />
+										</SegmentedControl.Item>
+									{/each}
+								</SegmentedControl.Control>
+							</SegmentedControl>
+						</article>
+					</div>
+					<div class={cardClass}>
+						<header class="card-header">Generate</header>
+						<article class={articleClassV}>
+							<Counter
+								name="Combination"
+								minCounter={1}
+								stepCounter={1}
+								count={currentLesson.combination}
+								onChange={(e: CustomEvent) => {
+									currentLesson.combination = e.detail as number;
+								}}
+							/>
+							<Counter
+								name="Repetition"
+								stepCounter={1}
+								minCounter={1}
+								count={currentLesson.repetition}
+								onChange={(e: CustomEvent) => {
+									currentLesson.repetition = e.detail as number;
+								}}
+							/>
+							<div>
+								Filter<button
+									class={iconButtonClass}
+									onclick={() => {
+										conditionalDisplay = conditionalDisplay !== "filter" ? "filter" : "fonts";
 									}}
-								/>
-								<Counter
-									name="Repetition"
-									stepCounter={1}
-									minCounter={1}
-									count={currentLesson.repetition}
-									onChange={(e: CustomEvent) => {
-										currentLesson.repetition = e.detail as number;
-									}}
-								/>
-								<div>
-									Filter<button
-										class={iconButtonClass}
-										onclick={() => {
-											conditionalDisplay = conditionalDisplay !== "filter" ? "filter" : "fonts";
-										}}
-										>🌪️
-									</button>
-								</div>
-							</article>
-						</div>
-						<div class={cardClass}>
-							<header class="card-header">Goals</header>
-							<article class={articleClassV}>
-								<Counter
-									name="Minimum&nbsp;WPM"
-									minCounter={0}
-									maxCounter={400}
-									stepCounter={10}
-									onChange={(e: CustomEvent) => {
-										idbSettings.minimumWPM = e.detail as number;
-									}}
-									count={idbSettings.minimumWPM}
-								/>
-								<Counter
-									name="Minimum&nbsp;Accuracy"
-									minCounter={0}
-									maxCounter={100}
-									onChange={(e: CustomEvent) => {
-										idbSettings.minimumAccuracy = e.detail as number;
-									}}
-									count={idbSettings.minimumAccuracy}
-								/>
-							</article>
-						</div>
-						<div class={cardClass}>
-							<header class="card-header">Sounds</header>
-							<article class={articleClassV}>
-								<Counter
-									name="Volume"
-									minCounter={0}
-									maxCounter={100}
-									stepCounter={5}
-									count={volume}
-									onChange={setNewVolume}
-								></Counter>
+									>🌪️
+								</button>
+							</div>
+						</article>
+					</div>
+					<div class={cardClass}>
+						<header class="card-header">Goals</header>
+						<article class={articleClassV}>
+							<Counter
+								name="Minimum&nbsp;WPM"
+								minCounter={0}
+								maxCounter={400}
+								stepCounter={10}
+								onChange={(e: CustomEvent) => {
+									idbSettings.minimumWPM = e.detail as number;
+								}}
+								count={idbSettings.minimumWPM}
+							/>
+							<Counter
+								name="Minimum&nbsp;Accuracy"
+								minCounter={0}
+								maxCounter={100}
+								onChange={(e: CustomEvent) => {
+									idbSettings.minimumAccuracy = e.detail as number;
+								}}
+								count={idbSettings.minimumAccuracy}
+							/>
+						</article>
+					</div>
+					<div class={cardClass}>
+						<header class="card-header">Sounds</header>
+						<article class={articleClassV}>
+							<Counter
+								name="Volume"
+								minCounter={0}
+								maxCounter={100}
+								stepCounter={5}
+								count={volume}
+								onChange={setNewVolume}
+							></Counter>
 
-								{#each SoundNames as name, i (name)}
-									<Switch checked={getSoundChecked(i)} onchange={(e) => soundsChanged(e, i)}>
-										<Switch.Control
-											class="preset-filled-secondary-50-950 data-[state=checked]:preset-filled-secondary-500"
-										>
-											<Switch.Thumb>
-												<Switch.Context>
-													{#snippet children(switch_)}
-														{#if switch_().checked}
-															<MusicIcon class="size-3" />
-														{/if}
-													{/snippet}
-												</Switch.Context>
-											</Switch.Thumb>
-										</Switch.Control>
-										<Switch.Label class="pl-2">{name}</Switch.Label>
+							{#each SoundNames as name, i (name)}
+								<Switch checked={getSoundChecked(i)} onchange={(e) => soundsChanged(e, i)}>
+									<Switch.Control
+										class="preset-filled-secondary-50-950 data-[state=checked]:preset-filled-secondary-500"
+									>
+										<Switch.Thumb>
+											<Switch.Context>
+												{#snippet children(switch_)}
+													{#if switch_().checked}
+														<MusicIcon class="size-3" />
+													{/if}
+												{/snippet}
+											</Switch.Context>
+										</Switch.Thumb>
+									</Switch.Control>
+									<Switch.Label class="pl-2">{name}</Switch.Label>
 
-										<Switch.HiddenInput />
-									</Switch>
+									<Switch.HiddenInput />
+								</Switch>
+							{/each}
+						</article>
+						<header class="card-header pt-3">Keyboard</header>
+						<article>
+							<select
+								class="select"
+								id="select-keyboard"
+								name="Keyboard Selection"
+								bind:value={selectedKeyboard}
+								onchange={() => {
+									setKeyboard();
+								}}
+							>
+								{#each KeyboardNames as name, i (name)}
+									<option value={i}>
+										{name}
+									</option>
 								{/each}
+							</select>
+						</article>
+						<header class="card-header pt-3">Layout</header>
+						<article>
+							<select
+								class="select"
+								id="select-keyboard-layout"
+								name="Keyboard Layout Selection"
+								bind:value={selectedLayout}
+								onchange={() => {
+									setLayout();
+								}}
+							>
+								{#each LayoutNames as name, i (name)}
+									<option value={i}>
+										{name}
+									</option>
+								{/each}
+							</select>
+						</article>
+					</div>
+				</article>
+				<article class="flex flex-col justify-stretch gap-2">
+					{#if conditionalDisplay === "fonts"}
+						<div class={cardClass}>
+							<header class="card-header">Font</header>
+							<article class={articleClassH}>
+								<label class="label" for="color-select">
+									<span>Color</span>
+									<select
+										class="select"
+										id="color-select"
+										name="Color Selection"
+										bind:value={selectedColor}
+										onchange={() => {
+											setColor();
+										}}
+									>
+										{#each ColorNames as name, i (name)}
+											<option value={i}>
+												{name}
+											</option>
+										{/each}
+									</select>
+								</label>
+								<button class="btn h-0 px-0" onclick={clearFont}>Clear Font {keyBackspace}</button>
+								<label class="label" for="font-family-select">
+									<span>Font Family</span>
+									<select
+										class="select"
+										id="font-family-select"
+										name="Font Family"
+										bind:value={selectedFontFamily}
+										onchange={() => {
+											setFontFamily();
+										}}
+									>
+										{#each FontFamilyCSS as name, i (name)}
+											<option value={name}>
+												{FontFamilyNames[i]}
+											</option>
+										{/each}
+									</select>
+								</label>
+								<label class="label" for="font-size-select">
+									<span>Font Size</span>
+									<select
+										class="select"
+										id="font-size-select"
+										name="Font Size"
+										bind:value={selectedFontSize}
+										onchange={() => {
+											setFontSize();
+										}}
+									>
+										{#each fontSizeCSS as name, i (name)}
+											<option value={name}>
+												{fontSizeNames[i]}
+											</option>
+										{/each}
+									</select>
+								</label>
+								<label class="label" for="font-weight-select">
+									<span>Font Weight</span>
+									<select
+										class="select"
+										id="font-weight-select"
+										name="Font Weight"
+										bind:value={selectedFontWeight}
+										onchange={() => {
+											setFontWeight();
+										}}
+									>
+										{#each fontWeightCSS as name, i (name)}
+											<option value={name}>
+												{fontWeightNames[i]}
+											</option>
+										{/each}
+									</select>
+								</label>
+								<label class="label" for="font-spacing-select">
+									<span>Font Spacing</span>
+									<select
+										class="select"
+										id="font-spacing-select"
+										name="Font Spacing"
+										bind:value={selectedFontSpacing}
+										onchange={() => {
+											setFontSpacing();
+										}}
+									>
+										{#each fontSpacingCSS as name, i (name)}
+											<option value={name}>
+												{fontSpacingNames[i]}
+											</option>
+										{/each}
+									</select>
+								</label>
 							</article>
-							<header class="card-header pt-3">Keyboard</header>
-							<article>
-								<select
-									class="select"
-									id="select-keyboard"
-									name="Keyboard Selection"
-									bind:value={selectedKeyboard}
-									onchange={() => {
-										setKeyboard();
-									}}
+							<header class="card-header">Legibility Test</header>
+							<article class={articleClassV}>
+								<span class="bg-transparent {idbSettings.font ?? ''}"
+									>il1IL1 dbdqpq DBDQPQ ij., fgjty rnmrn RNMRN o0O</span
 								>
-									{#each KeyboardNames as name, i (name)}
-										<option value={i}>
-											{name}
-										</option>
-									{/each}
-								</select>
-							</article>
-							<header class="card-header pt-3">Layout</header>
-							<article>
-								<select
-									class="select"
-									id="select-keyboard-layout"
-									name="Keyboard Layout Selection"
-									bind:value={selectedLayout}
-									onchange={() => {
-										setLayout();
-									}}
+								<span class="bg-transparent {idbSettings.font ?? ''}"
+									>Sphinx of black quartz, judge my vow!</span
 								>
-									{#each LayoutNames as name, i (name)}
-										<option value={i}>
-											{name}
-										</option>
-									{/each}
-								</select>
 							</article>
 						</div>
-					</article>
-					<article class="flex flex-col justify-stretch gap-2">
-						{#if conditionalDisplay === "fonts"}
+					{:else if conditionalDisplay === "filter"}
+						<section class="flex place-content-between gap-2">
 							<div class={cardClass}>
-								<header class="card-header">Font</header>
+								<header class="card-header">Filter</header>
 								<article class={articleClassH}>
-									<label class="label" for="color-select">
-										<span>Color</span>
-										<select
-											class="select"
-											id="color-select"
-											name="Color Selection"
-											bind:value={selectedColor}
-											onchange={() => {
-												setColor();
-											}}
-										>
-											{#each ColorNames as name, i (name)}
-												<option value={i}>
-													{name}
-												</option>
-											{/each}
-										</select>
-									</label>
-									<button class="btn h-0 px-0" onclick={clearFont}>Clear Font {keyBackspace}</button>
-									<label class="label" for="font-family-select">
-										<span>Font Family</span>
-										<select
-											class="select"
-											id="font-family-select"
-											name="Font Family"
-											bind:value={selectedFontFamily}
-											onchange={() => {
-												setFontFamily();
-											}}
-										>
-											{#each FontFamilyCSS as name, i (name)}
-												<option value={name}>
-													{FontFamilyNames[i]}
-												</option>
-											{/each}
-										</select>
-									</label>
-									<label class="label" for="font-size-select">
-										<span>Font Size</span>
-										<select
-											class="select"
-											id="font-size-select"
-											name="Font Size"
-											bind:value={selectedFontSize}
-											onchange={() => {
-												setFontSize();
-											}}
-										>
-											{#each fontSizeCSS as name, i (name)}
-												<option value={name}>
-													{fontSizeNames[i]}
-												</option>
-											{/each}
-										</select>
-									</label>
-									<label class="label" for="font-weight-select">
-										<span>Font Weight</span>
-										<select
-											class="select"
-											id="font-weight-select"
-											name="Font Weight"
-											bind:value={selectedFontWeight}
-											onchange={() => {
-												setFontWeight();
-											}}
-										>
-											{#each fontWeightCSS as name, i (name)}
-												<option value={name}>
-													{fontWeightNames[i]}
-												</option>
-											{/each}
-										</select>
-									</label>
-									<label class="label" for="font-spacing-select">
-										<span>Font Spacing</span>
-										<select
-											class="select"
-											id="font-spacing-select"
-											name="Font Spacing"
-											bind:value={selectedFontSpacing}
-											onchange={() => {
-												setFontSpacing();
-											}}
-										>
-											{#each fontSpacingCSS as name, i (name)}
-												<option value={name}>
-													{fontSpacingNames[i]}
-												</option>
-											{/each}
-										</select>
-									</label>
-								</article>
-								<header class="card-header">Legibility Test</header>
-								<article class={articleClassV}>
-									<span class="bg-transparent {idbSettings.font ?? ''}"
-										>il1IL1 dbdqpq DBDQPQ ij., fgjty rnmrn RNMRN o0O</span
-									>
-									<span class="bg-transparent {idbSettings.font ?? ''}"
-										>Sphinx of black quartz, judge my vow!</span
-									>
+									<OptionsFilter {currentLesson}></OptionsFilter>
 								</article>
 							</div>
-						{:else if conditionalDisplay === "filter"}
-							<section class="flex place-content-between gap-2">
+						</section>
+					{:else if conditionalDisplay === "code"}
+						<section class="flex place-content-between gap-2">
+							<div>
 								<div class={cardClass}>
-									<header class="card-header">Filter</header>
+									<header class="card-header">Code</header>
 									<article class={articleClassH}>
-										<OptionsFilter {currentLesson}></OptionsFilter>
+										<OptionsCode {idbCodeWords}></OptionsCode>
 									</article>
 								</div>
-							</section>
-						{:else if conditionalDisplay === "code"}
-							<section class="flex place-content-between gap-2">
-								<div>
-									<div class={cardClass}>
-										<header class="card-header">Code</header>
-										<article class={articleClassH}>
-											<OptionsCode {idbCodeWords}></OptionsCode>
-										</article>
-									</div>
+							</div>
+						</section>
+					{:else if conditionalDisplay === "custom"}
+						<section class="flex place-content-between gap-2">
+							<div>
+								<div class={cardClass}>
+									<header class="card-header">Custom</header>
+									<article class={articleClassH}>
+										<OptionsCustom {currentLesson}></OptionsCustom>
+									</article>
 								</div>
-							</section>
-						{:else if conditionalDisplay === "custom"}
-							<section class="flex place-content-between gap-2">
-								<div>
-									<div class={cardClass}>
-										<header class="card-header">Custom</header>
-										<article class={articleClassH}>
-											<OptionsCustom {currentLesson}></OptionsCustom>
-										</article>
-									</div>
-								</div>
-							</section>
-						{/if}
-					</article>
-				{:else}
-					<div class="flex place-content-center">
-						<div class="loader">Loading...</div>
-					</div>
-				{/if}
+							</div>
+						</section>
+					{/if}
+				</article>
+				<div class="flex place-content-center">
+					<div class="loader">Loading...</div>
+				</div>
 			</Dialog.Content>
 		</Dialog.Positioner>
 	</Portal>

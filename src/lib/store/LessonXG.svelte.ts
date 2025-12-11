@@ -1,5 +1,3 @@
-import { tags } from "typia";
-
 export const ScopeNames = [
 	"Top 50",
 	"Top 100",
@@ -14,9 +12,9 @@ export const ScopeNames = [
 export const ScopeValues = [50, 100, 200, 500, 1000, 2000, 4000, 8000, 16000];
 
 export class LessonXG {
-	scope: number & tags.Type<"int32"> & tags.Default<50> = ScopeValues[0];
-	combination: number & tags.Type<"int32"> & tags.Default<2> = 2;
-	repetition: number & tags.Type<"int32"> & tags.Default<20> = 20;
+	scope: number = ScopeValues[0];
+	combination: number = 2;
+	repetition: number = 20;
 	filter: string = "";
 	WPMs: number[] = [];
 

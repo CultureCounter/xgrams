@@ -3,17 +3,9 @@ import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vitest/config";
 import { playwright } from "@vitest/browser-playwright";
 import { sveltekit } from "@sveltejs/kit/vite";
-import UnpluginTypia from "@ryoppippi/unplugin-typia/vite";
 
 export default defineConfig({
-	plugins: [
-		tailwindcss(),
-		UnpluginTypia({
-			cache: true,
-		}),
-		sveltekit(),
-		devtoolsJson(),
-	],
+	plugins: [tailwindcss(), sveltekit(), devtoolsJson()],
 	optimizeDeps: {},
 	test: {
 		expect: { requireAssertions: true },

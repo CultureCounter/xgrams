@@ -7,7 +7,6 @@ import hexagrams from "$lib/store/hexagrams";
 import pangrams from "$lib/store/pangrams";
 import words from "$lib/store/words";
 import { SourceXG } from "$lib/store/SourceXG.svelte";
-import typia from "typia";
 
 const data: SourceXG = new SourceXG();
 data.bigrams = bigrams;
@@ -18,7 +17,7 @@ data.hexagrams = hexagrams;
 data.pangrams = pangrams;
 data.words = words;
 
-const jsonString = typia.json.stringify<SourceXG>(data);
+const jsonString = JSON.stringify(data);
 
 // Create a new Headers object
 const myHeaders = new Headers();

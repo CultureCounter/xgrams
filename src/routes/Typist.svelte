@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { deepClone, LessonsXG } from "$lib/store/LessonsXG.svelte";
 	import { ColorIndex, ColorNames, SettingsXG, SoundIndex } from "$lib/store/SettingsXG.svelte";
-	import { idbCodes, idbSources, idbSourcesLoadState, SourceKeys, SourceXG } from "$lib/store/SourceXG.svelte";
-	import { LoadNames } from "$lib/store/LoadState.svelte";
+	import { SourceKeys, SourceXG } from "$lib/store/SourceXG.svelte";
 	import Celebration, { startCelebration } from "./Celebration.svelte";
 	// import Celebration, { startCelebration, unleashWorker } from './Celebration.svelte';
 	import PlaySounds, { playSound, Sounds } from "./PlaySounds.svelte";
@@ -31,7 +30,13 @@
 	let accuracy = $state(0);
 	let isMouseInside = $state(false);
 
-	let { currentLesson = $bindable(), idbLessons = $bindable(), idbSettings = $bindable() } = $props();
+	let {
+		currentLesson = $bindable(),
+		idbLessons = $bindable(),
+		idbSettings = $bindable(),
+		idbSources = $bindable(),
+		idbCodes = $bindable(),
+	} = $props();
 
 	let lines: string[] = $state([]);
 	let linesIndex = $state(0);
@@ -112,18 +117,6 @@
 		return lines;
 	}
 
-	function isFinishedLoading(vidbSettings: SettingsXG, vidbLessons: LessonsXG, vidbSources: SourceXG): boolean {
-		let finishedLoading =
-			idbSettings !== undefined && idbLessons !== undefined && idbSources !== undefined && idbSources.isLoaded();
-		if (vidbSettings === undefined || vidbLessons === undefined || vidbSources === undefined) {
-			finishedLoading = false;
-		}
-		if (finishedLoading) {
-			console.log("isFinishedLoading:", finishedLoading);
-		}
-		return finishedLoading;
-	}
-	let finishedLoading = $derived(isFinishedLoading(idbSettings, idbLessons, idbSources?.current ?? undefined));
 	// $effect(() => {
 	// 	idbSettings;
 	// 	if (idbSettings.isLoaded()) {
@@ -186,7 +179,7 @@
 	// 	if (finishedLoading) {
 	// 		console.log("codeWords => updateCodeWords with", codeWords);
 	// 		if (codeWords.length > 0) {
-	// 			updateCodeWords();
+	// 			updateCodeWords(codeWords, idbCodes);
 	// 		}
 	// 	}
 	// });
@@ -439,52 +432,47 @@
 	// 	onclick={handleClick}
 	// 	onkeyup={handleClick}
 
+	console.log("Typist idbLessons", $state.snapshot(idbLessons));
+	console.log("Typist idbSettings", $state.snapshot(idbSettings));
+	// console.log("then idbCustomWords", $state.snapshot(idbCustomWords));
+	// console.log("then idbCodeWords", $state.snapshot(idbCodeWords));
+
 	initializeLesson();
 </script>
 
 <div class="mx-2">
-	{#if finishedLoading}
-		<div
-			role="textbox"
-			class={isMouseInside ? "textFocus textZone" : "textBlur textZone"}
-			onfocus={handleFocus}
-			onblur={handleBlur}
-			onmouseover={handleMouseOver}
-			onmouseleave={handleMouseLeave}
-			tabindex="-1"
-		>
-			<div class="p-2 {idbSettings.font}">
-				{#each classLine as cp, i (cp.chars + i)}
-					{#if cp.typing}
-						<span class={cp.class + " " + ClassSpan[ColorChars.typingChar]}>{cp.chars}</span>
-					{:else}
-						<span class={cp.class}>{cp.chars}</span>
-					{/if}
-				{/each}
+	<div
+		role="textbox"
+		class={isMouseInside ? "textFocus textZone" : "textBlur textZone"}
+		onfocus={handleFocus}
+		onblur={handleBlur}
+		onmouseover={handleMouseOver}
+		onmouseleave={handleMouseLeave}
+		tabindex="-1"
+	>
+		<div class="p-2 {idbSettings.font}">
+			{#each classLine as cp, i (cp.chars + i)}
+				{#if cp.typing}
+					<span class={cp.class + " " + ClassSpan[ColorChars.typingChar]}>{cp.chars}</span>
+				{:else}
+					<span class={cp.class}>{cp.chars}</span>
+				{/if}
+			{/each}
+		</div>
+		<h4 class="mt-6 flex place-content-evenly gap-x-3">
+			<div>
+				<strong>Lesson {linesIndex} / {lines.length}</strong>
 			</div>
-			<h4 class="mt-6 flex place-content-evenly gap-x-3">
-				<div>
-					<strong>Lesson {linesIndex} / {lines.length}</strong>
-				</div>
-			</h4>
-			<h4 class="mt-0 flex place-content-evenly gap-x-3">
-				<div>WPM: {rawWPM}</div>
-				<div>Accuracy: {accuracy}%</div>
-				<div>Average WPM: {averageWPM()}</div>
-			</h4>
-		</div>
-	{:else}
-		<div>
-			<strong>{LoadNames[idbSourcesLoadState.state]}</strong>
-		</div>
-	{/if}
+		</h4>
+		<h4 class="mt-0 flex place-content-evenly gap-x-3">
+			<div>WPM: {rawWPM}</div>
+			<div>Accuracy: {accuracy}%</div>
+			<div>Average WPM: {averageWPM()}</div>
+		</h4>
+	</div>
 </div>
 <div class="flex justify-center">
-	{#if finishedLoading}
-		<div class="w-4/12"><StopWatch color={idbSettings.color} /></div>
-	{:else}
-		<div class="w-4/12"><StopWatch color={ColorNames[ColorIndex.fuchsia]} /></div>
-	{/if}
+	<div class="w-4/12"><StopWatch color={idbSettings.color} /></div>
 </div>
 <svelte:window on:keydown={onKeyDown} />
 <!-- on:keyup={on_key_up} -->

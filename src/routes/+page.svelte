@@ -14,33 +14,72 @@
 	import { LessonsXG } from "$lib/store/LessonsXG.svelte";
 	import { LessonXG } from "$lib/store/LessonXG.svelte";
 	import { SettingsXG } from "$lib/store/SettingsXG.svelte";
+	import { CodeXG } from "$lib/store/code";
+	import { SourceXG } from "$lib/store/SourceXG.svelte";
+	import { LoadState } from "$lib/store/LoadState.svelte";
+	import { ServerStorage } from "$lib/ServerStorage.svelte";
+	import { CodeNames } from "$lib/store/code";
+	import { SourceNames } from "$lib/store/SourceXG.svelte";
+	import { CodeKeys } from "$lib/store/code";
+	import { SourceKeys } from "$lib/store/SourceXG.svelte";
 
-	let darkLight: Darklight;
+	const idbCodesLoadState = new LoadState("idbCodes", false);
+	let idbCodes = $state(
+		new ServerStorage<CodeXG>(
+			"idbCodes",
+			CodeNames,
+			CodeKeys as (keyof CodeXG)[],
+			"/api/code",
+			new CodeXG(),
+			idbCodesLoadState
+		)
+	);
 
-	let idbLessons = $state<LessonsXG>(new LessonsXG());
-	let idbSettings = $state<SettingsXG>(new SettingsXG());
-	let idbCustomWords = $state<string[]>([]);
-	let idbCodeWords = $state<boolean[]>([false, false, false, false, false, false, false, false, false]);
+	const idbSourcesLoadState = new LoadState("idbSources", false);
+	let idbSources = $state(
+		new ServerStorage<SourceXG>(
+			"idbSources",
+			SourceNames,
+			SourceKeys as (keyof SourceXG)[],
+			"/api/sources",
+			new SourceXG(),
+			idbSourcesLoadState
+		)
+	);
+
+	let idbLessons = $state<LessonsXG>(null as unknown as LessonsXG);
+	let idbSettings = $state<SettingsXG>(null as unknown as SettingsXG);
+	let idbCustomWords = $state<string[]>(null as unknown as string[]);
+	let idbCodeWords = $state<boolean[]>(null as unknown as boolean[]);
 
 	let currentLesson = $state(new LessonXG());
 
 	let idbStore = new IDBStore();
-	let values = await idbStore.getValues(
-		["idbLessons", "idbSettings", "customWords", "idbCodeWords"],
-		[
-			new LessonsXG(),
-			new SettingsXG(),
-			[] as string[],
-			[false, false, false, false, false, false, false, false, false] as boolean[],
-		],
-		false
-	);
-	idbLessons = new LessonsXG(values[0] as LessonsXG);
-	idbSettings = new SettingsXG(values[1] as SettingsXG);
-	let idbLessonsLoadState = idbStore.getLoadState("idbLessons");
-	let idbSettingsLoadState = idbStore.getLoadState("idbSettings");
-	let idbCustomWordsLoadState = idbStore.getLoadState("customWords");
-	let idbCodeWordsLoadState = idbStore.getLoadState("idbCodeWords");
+	idbStore
+		.getValues(
+			["idbLessons", "idbSettings", "customWords", "idbCodeWords"],
+			[
+				new LessonsXG(),
+				new SettingsXG(),
+				[] as string[],
+				[false, false, false, false, false, false, false, false, false] as boolean[],
+			],
+			false
+		)
+		.then((values) => {
+			idbLessons = new LessonsXG(values[0] as LessonsXG);
+			idbSettings = new SettingsXG(values[1] as SettingsXG);
+			idbCustomWords = values[2] as string[];
+			idbCodeWords = values[3] as boolean[];
+			// console.log("then idbLessons", $state.snapshot(idbLessons));
+			// console.log("then idbSettings", $state.snapshot(idbSettings));
+			// console.log("then idbCustomWords", $state.snapshot(idbCustomWords));
+			// console.log("then idbCodeWords", $state.snapshot(idbCodeWords));
+		});
+	// let idbLessonsLoadState = idbStore.getLoadState("idbLessons");
+	// let idbSettingsLoadState = idbStore.getLoadState("idbSettings");
+	// let idbCustomWordsLoadState = idbStore.getLoadState("customWords");
+	// let idbCodeWordsLoadState = idbStore.getLoadState("idbCodeWords");
 
 	onMount(() => {
 		// idbStore.clearDatabase(); // For testing purposes only, clear the database on each load
@@ -48,46 +87,40 @@
 </script>
 
 <div class="flex h-full w-full flex-col overflow-y-auto">
-	<div class="flex items-start justify-between">
-		<div class="object-left p-6">
-			<Darklight bind:this={darkLight}>
-				<!-- 🌚🌑 🌓 🌔🌜🌕🌛☀️🌞 -->
-				{#snippet dark()}
-					<button class="btn-icon"><h1 style="font-size: 3em">🌑</h1></button>
-				{/snippet}
-				{#snippet os()}
-					<button class="btn-icon"><h1 style="font-size: 3em">🌓</h1></button>
-				{/snippet}
-				{#snippet light()}
-					<button class="btn-icon"><h1 style="font-size: 3em">☀️</h1></button>
-				{/snippet}
-			</Darklight>
+	{#if idbLessons === null || idbSettings === null || idbCustomWords === null || idbCodeWords === null || !idbSources.isLoaded() || !idbCodes.isLoaded()}
+		Loading...
+	{:else}
+		<div class="flex items-start justify-between">
+			<div class="object-left p-6">
+				<Darklight>
+					<!-- 🌚🌑 🌓 🌔🌜🌕🌛☀️🌞 -->
+					{#snippet dark()}
+						<button class="btn-icon"><h1 style="font-size: 3em">🌑</h1></button>
+					{/snippet}
+					{#snippet os()}
+						<button class="btn-icon"><h1 style="font-size: 3em">🌓</h1></button>
+					{/snippet}
+					{#snippet light()}
+						<button class="btn-icon"><h1 style="font-size: 3em">☀️</h1></button>
+					{/snippet}
+				</Darklight>
+			</div>
+			<div class="object-center">
+				<h1
+					style="font-size: 3em"
+					class="dark:from-white-300 bg-linear-to-br from-yellow-300 to-red-800 box-decoration-clone bg-clip-text text-transparent dark:to-red-800"
+				>
+					Xgrams
+				</h1>
+			</div>
+			<div class="object-right">
+				<Settings bind:idbLessons bind:currentLesson bind:idbSettings bind:idbCustomWords bind:idbCodeWords
+				></Settings>
+			</div>
 		</div>
-		<div class="object-center">
-			<h1
-				style="font-size: 3em"
-				class="dark:from-white-300 bg-linear-to-br from-yellow-300 to-red-800 box-decoration-clone bg-clip-text text-transparent dark:to-red-800"
-			>
-				Xgrams
-			</h1>
-		</div>
-		<div class="object-right">
-			<Settings
-				bind:idbLessons
-				bind:currentLesson
-				bind:idbSettings
-				bind:idbCustomWords
-				bind:idbCodeWords
-				{idbLessonsLoadState}
-				{idbSettingsLoadState}
-				{idbCustomWordsLoadState}
-				{idbCodeWordsLoadState}
-			></Settings>
-		</div>
-	</div>
-	<Typist bind:idbLessons bind:currentLesson bind:idbSettings></Typist>
-	<Keyboard bind:idbSettings {idbSettingsLoadState}></Keyboard>
-
+		<Typist bind:idbLessons bind:currentLesson bind:idbSettings bind:idbSources bind:idbCodes></Typist>
+		<Keyboard bind:idbSettings></Keyboard>
+	{/if}
 	<div class="flex items-center justify-center gap-8 p-4">
 		<a
 			href="https://github.com/dirk-bester/xgrams"

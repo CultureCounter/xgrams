@@ -1,4 +1,3 @@
-import { tags } from "typia";
 import { KeyboardIndex, LayoutIndex } from "./keyboard";
 
 export enum SoundIndex {
@@ -123,10 +122,10 @@ export const ColorNames = [
 
 // These do not cause changes to typing lessons
 export class SettingsXG {
-	minimumWPM: number & tags.Type<"int32"> & tags.Minimum<0> & tags.Maximum<400> & tags.Default<40> = 40;
-	minimumAccuracy: number & tags.Type<"int32"> & tags.Minimum<0> & tags.Maximum<100> & tags.Default<100> = 100;
+	minimumWPM: number = 40;
+	minimumAccuracy: number = 100;
 	sounds: boolean[] = [true, true, true, true, true];
-	volume: number & tags.Type<"int32"> & tags.Minimum<0> & tags.Maximum<100> & tags.Default<100> = 100;
+	volume: number = 100;
 	font: string = " ";
 	color: ColorIndex = ColorIndex.fuchsia;
 	keyboard: KeyboardIndex = KeyboardIndex.matrix;

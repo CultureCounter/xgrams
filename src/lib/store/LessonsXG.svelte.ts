@@ -1,4 +1,3 @@
-import { tags } from "typia";
 import { SourceIndex } from "./SourceXG.svelte";
 import { LessonXG } from "./LessonXG.svelte.ts";
 
@@ -9,7 +8,7 @@ export const currentVersion = 2; // increment for schema changes.
  * Changes cause the lesson or lines to regenerate.
  */
 export class LessonsXG {
-	version: number & tags.Type<"int32"> = currentVersion;
+	version: number = currentVersion;
 
 	public sourceOptions: LessonXG[] = [
 		new LessonXG(),
@@ -23,8 +22,8 @@ export class LessonsXG {
 		new LessonXG(),
 	];
 
-	public source: number & tags.Minimum<0> & tags.Maximum<8> = SourceIndex.bigrams;
-	public lessonIndex: number & tags.Minimum<0> & tags.Maximum<8> = 0;
+	public source: number = SourceIndex.bigrams;
+	public lessonIndex: number = 0;
 
 	constructor(init?: Partial<LessonsXG>) {
 		if (init) {

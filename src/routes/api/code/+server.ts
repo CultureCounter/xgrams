@@ -1,6 +1,5 @@
 // import { json } from '@sveltejs/kit';
 import code, { CodeXG } from "$lib/store/code";
-import typia from "typia";
 
 const data: CodeXG = new CodeXG();
 data.cpp = code.cpp;
@@ -13,7 +12,7 @@ data.rust = code.rust;
 data.swift = code.swift;
 data.typescript = code.typescript;
 
-const jsonString = typia.json.stringify<CodeXG>(data);
+const jsonString = JSON.stringify(data);
 
 // Create a new Headers object
 const myHeaders = new Headers();
