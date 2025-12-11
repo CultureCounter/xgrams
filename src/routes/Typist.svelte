@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { deepClone, LessonsXG } from "$lib/store/LessonsXG.svelte";
-	import { ColorIndex, ColorNames, SettingsXG, SoundIndex } from "$lib/store/SettingsXG.svelte";
-	import { SourceKeys, SourceXG } from "$lib/store/SourceXG.svelte";
+	import { deepClone } from "$lib/store/LessonsXG.svelte";
+	import { SoundIndex } from "$lib/store/SettingsXG.svelte";
+	import { SourceKeys } from "$lib/store/SourceXG.svelte";
 	import Celebration, { startCelebration } from "./Celebration.svelte";
 	// import Celebration, { startCelebration, unleashWorker } from './Celebration.svelte';
 	import PlaySounds, { playSound, Sounds } from "./PlaySounds.svelte";
