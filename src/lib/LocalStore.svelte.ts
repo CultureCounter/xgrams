@@ -1,84 +1,60 @@
-/* eslint-disable @typescript-eslint/no-unused-expressions */
 import { LoadState, LoadIndex } from "./store/loadState.svelte";
+import typia from "typia";
 
-export class LocalStorage<T> {
+export class LocalStore<T> {
 	#key: string;
-	#version = $state(0);
 	#value: T;
 	#loadState: LoadState;
 
-	constructor(key: string, loadState: LoadState, initial: T) {
+	constructor(key: string, initial: T, loadState: LoadState) {
 		this.#key = key;
-		this.#loadState = loadState;
 		this.#value = initial;
-
-		if (typeof localStorage !== "undefined") {
-			this.#loadState.setState(LoadIndex.loadingLocal);
-			const oldkey = localStorage.getItem(key);
-			if (oldkey === null || oldkey === undefined) {
-				this.#loadState.setState(LoadIndex.default);
-				try {
-					localStorage.setItem(key, JSON.stringify(initial));
-					this.#loadState.setState(LoadIndex.loaded);
-				} catch (e) {
-					console.error(`LocalStorage: Error setting initial value for ${this.#key}`, e);
-					this.#loadState.setState(LoadIndex.error);
-				}
-			}
-		}
+		this.#loadState = loadState;
 	}
 
-	get current(): T {
-		this.#version;
-
-		const root =
-			typeof localStorage !== "undefined" ? JSON.parse(localStorage.getItem(this.#key) as string) : this.#value;
-		// if (typeof localStorage !== 'undefined') {
-		// 	console.log(`localStorage.getItem(this.#key) =`, localStorage.getItem(this.#key));
-		// 	console.log(`LocalStorage: Get ${this.#key} =`, root);
-		// }
-		const proxies = new WeakMap();
-
-		const proxy = (value: unknown) => {
-			if (typeof value !== "object" || value === null) {
-				return value;
-			}
-
-			let p = proxies.get(value);
-
-			if (!p) {
-				p = new Proxy(value, {
-					get: (target, property) => {
-						this.#version;
-						return proxy(Reflect.get(target, property));
-					},
-					set: (target, property, value) => {
-						this.#version += 1;
-						Reflect.set(target, property, value);
-
-						if (typeof localStorage !== "undefined") {
-							localStorage.setItem(this.#key, JSON.stringify(root));
-						}
-
-						return true;
-					},
-				});
-
-				proxies.set(value, p);
-			}
-
-			return p;
-		};
-
-		return proxy(root);
-	}
-
-	set current(value) {
-		if (typeof localStorage !== "undefined") {
-			localStorage.setItem(this.#key, JSON.stringify(value));
-			// console.log(`LocalStorage: Set ${this.#key} to`, value);
+	async getValue(): Promise<T> {
+		if (typeof localStorage === "undefined") {
+			// use default outside browser
+			this.#loadState.setState(LoadIndex.default);
+			this.#loadState.setState(LoadIndex.loaded);
+			return this.#value;
 		}
 
-		this.#version += 1;
+		this.#loadState.setState(LoadIndex.loadingLocal);
+		const currentValue = localStorage.getItem(this.#key);
+		if (currentValue === null || currentValue === undefined) {
+			// use default/current value and store it
+			this.#loadState.setState(LoadIndex.default);
+			this.setValue(this.#value);
+			this.#loadState.setState(LoadIndex.loaded);
+		} else {
+			// parse stored value
+			try {
+				// TODO: skanky, upgrade with an extraction to a real T if we ever store non pojo objects.
+				const value: T = typia.json.assertParse<T>(currentValue) as T;
+				this.#value = value;
+			} catch (error) {
+				// Parsing error, use default/current value
+				console.error(`LocalStore: Error parsing value for ${this.#key}`, error);
+				this.#loadState.setState(LoadIndex.error);
+			}
+		}
+		this.#loadState.setState(LoadIndex.loaded);
+
+		return this.#value;
+	}
+
+	setValue(val: T) {
+		this.#value = val;
+		if (typeof localStorage !== "undefined") {
+			try {
+				const value = typia.json.stringify<T>(val);
+				localStorage.setItem(this.#key, value);
+				this.#loadState.setState(LoadIndex.loaded);
+			} catch (e) {
+				console.error(`LocalStore: Error setting value for ${this.#key}`, e);
+				this.#loadState.setState(LoadIndex.error);
+			}
+		}
 	}
 }

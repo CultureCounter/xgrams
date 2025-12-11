@@ -2,15 +2,19 @@
 	import { onMount } from "svelte";
 	// DarkLight Service
 	import { TrinaryValue } from "./trinary";
-	import { LocalStorage } from "$lib/LocalStorage.svelte.ts";
+	import { LocalStore } from "$lib/LocalStore.svelte";
 	import { LoadState } from "$lib/store/loadState.svelte";
 
 	let { dark, light, os } = $props();
 
+	let userDarkLight = $state(TrinaryValue.neither);
 	let userDarkLightLoadState = $state(new LoadState("userDarkLight", false));
-	let userDarkLight = $state(
-		new LocalStorage<TrinaryValue>("userDarkLight", userDarkLightLoadState, TrinaryValue.neither)
+	let userDarkLightStore = new LocalStore<TrinaryValue>(
+		"userDarkLight",
+		TrinaryValue.neither,
+		userDarkLightLoadState
 	);
+	userDarkLight = await userDarkLightStore.getValue();
 
 	/** Get the OS Preference for light/dark mode */
 	function getOSDarkLight(): boolean {
@@ -22,8 +26,8 @@
 	 * toggleBack false -> neither -> true -> false ...
 	 */
 	function toggleBackUserDarkLight(): TrinaryValue {
-		userDarkLight.current = Math.abs((userDarkLight.current + 2) % 3);
-		return userDarkLight.current;
+		userDarkLight = Math.abs((userDarkLight + 2) % 3);
+		return userDarkLight;
 	}
 
 	/** Adjust the final dark light mode from combined user and OS preferences */
@@ -31,9 +35,9 @@
 		let finalDarkLight;
 
 		if (!("userDarkLight" in localStorage)) {
-			userDarkLight.current = TrinaryValue.neither;
+			userDarkLight = TrinaryValue.neither;
 		}
-		switch (userDarkLight.current) {
+		switch (userDarkLight) {
 			case TrinaryValue.neither:
 				// The user respects the OS preference
 				finalDarkLight = getOSDarkLight();
@@ -63,7 +67,7 @@
 	});
 
 	function onToggleHandler(): void {
-		userDarkLight.current = toggleBackUserDarkLight();
+		userDarkLight = toggleBackUserDarkLight();
 		adjustFinalDarkLight();
 	}
 
@@ -77,6 +81,7 @@
 		}
 	}
 
+	// TODO what is this even
 	// Reactive
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const cTransition = `transition-all duration-[200ms]`;
@@ -91,16 +96,16 @@
 	onkeydown={onKeyDown}
 	role="button"
 	aria-label="Dark Mode Button"
-	title="Toggle {userDarkLight.current == 2 ? 'Use OS'
-	: userDarkLight.current == 1 ? 'Light'
+	title="Toggle {userDarkLight == 2 ? 'Use OS'
+	: userDarkLight == 1 ? 'Light'
 	: 'Dark'} Mode"
 	tabindex="0"
 >
-	{#if userDarkLight.current == TrinaryValue.false}
+	{#if userDarkLight == TrinaryValue.false}
 		{@render light()}
-	{:else if userDarkLight.current == 1}
+	{:else if userDarkLight == 1}
 		{@render dark()}
-	{:else if userDarkLight.current == 2}
+	{:else if userDarkLight == 2}
 		{@render os()}
 	{/if}
 </div>
