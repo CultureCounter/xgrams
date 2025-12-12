@@ -1,12 +1,21 @@
 <script lang="ts">
-	import { ScopeNames, ScopeValues } from "$lib/store/LessonXG.svelte.ts";
-	import { ColorIndex, ColorNames, FontFamilyCSS, FontFamilyNames, SoundNames } from "$lib/store/SettingsXG.svelte";
-	import { SourceNames } from "$lib/store/SourceXG.svelte";
+	import { LessonXG, ScopeIndex, ScopeNames, ScopeValues } from "$lib/store/LessonXG.svelte.ts";
+	import { LessonsXG } from "$lib/store/LessonsXG.svelte";
+	import {
+		ColorIndex,
+		ColorNames,
+		FontFamilyCSS,
+		FontFamilyNames,
+		SettingsXG,
+		SoundNames,
+	} from "$lib/store/SettingsXG.svelte";
+	import { SourceIndex, SourceNames } from "$lib/store/SourceXG.svelte";
 	import { OtherIndex, OtherNames } from "$lib/store/otherWords.svelte";
 	import { KeyboardIndex, KeyboardNames, LayoutIndex, LayoutNames } from "$lib/store/keyboard";
 	import { Dialog, Portal, SegmentedControl, Switch } from "@skeletonlabs/skeleton-svelte";
 	import { setVolume } from "./PlaySounds.svelte";
 	import MusicIcon from "@lucide/svelte/icons/music";
+	import { CheckIcon } from "@lucide/svelte";
 
 	import Counter from "./Counter.svelte";
 	import OptionsCode from "./OptionsCode.svelte";
@@ -14,11 +23,13 @@
 	import OptionsFilter from "./OptionsFilter.svelte";
 
 	let {
-		currentLesson = $bindable(),
-		idbLessons = $bindable(),
-		idbSettings = $bindable(),
-		idbCustomWords = $bindable(),
-		idbCodeWords = $bindable(),
+		currentLesson = $bindable<LessonXG>(),
+		idbLessons = $bindable<LessonsXG>(),
+		idbSettings = $bindable<SettingsXG>(),
+		idbCustomWords = $bindable<string[]>(),
+		idbCodeChoices = $bindable<boolean[]>(),
+		onLessonChanged,
+		onSettingsChanged,
 	} = $props();
 
 	/**
@@ -59,6 +70,7 @@
 	let selectedFontFamily: string = $state(findStrings(idbSettings.font ?? "", FontFamilyCSS));
 	function setFontFamily(): void {
 		idbSettings.font = replaceStrings(idbSettings.font, FontFamilyCSS, selectedFontFamily);
+		idbSettings.isDirty = true;
 	}
 
 	let fontSizeCSS = [
@@ -80,6 +92,7 @@
 	let selectedFontSize: string = $state(findStrings(idbSettings.font ?? "", fontSizeCSS));
 	function setFontSize(): void {
 		idbSettings.font = replaceStrings(idbSettings.font, fontSizeCSS, selectedFontSize);
+		idbSettings.isDirty = true;
 	}
 
 	let fontWeightCSS = [
@@ -107,6 +120,7 @@
 	let selectedFontWeight: string = $state(findStrings(idbSettings.font ?? "", fontWeightCSS));
 	function setFontWeight(): void {
 		idbSettings.font = replaceStrings(idbSettings.font, fontWeightCSS, selectedFontWeight);
+		idbSettings.isDirty = true;
 	}
 
 	let fontSpacingCSS = [
@@ -121,21 +135,25 @@
 	let selectedFontSpacing: string = $state(findStrings(idbSettings.font ?? "", fontSpacingCSS));
 	function setFontSpacing(): void {
 		idbSettings.font = replaceStrings(idbSettings.font, fontSpacingCSS, selectedFontSpacing);
+		idbSettings.isDirty = true;
 	}
 
 	let selectedColor: ColorIndex = $state(idbSettings?.color ?? ColorIndex.fuchsia);
 	function setColor(): void {
 		idbSettings.color = selectedColor;
+		idbSettings.isDirty = true;
 	}
 
 	let selectedKeyboard: KeyboardIndex = $state(idbSettings?.keyboard ?? KeyboardIndex.matrix);
 	function setKeyboard(): void {
 		idbSettings.keyboard = selectedKeyboard;
+		idbSettings.isDirty = true;
 	}
 
 	let selectedLayout: LayoutIndex = $state(idbSettings?.layout ?? LayoutIndex.colemakDH);
 	function setLayout(): void {
 		idbSettings.layout = selectedLayout;
+		idbSettings.isDirty = true;
 	}
 
 	function clearFont(): void {
@@ -144,22 +162,28 @@
 		selectedFontSize = findStrings(idbSettings.font ?? "", fontSizeCSS);
 		selectedFontWeight = findStrings(idbSettings.font ?? "", fontWeightCSS);
 		selectedFontSpacing = findStrings(idbSettings.font ?? "", fontSpacingCSS);
+		idbSettings.isDirty = true;
 	}
 	let keyBackspace = `\u232B`;
 
-	let sourceValue = $state<string | null>(SourceNames[0]);
-	let scopeValue = $state<string | null>(ScopeNames[0]);
+	let sourceValue = $state<string | null>(SourceNames[SourceIndex.bigrams]);
+	let scopeValue = $state<string | null>(ScopeNames[ScopeIndex.top50]);
 	function soundsChanged(e: Event, i: number) {
 		idbSettings.sounds[i] = (e.target as HTMLInputElement).checked;
+		idbSettings.isDirty = true;
 	}
 
 	function setSource(newSource: string | null): void {
 		sourceValue = newSource;
-		idbLessons.source = SourceNames.indexOf(sourceValue ?? "");
+		let index = SourceNames.indexOf(sourceValue ?? "");
+		idbLessons.lessonIndex = index;
+		idbLessons.isDirty = true;
+		onLessonChanged();
 	}
 	function setScope(newScope: string | null): void {
 		scopeValue = newScope;
-		idbLessons.sourceOptions[idbLessons.lessonIndex].scope = ScopeValues[ScopeNames.indexOf(scopeValue ?? "")];
+		idbLessons.sourceLessons[idbLessons.lessonIndex].scope = ScopeValues[ScopeNames.indexOf(scopeValue ?? "")];
+		idbLessons.isDirty = true;
 	}
 
 	let volume = idbSettings?.volume ?? 50;
@@ -167,9 +191,13 @@
 		// volume = newVolume;
 		setVolume(newVolume);
 		idbSettings.volume = newVolume;
+		idbSettings.isDirty = true;
 	}
 	function getSoundChecked(i: number): boolean {
 		return idbSettings.sounds[i];
+	}
+	function saveSettings(): void {
+		onSettingsChanged();
 	}
 
 	const animBackdrop =
@@ -190,7 +218,7 @@
 
 <!-- h-svh w-svw
  size-dvw -->
-<Dialog>
+<Dialog restoreFocus={true} onOpenChange={saveSettings}>
 	<Dialog.Trigger class="btn"><h1 style="font-size: 3em">🧜‍♀️</h1></Dialog.Trigger>
 	<Portal>
 		<Dialog.Backdrop
@@ -200,7 +228,9 @@
 			<Dialog.Content class="size-min space-y-4 card bg-surface-100-900 shadow-xl {animModal}">
 				<header class="flex justify-between">
 					<Dialog.Title class="text-2xl font-bold">Settings</Dialog.Title>
-					<Dialog.CloseTrigger class="btn preset-tonal">Save</Dialog.CloseTrigger>
+					<Dialog.CloseTrigger class="btn preset-tonal">
+						<CheckIcon class="size-4" />
+					</Dialog.CloseTrigger>
 				</header>
 				<article class="flex place-content-between gap-2">
 					<div class={cardClass}>
@@ -222,6 +252,7 @@
 														onclick={() => {
 															conditionalDisplay =
 																conditionalDisplay !== "code" ? "code" : "fonts";
+															setSource(name);
 														}}
 														>🤖
 													</button>
@@ -236,6 +267,7 @@
 														onclick={() => {
 															conditionalDisplay =
 																conditionalDisplay !== "custom" ? "custom" : "fonts";
+															setSource(name);
 														}}
 														>🛠️
 													</button>
@@ -524,7 +556,7 @@
 								<div class={cardClass}>
 									<header class="card-header">Code</header>
 									<article class={articleClassH}>
-										<OptionsCode {idbCodeWords}></OptionsCode>
+										<OptionsCode {idbCodeChoices}></OptionsCode>
 									</article>
 								</div>
 							</div>

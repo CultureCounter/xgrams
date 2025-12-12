@@ -143,6 +143,14 @@ export class SettingsXG {
 			if (init.layout !== undefined) this.layout = init.layout;
 		}
 	}
+
+	#isDirty: boolean = false;
+	set isDirty(value: boolean) {
+		this.#isDirty = value;
+	}
+	get isDirty() {
+		return this.#isDirty;
+	}
 }
 
 // const key = "idbSettings";

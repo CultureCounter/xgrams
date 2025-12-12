@@ -23,8 +23,8 @@
 	import { CodeKeys } from "$lib/store/code";
 	import { SourceKeys } from "$lib/store/SourceXG.svelte";
 
-	const idbCodesLoadState = new LoadState("idbCodes", false);
-	let idbCodes = $state(
+	const idbCodesLoadState = new LoadState("idbCodes", true);
+	let idbCodes = $state.raw(
 		new ServerStorage<CodeXG>(
 			"idbCodes",
 			CodeNames,
@@ -35,8 +35,8 @@
 		)
 	);
 
-	const idbSourcesLoadState = new LoadState("idbSources", false);
-	let idbSources = $state(
+	const idbSourcesLoadState = new LoadState("idbSources", true);
+	let idbSources = $state.raw(
 		new ServerStorage<SourceXG>(
 			"idbSources",
 			SourceNames,
@@ -47,47 +47,106 @@
 		)
 	);
 
-	let idbLessons = $state<LessonsXG>(null as unknown as LessonsXG);
-	let idbSettings = $state<SettingsXG>(null as unknown as SettingsXG);
-	let idbCustomWords = $state<string[]>(null as unknown as string[]);
-	let idbCodeWords = $state<boolean[]>(null as unknown as boolean[]);
+	let idbLessons = $state.raw<LessonsXG>(null as unknown as LessonsXG);
+	let idbSettings = $state.raw<SettingsXG>(null as unknown as SettingsXG);
+	let idbCustomWords = $state.raw<string[]>(null as unknown as string[]);
+	let idbCodeChoices = $state.raw<boolean[]>(null as unknown as boolean[]);
 
-	let currentLesson = $state(new LessonXG());
+	let currentLesson = $state.raw(null as unknown as LessonXG);
 
 	let idbStore = new IDBStore();
 	idbStore
 		.getValues(
-			["idbLessons", "idbSettings", "customWords", "idbCodeWords"],
+			["idbLessons", "idbSettings", "idbCustomWords", "idbCodeChoices"],
 			[
 				new LessonsXG(),
 				new SettingsXG(),
 				[] as string[],
 				[false, false, false, false, false, false, false, false, false] as boolean[],
 			],
-			false
+			true
 		)
 		.then((values) => {
 			idbLessons = new LessonsXG(values[0] as LessonsXG);
 			idbSettings = new SettingsXG(values[1] as SettingsXG);
 			idbCustomWords = values[2] as string[];
-			idbCodeWords = values[3] as boolean[];
-			// console.log("then idbLessons", $state.snapshot(idbLessons));
-			// console.log("then idbSettings", $state.snapshot(idbSettings));
-			// console.log("then idbCustomWords", $state.snapshot(idbCustomWords));
-			// console.log("then idbCodeWords", $state.snapshot(idbCodeWords));
+			idbCodeChoices = values[3] as boolean[];
+			currentLesson = idbLessons.sourceLessons[idbLessons.lessonIndex];
 		});
-	// let idbLessonsLoadState = idbStore.getLoadState("idbLessons");
-	// let idbSettingsLoadState = idbStore.getLoadState("idbSettings");
-	// let idbCustomWordsLoadState = idbStore.getLoadState("customWords");
-	// let idbCodeWordsLoadState = idbStore.getLoadState("idbCodeWords");
+
+	// svelte-ignore non_reactive_update
+	let typist: Typist;
+
+	function onLessonChanged() {
+		// Save dirty settings
+		onSettingsChanged();
+
+		if (currentLesson !== idbLessons.sourceLessons[idbLessons.lessonIndex]) {
+			currentLesson = idbLessons.sourceLessons[idbLessons.lessonIndex];
+			console.log("onLessonChanged(): " + idbLessons.lessonIndex);
+			typist?.initializeLesson();
+		}
+	}
+
+	const arraysEqualBoolean = (a1: boolean[], a2: boolean[]) => {
+		// Check if lengths are the same
+		if (a1.length !== a2.length) {
+			return false;
+		}
+		// Check if every element in a1 strictly equals the corresponding element in a2
+		return a1.every((element, index) => {
+			return element === a2[index];
+		});
+	};
+
+	const arraysEqualString = (a1: string[], a2: string[]) => {
+		// Check if lengths are the same
+		if (a1.length !== a2.length) {
+			return false;
+		}
+		// Check if every element in a1 strictly equals the corresponding element in a2
+		return a1.every((element, index) => {
+			return element === a2[index];
+		});
+	};
+
+	/**
+	 * Update typist and stores if settings have changed
+	 */
+	function onSettingsChanged() {
+		let settingsChanged = false;
+		if (idbSettings.isDirty) {
+			idbStore.setValue("idbSettings", idbSettings);
+			idbSettings.isDirty = false;
+			settingsChanged = true;
+		}
+		if (idbLessons.isDirty) {
+			idbStore.setValue("idbLessons", idbLessons);
+			idbLessons.isDirty = false;
+			settingsChanged = true;
+		}
+		if (!arraysEqualString(idbCustomWords, idbStore.getValue("idbCustomWords") as string[])) {
+			idbStore.setValue("idbCustomWords", idbCustomWords);
+			settingsChanged = true;
+		}
+		if (!arraysEqualBoolean(idbCodeChoices, idbStore.getValue("idbCodeChoices") as boolean[])) {
+			idbStore.setValue("idbCodeChoices", idbCodeChoices);
+			settingsChanged = true;
+		}
+		if (settingsChanged) {
+			console.log("onSettingsChanged(): ");
+			typist?.initializeLesson();
+		}
+	}
 
 	onMount(() => {
 		// idbStore.clearDatabase(); // For testing purposes only, clear the database on each load
+		// localStorage.clear();
 	});
 </script>
 
 <div class="flex h-full w-full flex-col overflow-y-auto">
-	{#if idbLessons === null || idbSettings === null || idbCustomWords === null || idbCodeWords === null || !idbSources.isLoaded() || !idbCodes.isLoaded()}
+	{#if idbLessons === null || idbSettings === null || idbCustomWords === null || idbCodeChoices === null || !idbSources.isLoaded() || !idbCodes.isLoaded()}
 		Loading...
 	{:else}
 		<div class="flex items-start justify-between">
@@ -114,11 +173,27 @@
 				</h1>
 			</div>
 			<div class="object-right">
-				<Settings bind:idbLessons bind:currentLesson bind:idbSettings bind:idbCustomWords bind:idbCodeWords
+				<Settings
+					bind:idbLessons
+					bind:currentLesson
+					bind:idbSettings
+					bind:idbCustomWords
+					bind:idbCodeChoices
+					{onLessonChanged}
+					{onSettingsChanged}
 				></Settings>
 			</div>
 		</div>
-		<Typist bind:idbLessons bind:currentLesson bind:idbSettings bind:idbSources bind:idbCodes></Typist>
+		<Typist
+			bind:this={typist}
+			bind:idbLessons
+			bind:currentLesson
+			bind:idbSettings
+			bind:idbSources
+			bind:idbCodes
+			bind:idbCodeChoices
+			bind:idbCustomWords
+		></Typist>
 		<Keyboard bind:idbSettings></Keyboard>
 	{/if}
 	<div class="flex items-center justify-center gap-8 p-4">

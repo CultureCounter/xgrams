@@ -10,6 +10,17 @@ export enum SourceIndex {
 	pangrams,
 	words,
 }
+export enum SourceAllIndex {
+	bigrams = 0,
+	trigrams,
+	tetragrams,
+	pentagrams,
+	hexagrams,
+	pangrams,
+	words,
+	code,
+	custom,
+}
 export const SourceNames: string[] = [
 	"Bigrams",
 	"Trigrams",

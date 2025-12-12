@@ -1,12 +1,25 @@
 <script lang="ts">
-	import { deepClone } from "$lib/store/LessonsXG.svelte";
-	import { SoundIndex } from "$lib/store/SettingsXG.svelte";
-	import { SourceKeys } from "$lib/store/SourceXG.svelte";
+	import { deepClone, LessonsXG } from "$lib/store/LessonsXG.svelte";
+	import { SettingsXG, SoundIndex } from "$lib/store/SettingsXG.svelte";
+	import { SourceAllIndex, SourceKeys, SourceNames, SourceXG } from "$lib/store/SourceXG.svelte";
+	import { CodeIndex, CodeXG } from "$lib/store/code";
 	import Celebration, { startCelebration } from "./Celebration.svelte";
 	// import Celebration, { startCelebration, unleashWorker } from './Celebration.svelte';
 	import PlaySounds, { playSound, Sounds } from "./PlaySounds.svelte";
 	import StopWatch from "../lib/utilities/StopWatch/StopWatch.svelte";
 	import { lapTime, resetStopWatch, resetLap, startLap, endLap } from "../lib/utilities/StopWatch/stopwatch";
+	import { LessonXG } from "$lib/store/LessonXG.svelte";
+
+	let {
+		currentLesson = $bindable<LessonXG>(),
+		idbLessons = $bindable<LessonsXG>(),
+		idbSettings = $bindable<SettingsXG>(),
+		idbSources = $bindable<SourceXG>(),
+		idbCodes = $bindable<CodeXG>(),
+		idbCodeChoices = $bindable<boolean[]>(),
+		idbCustomWords = $bindable<string[]>(),
+	} = $props();
+	let codesSource: string[] = [];
 
 	function shuffle(array: string[]): void {
 		for (let i = array.length - 1; i > 0; i--) {
@@ -30,21 +43,14 @@
 	let accuracy = $state(0);
 	let isMouseInside = $state(false);
 
-	let {
-		currentLesson = $bindable(),
-		idbLessons = $bindable(),
-		idbSettings = $bindable(),
-		idbSources = $bindable(),
-		idbCodes = $bindable(),
-	} = $props();
-
 	let lines: string[] = $state([]);
 	let linesIndex = $state(0);
 	/**
 	 * Lessons are a series of `lines`
 	 */
-	function initializeLesson() {
-		lines = generateLines(currentLesson.combination, currentLesson.repetition, currentLesson.filter);
+	export function initializeLesson() {
+		if (currentLesson.source == SourceAllIndex.code) updateCodeWords(idbCodeChoices);
+		lines = generateLines();
 		expectedLine = lines[0] || "";
 		linesIndex = 0;
 		initializeLine();
@@ -57,17 +63,22 @@
 	 * @param filter reduce the available combinations
 	 * @returns lines to type
 	 */
-	function generateLines(combinations: number, repetitions: number, filter: string): string[] {
+	export function generateLines(): string[] {
+		let combinations = currentLesson.combination;
+		let repetitions = currentLesson.repetition;
+		let filter = currentLesson.filter;
 		let scope = currentLesson.scope;
-		let index = idbLessons.source;
-		let s: string = SourceKeys[index];
-		let source = idbSources.current[s];
+		let index = idbLessons.lessonIndex;
+		let source: string[];
+		if (index == SourceAllIndex.code) source = codesSource;
+		else if (index == SourceAllIndex.custom) source = idbCustomWords;
+		else source = idbSources.current[SourceKeys[index]];
 
-		console.log("Generating lines with source length:", s, source.length);
+		let s: string = SourceNames[index];
+		console.log("Generating lines with source:", index, $state.snapshot(idbSources));
+		console.log("Generating lines with source length:", s, source?.length);
 		if (source == null) {
-			console.log("Generating lines with source == null:");
-			console.log("idbSources.source:", idbSources);
-			console.log("idbCodes:", $state.snapshot(idbCodes));
+			console.assert(source != null, "Generating lines with source == null:", index);
 			source = idbSources.current.bigrams.slice(0, scope);
 		}
 
@@ -98,7 +109,6 @@
 
 		let ngrams = deepClone(source);
 		shuffle(ngrams);
-
 		padToMultiple(ngrams, combinations); // Ensure all subLines have requested combinations
 
 		let lines = [];
@@ -114,89 +124,29 @@
 			ngrams.splice(0, combinations);
 		}
 
+		shuffle(lines);
 		return lines;
 	}
 
-	// $effect(() => {
-	// 	idbSettings;
-	// 	if (idbSettings.isLoaded()) {
-	// 		console.log("finishedLoading => initializeLesson");
-	// 		initializeLesson();
-	// 	}
-	// });
-
-	// TODO: Today we are going to async load the data and nothing but the data.
-	// We will cache these results, especially getmany.
-	// We will assign them to client objects by returning the actual goddamn data.
-	// If the cache does not have it we go and goddamned get it.
-	// Fuck the reactivity for now, manual updates.
-
-	// let oldLessonIndex = -1;
-	// $effect(() => {
-	// 	debugger;
-	// 	if (finishedLoading) {
-	// 		console.log("finishedLoading => initializeLesson");
-	// 		console.assert(idbLessons.lessonIndex >= 0);
-	// 		console.assert(idbLessons.sourceOptions[idbLessons.lessonIndex] != null);
-	// 		if (oldLessonIndex == -1) {
-	// 			oldLessonIndex = idbLessons.lessonIndex;
-	// 			console.log("oldLessonIndex -1 => ", idbLessons.lessonIndex);
-	// 			currentLesson = idbLessons.sourceOptions[idbLessons.lessonIndex];
-	// 			console.log(
-	// 				"currentLesson idbLessons.sourceOptions.length ",
-	// 				idbLessons.sourceOptions.length
-	// 			);
-	// 			debugger;
-	// 		} else if (oldLessonIndex != idbLessons.lessonIndex) {
-	// 			console.log("oldLessonIndex => ", oldLessonIndex, idbLessons.lessonIndex);
-	// 			oldLessonIndex = idbLessons.lessonIndex;
-	// 			currentLesson = idbLessons.sourceOptions[idbLessons.lessonIndex];
-	// 			debugger;
-	// 		}
-	// 		console.assert(currentLesson != null);
-	// 		console.assert(currentLesson.combination > 0);
-	// 		console.assert(currentLesson.repetition > 0);
-	// 		console.assert(currentLesson.scope > 0);
-	// 		console.assert(currentLesson.filter.length > 0);
-	// 		initializeLesson();
-	// 	}
-	// });
-
-	// $effect(() => {
-	// 	// eslint-disable-next-line @typescript-eslint/no-unused-expressions
-	// 	idbLessons;
-	// 	if (finishedLoading && idbLessons !== undefined) {
-	// 		console.log("idbCodeWords => generateLines currentLesson:", $state.snapshot(currentLesson));
-	// 		lines = generateLines(
-	// 			currentLesson.combination,
-	// 			currentLesson.repetition,
-	// 			currentLesson.filter
-	// 		);
-	// 	}
-	// });
-
-	// $effect(() => {
-	// 	if (finishedLoading) {
-	// 		console.log("codeWords => updateCodeWords with", codeWords);
-	// 		if (codeWords.length > 0) {
-	// 			updateCodeWords(codeWords, idbCodes);
-	// 		}
-	// 	}
-	// });
-
-	// $effect(() => {
-	// 	if (finishedLoading) {
-	// 		console.log("idbSources.current => initializeLesson", idbSources.current);
-	// 		initializeLesson();
-	// 	}
-	// });
-
-	// $effect(() => {
-	// 	if (finishedLoading) {
-	// 		console.log("idbLessons => onLessonsChanged", idbLessons);
-	// 		onLessonsChanged(idbLessons);
-	// 	}
-	// });
+	/**
+	 * Update codesSource array based on idbCodeChoices
+	 * TODO: only update if idbCodeChoices has changed
+	 * @param idbCodeChoices boolean[] indicating which languages to include.
+	 */
+	function updateCodeWords(idbCodeChoices: boolean[]) {
+		codesSource.length = 0;
+		codesSource.push(
+			...(idbCodeChoices[CodeIndex.cpp] ? idbCodes.cpp : []),
+			...(idbCodeChoices[CodeIndex.cs] ? idbCodes.cs : []),
+			...(idbCodeChoices[CodeIndex.go] ? idbCodes.go : []),
+			...(idbCodeChoices[CodeIndex.java] ? idbCodes.java : []),
+			...(idbCodeChoices[CodeIndex.javascript] ? idbCodes.javascript : []),
+			...(idbCodeChoices[CodeIndex.python] ? idbCodes.python : []),
+			...(idbCodeChoices[CodeIndex.rust] ? idbCodes.rust : []),
+			...(idbCodeChoices[CodeIndex.swift] ? idbCodes.swift : []),
+			...(idbCodeChoices[CodeIndex.typescript] ? idbCodes.typescript : [])
+		);
+	}
 
 	const ColorChars = {
 		untoldChar: 0,

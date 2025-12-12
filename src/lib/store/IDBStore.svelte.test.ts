@@ -111,12 +111,12 @@ describe("IDBStore", () => {
 		});
 	});
 
-	describe("updateValue() Functionality", () => {
+	describe("setValue() Functionality", () => {
 		it("should update a single value", async () => {
 			const key = "updateKey";
 			const newValue = { updated: true };
 
-			await store.updateValue(key, newValue);
+			await store.setValue(key, newValue);
 
 			// Verify it was saved to IndexedDB
 			const retrieved = await getMany([key]);
@@ -127,7 +127,7 @@ describe("IDBStore", () => {
 			const key = "existingKey";
 			await setMany([[key, "oldValue"]]);
 
-			await store.updateValue(key, "newValue");
+			await store.setValue(key, "newValue");
 
 			const retrieved = await getMany([key]);
 			expect(retrieved[0]).toBe("newValue");
@@ -142,7 +142,7 @@ describe("IDBStore", () => {
 				},
 			};
 
-			await store.updateValue(key, complexValue);
+			await store.setValue(key, complexValue);
 
 			const retrieved = await getMany([key]);
 			expect(retrieved[0]).toEqual(complexValue);
@@ -191,7 +191,7 @@ describe("IDBStore", () => {
 				const customWords = ["hello", "world", "test", "example"];
 				const keys = ["customWords"];
 
-				await store.updateValue(keys[0], customWords);
+				await store.setValue(keys[0], customWords);
 
 				const values = await store.getValues(keys, [[]]);
 				expect(values[0]).toEqual(customWords);
@@ -211,7 +211,7 @@ describe("IDBStore", () => {
 				const codeWords = [true, false, true, false, true, false, true, false, true];
 				const keys = ["idbCodeWords"];
 
-				await store.updateValue(keys[0], codeWords);
+				await store.setValue(keys[0], codeWords);
 
 				const values = await store.getValues(keys, [[]]);
 				expect(values[0]).toEqual(codeWords);
@@ -222,7 +222,7 @@ describe("IDBStore", () => {
 				const codeWords = [false, false, false, false, false, false, false, false, false];
 				const keys = ["idbCodeWords"];
 
-				await store.updateValue(keys[0], codeWords);
+				await store.setValue(keys[0], codeWords);
 
 				const values = await store.getValues(keys, [[]]);
 				expect(values[0]).toEqual(codeWords);
@@ -238,7 +238,7 @@ describe("IDBStore", () => {
 				const lessons = new LessonsXG();
 				lessons.source = SourceIndex.trigrams;
 				lessons.lessonIndex = 3;
-				lessons.sourceOptions[1] = new LessonXG({
+				lessons.sourceLessons[1] = new LessonXG({
 					scope: 15,
 					combination: 25,
 					repetition: 35,
@@ -247,18 +247,18 @@ describe("IDBStore", () => {
 				});
 
 				const keys = ["idbLessons"];
-				await store.updateValue(keys[0], lessons);
+				await store.setValue(keys[0], lessons);
 
 				const values = await store.getValues(keys, [new LessonsXG()]);
 				const retrieved = values[0] as LessonsXG;
 
 				expect(retrieved.source).toBe(SourceIndex.trigrams);
 				expect(retrieved.lessonIndex).toBe(3);
-				expect(retrieved.sourceOptions[1].scope).toBe(15);
-				expect(retrieved.sourceOptions[1].combination).toBe(25);
-				expect(retrieved.sourceOptions[1].repetition).toBe(35);
-				expect(retrieved.sourceOptions[1].filter).toBe("test filter");
-				expect(retrieved.sourceOptions[1].WPMs).toEqual([50, 60, 70]);
+				expect(retrieved.sourceLessons[1].scope).toBe(15);
+				expect(retrieved.sourceLessons[1].combination).toBe(25);
+				expect(retrieved.sourceLessons[1].repetition).toBe(35);
+				expect(retrieved.sourceLessons[1].filter).toBe("test filter");
+				expect(retrieved.sourceLessons[1].WPMs).toEqual([50, 60, 70]);
 			});
 
 			it("should handle default LessonsXG when nothing is stored", async () => {
@@ -270,7 +270,7 @@ describe("IDBStore", () => {
 
 				expect(retrieved.source).toBe(SourceIndex.bigrams);
 				expect(retrieved.lessonIndex).toBe(0);
-				expect(retrieved.sourceOptions.length).toBe(defaultLessons.sourceOptions.length);
+				expect(retrieved.sourceLessons.length).toBe(defaultLessons.sourceLessons.length);
 			});
 		});
 
@@ -285,7 +285,7 @@ describe("IDBStore", () => {
 				settings.volume = 75;
 
 				const keys = ["idbSettings"];
-				await store.updateValue(keys[0], settings);
+				await store.setValue(keys[0], settings);
 
 				const values = await store.getValues(keys, [new SettingsXG()]);
 				const retrieved = values[0] as SettingsXG;
@@ -380,10 +380,10 @@ describe("IDBStore", () => {
 			settings.minimumWPM = 60;
 
 			// Update all four
-			await store.updateValue("customWords", customWords);
-			await store.updateValue("idbCodeWords", codeWords);
-			await store.updateValue("idbLessons", lessons);
-			await store.updateValue("idbSettings", settings);
+			await store.setValue("customWords", customWords);
+			await store.setValue("idbCodeWords", codeWords);
+			await store.setValue("idbLessons", lessons);
+			await store.setValue("idbSettings", settings);
 
 			// Retrieve and verify
 			const keys = ["customWords", "idbCodeWords", "idbLessons", "idbSettings"];
@@ -418,7 +418,7 @@ describe("IDBStore", () => {
 			const largeArray = Array.from({ length: 1000 }, (_, i) => `word${i}`);
 			const keys = ["largeArray"];
 
-			await store.updateValue(keys[0], largeArray);
+			await store.setValue(keys[0], largeArray);
 
 			const values = await store.getValues(keys, [[]]);
 			expect((values[0] as string[]).length).toBe(1000);
@@ -440,7 +440,7 @@ describe("IDBStore", () => {
 			};
 
 			const keys = ["nested"];
-			await store.updateValue(keys[0], nested);
+			await store.setValue(keys[0], nested);
 
 			const values = await store.getValues(keys, [{}]);
 			expect(

@@ -1,5 +1,4 @@
 import { browser } from "$app/environment";
-// import { tick } from "svelte";
 import { clear, getMany, set, setMany } from "idb-keyval";
 import { LoadIndex, LoadState } from "./LoadState.svelte";
 
@@ -85,12 +84,19 @@ export class IDBStore {
 		return this.#loadStates.get(key) as LoadState;
 	}
 
-	async updateValue(key: string, value: unknown) {
+	async setValue(key: string, value: unknown) {
 		if (!browser) {
 			return;
 		}
 		await set(key, value);
 		this.#values.set(key, value);
 		this.#loadStates.get(key)?.setState(LoadIndex.loaded);
+	}
+
+	getValue(key: string): unknown {
+		if (!this.#values.has(key)) {
+			throw new Error("Value not found for key: " + key);
+		}
+		return this.#values.get(key);
 	}
 }
