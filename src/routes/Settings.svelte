@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { LessonXG, ScopeIndex, ScopeNames, ScopeValues } from "$lib/store/LessonXG.svelte.ts";
+	import { LessonState, ScopeIndex, ScopeNames, ScopeValues } from "$lib/store/LessonXG.svelte.ts";
 	import { LessonsXG } from "$lib/store/LessonsXG.svelte";
 	import {
 		ColorIndex,
@@ -23,7 +23,7 @@
 	import OptionsFilter from "./OptionsFilter.svelte";
 
 	let {
-		currentLesson = $bindable<LessonXG>(),
+		currentLesson = $bindable<LessonState>(),
 		idbLessons = $bindable<LessonsXG>(),
 		idbSettings = $bindable<SettingsXG>(),
 		idbCustomWords = $bindable<string[]>(),
@@ -166,23 +166,38 @@
 	}
 	let keyBackspace = `\u232B`;
 
-	let sourceValue = $state<string | null>(SourceNames[SourceIndex.bigrams]);
-	let scopeValue = $state<string | null>(ScopeNames[ScopeIndex.top50]);
 	function soundsChanged(e: Event, i: number) {
 		idbSettings.sounds[i] = (e.target as HTMLInputElement).checked;
 		idbSettings.isDirty = true;
 	}
 
+	let sourceValue = $state<string>(SourceNames[idbLessons.lessonIndex]);
 	function setSource(newSource: string | null): void {
-		sourceValue = newSource;
-		let index = SourceNames.indexOf(sourceValue ?? "");
+		sourceValue = newSource ?? SourceNames[SourceIndex.bigrams];
+		let index = SourceNames.indexOf(sourceValue);
 		idbLessons.lessonIndex = index;
 		idbLessons.isDirty = true;
 		onLessonChanged();
 	}
+
+	let scopeValue = $state<string>(ScopeNames[ScopeValues.indexOf(currentLesson.scope)]);
 	function setScope(newScope: string | null): void {
-		scopeValue = newScope;
-		idbLessons.sourceLessons[idbLessons.lessonIndex].scope = ScopeValues[ScopeNames.indexOf(scopeValue ?? "")];
+		let scopeName = newScope ?? ScopeNames[ScopeIndex.top100];
+		let index = ScopeNames.indexOf(scopeName);
+		currentLesson.scope = ScopeValues[index];
+		scopeValue = scopeName;
+		idbLessons.isDirty = true;
+	}
+	let combination = $state<number>(currentLesson.combination);
+	function setCombination(newCombination: number): void {
+		combination = newCombination;
+		currentLesson.combination = newCombination;
+		idbLessons.isDirty = true;
+	}
+	let repetition = $state<number>(currentLesson.repetition);
+	function setRepetition(newRepetition: number): void {
+		repetition = newRepetition;
+		currentLesson.repetition = newRepetition;
 		idbLessons.isDirty = true;
 	}
 
@@ -314,19 +329,15 @@
 								name="Combination"
 								minCounter={1}
 								stepCounter={1}
-								count={currentLesson.combination}
-								onChange={(e: CustomEvent) => {
-									currentLesson.combination = e.detail as number;
-								}}
+								count={combination}
+								onChange={setCombination}
 							/>
 							<Counter
 								name="Repetition"
 								stepCounter={1}
 								minCounter={1}
-								count={currentLesson.repetition}
-								onChange={(e: CustomEvent) => {
-									currentLesson.repetition = e.detail as number;
-								}}
+								count={repetition}
+								onChange={setRepetition}
 							/>
 							<div>
 								Filter<button
@@ -349,6 +360,7 @@
 								stepCounter={10}
 								onChange={(e: CustomEvent) => {
 									idbSettings.minimumWPM = e.detail as number;
+									idbLessons.isDirty = true;
 								}}
 								count={idbSettings.minimumWPM}
 							/>
@@ -358,6 +370,7 @@
 								maxCounter={100}
 								onChange={(e: CustomEvent) => {
 									idbSettings.minimumAccuracy = e.detail as number;
+									idbLessons.isDirty = true;
 								}}
 								count={idbSettings.minimumAccuracy}
 							/>

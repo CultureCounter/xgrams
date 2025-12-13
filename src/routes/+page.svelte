@@ -12,7 +12,7 @@
 	import Keyboard from "./Keyboard.svelte";
 	import { IDBStore } from "$lib/store/IDBStore.svelte";
 	import { LessonsXG } from "$lib/store/LessonsXG.svelte";
-	import { LessonXG } from "$lib/store/LessonXG.svelte";
+	import { LessonState } from "$lib/store/LessonXG.svelte";
 	import { SettingsXG } from "$lib/store/SettingsXG.svelte";
 	import { CodeXG } from "$lib/store/code";
 	import { SourceXG } from "$lib/store/SourceXG.svelte";
@@ -23,7 +23,8 @@
 	import { CodeKeys } from "$lib/store/code";
 	import { SourceKeys } from "$lib/store/SourceXG.svelte";
 
-	const idbCodesLoadState = new LoadState("idbCodes", true);
+	const isTracing = false;
+	const idbCodesLoadState = new LoadState("idbCodes", isTracing);
 	let idbCodes = $state.raw(
 		new ServerStorage<CodeXG>(
 			"idbCodes",
@@ -35,7 +36,7 @@
 		)
 	);
 
-	const idbSourcesLoadState = new LoadState("idbSources", true);
+	const idbSourcesLoadState = new LoadState("idbSources", isTracing);
 	let idbSources = $state.raw(
 		new ServerStorage<SourceXG>(
 			"idbSources",
@@ -52,7 +53,7 @@
 	let idbCustomWords = $state.raw<string[]>(null as unknown as string[]);
 	let idbCodeChoices = $state.raw<boolean[]>(null as unknown as boolean[]);
 
-	let currentLesson = $state.raw(null as unknown as LessonXG);
+	let currentLesson = $state.raw(null as unknown as LessonState);
 
 	let idbStore = new IDBStore();
 	idbStore
@@ -64,14 +65,14 @@
 				[] as string[],
 				[false, false, false, false, false, false, false, false, false] as boolean[],
 			],
-			true
+			isTracing
 		)
 		.then((values) => {
 			idbLessons = new LessonsXG(values[0] as LessonsXG);
 			idbSettings = new SettingsXG(values[1] as SettingsXG);
 			idbCustomWords = values[2] as string[];
 			idbCodeChoices = values[3] as boolean[];
-			currentLesson = idbLessons.sourceLessons[idbLessons.lessonIndex];
+			currentLesson = new LessonState(idbLessons.sourceLessons[idbLessons.lessonIndex]);
 		});
 
 	// svelte-ignore non_reactive_update
@@ -82,7 +83,7 @@
 		onSettingsChanged();
 
 		if (currentLesson !== idbLessons.sourceLessons[idbLessons.lessonIndex]) {
-			currentLesson = idbLessons.sourceLessons[idbLessons.lessonIndex];
+			currentLesson.transferFromLesson(idbLessons.sourceLessons[idbLessons.lessonIndex]);
 			console.log("onLessonChanged(): " + idbLessons.lessonIndex);
 			typist?.initializeLesson();
 		}
@@ -121,9 +122,17 @@
 			settingsChanged = true;
 		}
 		if (idbLessons.isDirty) {
+			let target = idbLessons.sourceLessons[idbLessons.lessonIndex];
+			console.log("onSettingsChanged(): scope ", target.scope, " -> ", currentLesson.scope);
+			console.log("onSettingsChanged(): combination ", target.combination, " -> ", currentLesson.combination);
+			console.log("onSettingsChanged(): repetition ", target.repetition, " -> ", currentLesson.repetition);
+			console.log("onSettingsChanged(): WPMs ", target.WPMs, " -> ", currentLesson.WPMs);
+			console.log("onSettingsChanged(): filter ", target.filter, " -> ", currentLesson.filter);
+			let didChange = currentLesson.transferToLesson(target);
 			idbStore.setValue("idbLessons", idbLessons);
+
 			idbLessons.isDirty = false;
-			settingsChanged = true;
+			settingsChanged = didChange || settingsChanged;
 		}
 		if (!arraysEqualString(idbCustomWords, idbStore.getValue("idbCustomWords") as string[])) {
 			idbStore.setValue("idbCustomWords", idbCustomWords);
@@ -134,7 +143,7 @@
 			settingsChanged = true;
 		}
 		if (settingsChanged) {
-			console.log("onSettingsChanged(): ");
+			console.log("onSettingsChanged() => initializeLesson");
 			typist?.initializeLesson();
 		}
 	}
