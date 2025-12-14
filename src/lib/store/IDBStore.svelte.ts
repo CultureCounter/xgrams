@@ -34,6 +34,9 @@ export class IDBStore {
 	}
 
 	async getValues(keys: string[], defaultValues: unknown[], trace: boolean = false): Promise<unknown[]> {
+		if (LoadState.clearDatabase) {
+			return [];
+		}
 		if (!browser) {
 			keys.forEach((key) => {
 				this.#loadStates.set(key, new LoadState(key, trace));
@@ -84,16 +87,19 @@ export class IDBStore {
 		return this.#loadStates.get(key) as LoadState;
 	}
 
-	async setValue(key: string, value: unknown) {
-		if (!browser) {
+	setValue(key: string, value: unknown) {
+		if (!browser || LoadState.clearDatabase) {
 			return;
 		}
-		await set(key, value);
+		set(key, value);
 		this.#values.set(key, value);
 		this.#loadStates.get(key)?.setState(LoadIndex.loaded);
 	}
 
 	getValue(key: string): unknown {
+		if (!browser || LoadState.clearDatabase) {
+			return;
+		}
 		if (!this.#values.has(key)) {
 			throw new Error("Value not found for key: " + key);
 		}

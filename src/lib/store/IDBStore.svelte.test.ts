@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { clear, getMany, setMany } from "idb-keyval";
 import { IDBStore } from "./IDBStore.svelte";
-import { LessonXG } from "./LessonXG.svelte";
-import { LessonsXG } from "./LessonsXG.svelte";
-import { SettingsXG, ColorIndex } from "./SettingsXG.svelte";
+import { LessonDB } from "./LessonXG.svelte";
+import { LessonsDB } from "./LessonsXG.svelte";
+import { SettingsDB, ColorIndex } from "./SettingsXG.svelte";
 import { SourceIndex } from "./SourceXG.svelte";
 import { KeyboardIndex, LayoutIndex } from "./keyboard";
 
@@ -233,12 +233,12 @@ describe("IDBStore", () => {
 			});
 		});
 
-		describe("idbLessons (LessonsXG)", () => {
-			it("should handle LessonsXG object", async () => {
-				const lessons = new LessonsXG();
+		describe("idbLessons (LessonsDB)", () => {
+			it("should handle LessonsDB object", async () => {
+				const lessons = new LessonsDB();
 				lessons.source = SourceIndex.trigrams;
 				lessons.lessonIndex = 3;
-				lessons.sourceLessons[1] = new LessonXG({
+				lessons.sourceLessons[1] = new LessonDB({
 					scope: 15,
 					combination: 25,
 					repetition: 35,
@@ -249,8 +249,8 @@ describe("IDBStore", () => {
 				const keys = ["idbLessons"];
 				await store.setValue(keys[0], lessons);
 
-				const values = await store.getValues(keys, [new LessonsXG()]);
-				const retrieved = values[0] as LessonsXG;
+				const values = await store.getValues(keys, [new LessonsDB()]);
+				const retrieved = values[0] as LessonsDB;
 
 				expect(retrieved.source).toBe(SourceIndex.trigrams);
 				expect(retrieved.lessonIndex).toBe(3);
@@ -261,12 +261,12 @@ describe("IDBStore", () => {
 				expect(retrieved.sourceLessons[1].WPMs).toEqual([50, 60, 70]);
 			});
 
-			it("should handle default LessonsXG when nothing is stored", async () => {
+			it("should handle default LessonsDB when nothing is stored", async () => {
 				const keys = ["idbLessons"];
-				const defaultLessons = new LessonsXG();
+				const defaultLessons = new LessonsDB();
 
 				const values = await store.getValues(keys, [defaultLessons]);
-				const retrieved = values[0] as LessonsXG;
+				const retrieved = values[0] as LessonsDB;
 
 				expect(retrieved.source).toBe(SourceIndex.bigrams);
 				expect(retrieved.lessonIndex).toBe(0);
@@ -274,9 +274,9 @@ describe("IDBStore", () => {
 			});
 		});
 
-		describe("idbSettings (SettingsXG)", () => {
-			it("should handle SettingsXG object", async () => {
-				const settings = new SettingsXG();
+		describe("idbSettings (SettingsDB)", () => {
+			it("should handle SettingsDB object", async () => {
+				const settings = new SettingsDB();
 				settings.minimumWPM = 50;
 				settings.minimumAccuracy = 95;
 				settings.color = ColorIndex.blue;
@@ -287,8 +287,8 @@ describe("IDBStore", () => {
 				const keys = ["idbSettings"];
 				await store.setValue(keys[0], settings);
 
-				const values = await store.getValues(keys, [new SettingsXG()]);
-				const retrieved = values[0] as SettingsXG;
+				const values = await store.getValues(keys, [new SettingsDB()]);
+				const retrieved = values[0] as SettingsDB;
 
 				expect(retrieved.minimumWPM).toBe(50);
 				expect(retrieved.minimumAccuracy).toBe(95);
@@ -298,12 +298,12 @@ describe("IDBStore", () => {
 				expect(retrieved.volume).toBe(75);
 			});
 
-			it("should handle default SettingsXG when nothing is stored", async () => {
+			it("should handle default SettingsDB when nothing is stored", async () => {
 				const keys = ["idbSettings"];
-				const defaultSettings = new SettingsXG();
+				const defaultSettings = new SettingsDB();
 
 				const values = await store.getValues(keys, [defaultSettings]);
-				const retrieved = values[0] as SettingsXG;
+				const retrieved = values[0] as SettingsDB;
 
 				expect(retrieved.minimumWPM).toBe(40);
 				expect(retrieved.minimumAccuracy).toBe(100);
@@ -317,9 +317,9 @@ describe("IDBStore", () => {
 		it("should retrieve all four data types in a single call", async () => {
 			const customWords = ["test", "words"];
 			const codeWords = [true, false, true, false, true, false, true, false, true];
-			const lessons = new LessonsXG();
+			const lessons = new LessonsDB();
 			lessons.source = SourceIndex.words;
-			const settings = new SettingsXG();
+			const settings = new SettingsDB();
 			settings.volume = 80;
 
 			// Store all values
@@ -331,19 +331,19 @@ describe("IDBStore", () => {
 			]);
 
 			const keys = ["customWords", "idbCodeWords", "idbLessons", "idbSettings"];
-			const defaults = [[], [], new LessonsXG(), new SettingsXG()];
+			const defaults = [[], [], new LessonsDB(), new SettingsDB()];
 
 			const values = await store.getValues(keys, defaults);
 
 			expect(values[0]).toEqual(customWords);
 			expect(values[1]).toEqual(codeWords);
-			expect((values[2] as LessonsXG).source).toBe(SourceIndex.words);
-			expect((values[3] as SettingsXG).volume).toBe(80);
+			expect((values[2] as LessonsDB).source).toBe(SourceIndex.words);
+			expect((values[3] as SettingsDB).volume).toBe(80);
 		});
 
 		it("should handle mixed defaults and existing values for all four types", async () => {
 			const customWords = ["existing", "words"];
-			const lessons = new LessonsXG();
+			const lessons = new LessonsDB();
 			lessons.lessonIndex = 5;
 
 			// Store only two of the four
@@ -356,27 +356,27 @@ describe("IDBStore", () => {
 			const defaults = [
 				[],
 				[false, false, false, false, false, false, false, false, false],
-				new LessonsXG(),
-				new SettingsXG(),
+				new LessonsDB(),
+				new SettingsDB(),
 			];
 
 			const values = await store.getValues(keys, defaults);
 
 			// Existing values
 			expect(values[0]).toEqual(customWords);
-			expect((values[2] as LessonsXG).lessonIndex).toBe(5);
+			expect((values[2] as LessonsDB).lessonIndex).toBe(5);
 
 			// Default values
 			expect(values[1]).toEqual([false, false, false, false, false, false, false, false, false]);
-			expect((values[3] as SettingsXG).volume).toBe(100);
+			expect((values[3] as SettingsDB).volume).toBe(100);
 		});
 
 		it("should update multiple values and verify persistence", async () => {
 			const customWords = ["updated", "custom"];
 			const codeWords = [true, true, false, false, true, true, false, false, true];
-			const lessons = new LessonsXG();
+			const lessons = new LessonsDB();
 			lessons.source = SourceIndex.pangrams;
-			const settings = new SettingsXG();
+			const settings = new SettingsDB();
 			settings.minimumWPM = 60;
 
 			// Update all four
@@ -391,8 +391,8 @@ describe("IDBStore", () => {
 
 			expect(retrieved[0]).toEqual(customWords);
 			expect(retrieved[1]).toEqual(codeWords);
-			expect((retrieved[2] as LessonsXG).source).toBe(SourceIndex.pangrams);
-			expect((retrieved[3] as SettingsXG).minimumWPM).toBe(60);
+			expect((retrieved[2] as LessonsDB).source).toBe(SourceIndex.pangrams);
+			expect((retrieved[3] as SettingsDB).minimumWPM).toBe(60);
 		});
 	});
 

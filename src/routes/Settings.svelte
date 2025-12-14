@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { LessonState, ScopeIndex, ScopeNames, ScopeValues } from "$lib/store/LessonXG.svelte.ts";
-	import { LessonsXG } from "$lib/store/LessonsXG.svelte";
+	import { LessonDB, ScopeIndex, ScopeNames, ScopeValues } from "$lib/store/LessonXG.svelte.ts";
+	import { LessonsDB } from "$lib/store/LessonsXG.svelte";
 	import {
 		ColorIndex,
 		ColorNames,
 		FontFamilyCSS,
 		FontFamilyNames,
-		SettingsXG,
+		SettingsDB,
 		SoundNames,
 	} from "$lib/store/SettingsXG.svelte";
 	import { SourceIndex, SourceNames } from "$lib/store/SourceXG.svelte";
@@ -21,51 +21,72 @@
 	import OptionsCode from "./OptionsCode.svelte";
 	import OptionsCustom from "./OptionsCustom.svelte";
 	import OptionsFilter from "./OptionsFilter.svelte";
+	import { findStrings, replaceStrings } from "$lib/utilities/utils";
 
+	type Props = {
+		// Define the expected type for the prop
+		currentLesson: LessonDB;
+		idbLessons: LessonsDB;
+		idbSettings: SettingsDB;
+		idbCustomWords: string[];
+		idbCodeChoices: boolean[];
+		onLessonChanged: (
+			settingsDB: SettingsDB,
+			currentLesson: LessonDB,
+			lessonsDB: LessonsDB,
+			codeChoices?: boolean[],
+			customWords?: string[]
+		) => void;
+		onSettingsChanged: (
+			settingsDB: SettingsDB,
+			currentLesson: LessonDB,
+			lessonsDB: LessonsDB,
+			codeChoices?: boolean[],
+			customWords?: string[]
+		) => void;
+	};
 	let {
-		currentLesson = $bindable<LessonState>(),
-		idbLessons = $bindable<LessonsXG>(),
-		idbSettings = $bindable<SettingsXG>(),
-		idbCustomWords = $bindable<string[]>(),
-		idbCodeChoices = $bindable<boolean[]>(),
+		currentLesson = $bindable(),
+		idbLessons = $bindable(),
+		idbSettings = $bindable(),
+		idbCustomWords,
+		idbCodeChoices,
 		onLessonChanged,
 		onSettingsChanged,
-	} = $props();
+	}: Props = $props();
 
-	/**
-	 * Remove from space delimited `target` all `removals` and leave one `add`
-	 * @param target
-	 * @param removals
-	 * @param add
-	 * @returns string
-	 */
-	function replaceStrings(target: string, removals: string[], add: string): string {
-		for (let candidate of removals) {
-			// console.log('removing:`' + candidate + '`');
-			target = target.replace(candidate, "");
-		}
-		target += add;
-		return target;
-	}
-
-	/**
-	 * Find in space delimited `target` one of `candidates`
-	 * @param target
-	 * @param removals
-	 * @param add
-	 * @returns string `candidate` or ''
-	 */
-	function findStrings(target: string, candidates: string[]): string {
-		for (let candidate of candidates) {
-			if (target.includes(candidate)) {
-				return candidate;
-			}
-		}
-		return "";
-	}
-
+	// Avoid Aria whining using conditional display not popups
 	type ConditionalDisplay = "fonts" | "filter" | "code" | "custom";
 	let conditionalDisplay = $state<ConditionalDisplay>("fonts");
+
+	let minimumWPM = $state(idbSettings.minimumWPM);
+	function setMinimumWPM(newMinimumWPM: number): void {
+		minimumWPM = newMinimumWPM;
+		idbSettings.minimumWPM = newMinimumWPM;
+		idbSettings.isDirty = true;
+	}
+
+	let minimumAccuracy = $state(idbSettings.minimumAccuracy);
+	function setMinimumAccuracy(newMinimumAccuracy: number): void {
+		minimumAccuracy = newMinimumAccuracy;
+		idbSettings.minimumAccuracy = newMinimumAccuracy;
+		idbSettings.isDirty = true;
+	}
+
+	let sounds = $state(idbSettings.sounds);
+	function soundsChanged(e: Event, i: number) {
+		sounds[i] = (e.target as HTMLInputElement).checked;
+		idbSettings.sounds[i] = sounds[i];
+		idbSettings.isDirty = true;
+	}
+
+	let volume = $state(idbSettings.volume);
+	function setNewVolume(newVolume: number): void {
+		// volume = newVolume;
+		setVolume(newVolume);
+		idbSettings.volume = newVolume;
+		idbSettings.isDirty = true;
+	}
 
 	let selectedFontFamily: string = $state(findStrings(idbSettings.font ?? "", FontFamilyCSS));
 	function setFontFamily(): void {
@@ -166,28 +187,31 @@
 	}
 	let keyBackspace = `\u232B`;
 
-	function soundsChanged(e: Event, i: number) {
-		idbSettings.sounds[i] = (e.target as HTMLInputElement).checked;
-		idbSettings.isDirty = true;
-	}
-
 	let sourceValue = $state<string>(SourceNames[idbLessons.lessonIndex]);
 	function setSource(newSource: string | null): void {
 		sourceValue = newSource ?? SourceNames[SourceIndex.bigrams];
 		let index = SourceNames.indexOf(sourceValue);
 		idbLessons.lessonIndex = index;
 		idbLessons.isDirty = true;
-		onLessonChanged();
+		onLessonChanged(idbSettings, currentLesson, idbLessons, idbCodeChoices, idbCustomWords);
 	}
 
-	let scopeValue = $state<string>(ScopeNames[ScopeValues.indexOf(currentLesson.scope)]);
+	// let scopeValue = $state<string>(ScopeNames[ScopeValues.indexOf(currentLesson.scope)]);
+	// function setScope(newScope: string | null): void {
+	// 	let scopeName = newScope ?? ScopeNames[ScopeIndex.top100];
+	// 	let index = ScopeNames.indexOf(scopeName);
+	// 	currentLesson.scope = ScopeValues[index];
+	// 	scopeValue = scopeName;
+	// 	idbLessons.isDirty = true;
+	// }
+	let scopeValue = $state<string>(currentLesson.scope.toString());
 	function setScope(newScope: string | null): void {
-		let scopeName = newScope ?? ScopeNames[ScopeIndex.top100];
-		let index = ScopeNames.indexOf(scopeName);
-		currentLesson.scope = ScopeValues[index];
-		scopeValue = scopeName;
+		let scope = newScope ? Number(newScope) : ScopeValues[ScopeIndex.top50];
+		currentLesson.scope = scope;
+		scopeValue = scope.toString();
 		idbLessons.isDirty = true;
 	}
+
 	let combination = $state<number>(currentLesson.combination);
 	function setCombination(newCombination: number): void {
 		combination = newCombination;
@@ -201,18 +225,24 @@
 		idbLessons.isDirty = true;
 	}
 
-	let volume = idbSettings?.volume ?? 50;
-	function setNewVolume(newVolume: number): void {
-		// volume = newVolume;
-		setVolume(newVolume);
-		idbSettings.volume = newVolume;
-		idbSettings.isDirty = true;
+	const newCodeChoices = [...idbCodeChoices];
+	function codeChanged(choice: boolean, i: number): void {
+		newCodeChoices[i] = choice;
 	}
-	function getSoundChecked(i: number): boolean {
-		return idbSettings.sounds[i];
+
+	// svelte-ignore non_reactive_update
+	let customString = idbCustomWords.join(" ");
+	function customChanged(newCustom: string): void {
+		customString = newCustom;
 	}
+
+	function filterChanged(newFilter: string): void {
+		currentLesson.filter = newFilter;
+	}
+
 	function saveSettings(): void {
-		onSettingsChanged();
+		const customArray = customString.split(/\s+/);
+		onSettingsChanged(idbSettings, currentLesson, idbLessons, newCodeChoices, customArray);
 	}
 
 	const animBackdrop =
@@ -311,7 +341,7 @@
 								<SegmentedControl.Control>
 									<SegmentedControl.Indicator />
 									{#each ScopeNames as name, i (name)}
-										<SegmentedControl.Item value={name}>
+										<SegmentedControl.Item value={ScopeValues[i].toString()}>
 											<SegmentedControl.ItemText
 												>Top&nbsp;{ScopeValues[i]}</SegmentedControl.ItemText
 											>
@@ -358,21 +388,15 @@
 								minCounter={0}
 								maxCounter={400}
 								stepCounter={10}
-								onChange={(e: CustomEvent) => {
-									idbSettings.minimumWPM = e.detail as number;
-									idbLessons.isDirty = true;
-								}}
-								count={idbSettings.minimumWPM}
+								onChange={setMinimumWPM}
+								bind:count={minimumWPM}
 							/>
 							<Counter
 								name="Minimum&nbsp;Accuracy"
 								minCounter={0}
 								maxCounter={100}
-								onChange={(e: CustomEvent) => {
-									idbSettings.minimumAccuracy = e.detail as number;
-									idbLessons.isDirty = true;
-								}}
-								count={idbSettings.minimumAccuracy}
+								onChange={setMinimumAccuracy}
+								bind:count={minimumAccuracy}
 							/>
 						</article>
 					</div>
@@ -389,7 +413,7 @@
 							></Counter>
 
 							{#each SoundNames as name, i (name)}
-								<Switch checked={getSoundChecked(i)} onchange={(e) => soundsChanged(e, i)}>
+								<Switch checked={sounds[i]} onchange={(e) => soundsChanged(e, i)}>
 									<Switch.Control
 										class="preset-filled-secondary-50-950 data-[state=checked]:preset-filled-secondary-500"
 									>
@@ -559,7 +583,7 @@
 							<div class={cardClass}>
 								<header class="card-header">Filter</header>
 								<article class={articleClassH}>
-									<OptionsFilter {currentLesson}></OptionsFilter>
+									<OptionsFilter filter={currentLesson.filter} {filterChanged}></OptionsFilter>
 								</article>
 							</div>
 						</section>
@@ -569,7 +593,7 @@
 								<div class={cardClass}>
 									<header class="card-header">Code</header>
 									<article class={articleClassH}>
-										<OptionsCode {idbCodeChoices}></OptionsCode>
+										<OptionsCode {idbCodeChoices} {codeChanged}></OptionsCode>
 									</article>
 								</div>
 							</div>
@@ -580,7 +604,7 @@
 								<div class={cardClass}>
 									<header class="card-header">Custom</header>
 									<article class={articleClassH}>
-										<OptionsCustom {currentLesson}></OptionsCustom>
+										<OptionsCustom {customString} {customChanged}></OptionsCustom>
 									</article>
 								</div>
 							</div>

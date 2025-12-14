@@ -6,8 +6,13 @@
 <script lang="ts">
 	import KeyCap from "./KeyCap.svelte";
 	import { keyboards, getKeyCaps, KeyboardIndex, LayoutIndex } from "$lib/store/keyboard";
+	import type { SettingsDB } from "$lib/store/SettingsXG.svelte";
 
-	let { idbSettings = $bindable() } = $props();
+	type Props = {
+		// Define the expected type for the prop
+		idbSettings: SettingsDB;
+	};
+	let { idbSettings = $bindable<SettingsDB>() }: Props = $props();
 
 	let isLargeKey = true;
 	// console.log("Keyboard.svelte rendered", $state.snapshot(idbSettings));

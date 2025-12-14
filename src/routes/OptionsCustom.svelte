@@ -1,13 +1,17 @@
 <script lang="ts">
 	import { OtherIndex, OtherNames } from "$lib/store/otherWords.svelte";
 
-	let { currentLesson } = $props();
+	type Props = {
+		customString: string;
+		customChanged: (customString: string) => void;
+	};
+	let { customString, customChanged }: Props = $props();
 
 	let myTextArea: HTMLTextAreaElement;
-	function customChanged() {
-		currentLesson.filter = myTextArea.value;
+	function textChanged() {
+		customString = myTextArea.value;
+		customChanged(customString);
 	}
-	console.log("Custom changed:", currentLesson.custom);
 </script>
 
 <textarea
@@ -15,12 +19,12 @@
 	id="custom-text"
 	name={OtherNames[OtherIndex.custom]}
 	rows="10"
-	value={currentLesson.custom}
+	value={customString}
 	bind:this={myTextArea}
 ></textarea>
 <button
 	onclick={() => {
-		customChanged();
+		textChanged();
 	}}
 	type="button"
 	class="btn preset-filled">Save</button

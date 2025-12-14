@@ -6,14 +6,13 @@
 	import iconSvelte from "$lib/images/svelte-logo.svg";
 	import iconX from "$lib/images/x.svg";
 
-	import { onMount } from "svelte";
 	import Settings from "./Settings.svelte";
 	import Typist from "./Typist.svelte";
 	import Keyboard from "./Keyboard.svelte";
 	import { IDBStore } from "$lib/store/IDBStore.svelte";
-	import { LessonsXG } from "$lib/store/LessonsXG.svelte";
-	import { LessonState } from "$lib/store/LessonXG.svelte";
-	import { SettingsXG } from "$lib/store/SettingsXG.svelte";
+	import { LessonsDB } from "$lib/store/LessonsXG.svelte";
+	import { LessonDB, transferTo } from "$lib/store/LessonXG.svelte";
+	import { SettingsDB } from "$lib/store/SettingsXG.svelte";
 	import { CodeXG } from "$lib/store/code";
 	import { SourceXG } from "$lib/store/SourceXG.svelte";
 	import { LoadState } from "$lib/store/LoadState.svelte";
@@ -22,143 +21,137 @@
 	import { SourceNames } from "$lib/store/SourceXG.svelte";
 	import { CodeKeys } from "$lib/store/code";
 	import { SourceKeys } from "$lib/store/SourceXG.svelte";
+	import { arrayCopyBoolean, arrayCopyString, arrayEqualBoolean, arrayEqualString } from "$lib/utilities/utils";
+
+	function clearAll() {
+		idbStore.clearDatabase(); // For testing purposes only, clear the database on each load
+		localStorage.clear();
+		LoadState.clearDatabase = true;
+	}
 
 	const isTracing = false;
 	const idbCodesLoadState = new LoadState("idbCodes", isTracing);
-	let idbCodes = $state.raw(
-		new ServerStorage<CodeXG>(
-			"idbCodes",
-			CodeNames,
-			CodeKeys as (keyof CodeXG)[],
-			"/api/code",
-			new CodeXG(),
-			idbCodesLoadState
-		)
+	// svelte-ignore non_reactive_update
+	let idbCodes = new ServerStorage<CodeXG>(
+		"idbCodes",
+		CodeNames,
+		CodeKeys as (keyof CodeXG)[],
+		"/api/code",
+		new CodeXG(),
+		idbCodesLoadState
 	);
 
 	const idbSourcesLoadState = new LoadState("idbSources", isTracing);
-	let idbSources = $state.raw(
-		new ServerStorage<SourceXG>(
-			"idbSources",
-			SourceNames,
-			SourceKeys as (keyof SourceXG)[],
-			"/api/sources",
-			new SourceXG(),
-			idbSourcesLoadState
-		)
+	// svelte-ignore non_reactive_update
+	let idbSources = new ServerStorage<SourceXG>(
+		"idbSources",
+		SourceNames,
+		SourceKeys as (keyof SourceXG)[],
+		"/api/sources",
+		new SourceXG(),
+		idbSourcesLoadState
 	);
 
-	let idbLessons = $state.raw<LessonsXG>(null as unknown as LessonsXG);
-	let idbSettings = $state.raw<SettingsXG>(null as unknown as SettingsXG);
-	let idbCustomWords = $state.raw<string[]>(null as unknown as string[]);
-	let idbCodeChoices = $state.raw<boolean[]>(null as unknown as boolean[]);
+	// svelte-ignore non_reactive_update
+	let idbLessons = null as unknown as LessonsDB;
+	// svelte-ignore non_reactive_update
+	let idbSettings = null as unknown as SettingsDB;
+	// svelte-ignore non_reactive_update
+	let idbCustomWords: string[] = [];
+	// svelte-ignore non_reactive_update
+	let idbCodeChoices: boolean[] = [];
 
-	let currentLesson = $state.raw(null as unknown as LessonState);
+	// svelte-ignore non_reactive_update
+	let currentLesson = null as unknown as LessonDB;
 
 	let idbStore = new IDBStore();
+	let idbLoading = $state(true);
 	idbStore
 		.getValues(
 			["idbLessons", "idbSettings", "idbCustomWords", "idbCodeChoices"],
 			[
-				new LessonsXG(),
-				new SettingsXG(),
+				new LessonsDB(),
+				new SettingsDB(),
 				[] as string[],
 				[false, false, false, false, false, false, false, false, false] as boolean[],
 			],
 			isTracing
 		)
 		.then((values) => {
-			idbLessons = new LessonsXG(values[0] as LessonsXG);
-			idbSettings = new SettingsXG(values[1] as SettingsXG);
-			idbCustomWords = values[2] as string[];
-			idbCodeChoices = values[3] as boolean[];
-			currentLesson = new LessonState(idbLessons.sourceLessons[idbLessons.lessonIndex]);
+			idbLessons = new LessonsDB(values[0] as LessonsDB);
+			idbSettings = new SettingsDB(values[1] as SettingsDB);
+			arrayCopyString(values[2] as string[], idbCustomWords);
+			arrayCopyBoolean(values[3] as boolean[], idbCodeChoices);
+			currentLesson = new LessonDB(idbLessons.sourceLessons[idbLessons.lessonIndex]);
+			idbLoading = false;
 		});
 
 	// svelte-ignore non_reactive_update
 	let typist: Typist;
 
-	function onLessonChanged() {
+	function onLessonChanged(
+		settingsDB: SettingsDB,
+		currentLesson: LessonDB,
+		lessonsDB: LessonsDB,
+		codeChoices?: boolean[],
+		customWords?: string[]
+	) {
 		// Save dirty settings
-		onSettingsChanged();
+		onSettingsChanged(settingsDB, currentLesson, lessonsDB, codeChoices, customWords);
 
 		if (currentLesson !== idbLessons.sourceLessons[idbLessons.lessonIndex]) {
-			currentLesson.transferFromLesson(idbLessons.sourceLessons[idbLessons.lessonIndex]);
+			transferTo(currentLesson, idbLessons.sourceLessons[idbLessons.lessonIndex]);
 			console.log("onLessonChanged(): " + idbLessons.lessonIndex);
 			typist?.initializeLesson();
 		}
 	}
 
-	const arraysEqualBoolean = (a1: boolean[], a2: boolean[]) => {
-		// Check if lengths are the same
-		if (a1.length !== a2.length) {
-			return false;
-		}
-		// Check if every element in a1 strictly equals the corresponding element in a2
-		return a1.every((element, index) => {
-			return element === a2[index];
-		});
-	};
-
-	const arraysEqualString = (a1: string[], a2: string[]) => {
-		// Check if lengths are the same
-		if (a1.length !== a2.length) {
-			return false;
-		}
-		// Check if every element in a1 strictly equals the corresponding element in a2
-		return a1.every((element, index) => {
-			return element === a2[index];
-		});
-	};
-
 	/**
 	 * Update typist and stores if settings have changed
 	 */
-	function onSettingsChanged() {
-		let settingsChanged = false;
-		if (idbSettings.isDirty) {
-			idbStore.setValue("idbSettings", idbSettings);
+	function onSettingsChanged(
+		settingsDB: SettingsDB,
+		currentLesson: LessonDB,
+		lessonsDB: LessonsDB,
+		codeChoices?: boolean[],
+		customWords?: string[]
+	) {
+		if (settingsDB.isDirty) {
+			idbStore.setValue("idbSettings", settingsDB);
 			idbSettings.isDirty = false;
-			settingsChanged = true;
+			settingsDB.isDirty = false;
 		}
-		if (idbLessons.isDirty) {
-			let target = idbLessons.sourceLessons[idbLessons.lessonIndex];
-			console.log("onSettingsChanged(): scope ", target.scope, " -> ", currentLesson.scope);
-			console.log("onSettingsChanged(): combination ", target.combination, " -> ", currentLesson.combination);
-			console.log("onSettingsChanged(): repetition ", target.repetition, " -> ", currentLesson.repetition);
-			console.log("onSettingsChanged(): WPMs ", target.WPMs, " -> ", currentLesson.WPMs);
-			console.log("onSettingsChanged(): filter ", target.filter, " -> ", currentLesson.filter);
-			let didChange = currentLesson.transferToLesson(target);
-			idbStore.setValue("idbLessons", idbLessons);
-
-			idbLessons.isDirty = false;
-			settingsChanged = didChange || settingsChanged;
+		if (lessonsDB.isDirty) {
+			let target = lessonsDB.sourceLessons[lessonsDB.lessonIndex];
+			transferTo(currentLesson, target);
+			idbStore.setValue("idbLessons", lessonsDB);
+			lessonsDB.isDirty = false;
+			currentLesson.isDirty = false;
 		}
-		if (!arraysEqualString(idbCustomWords, idbStore.getValue("idbCustomWords") as string[])) {
-			idbStore.setValue("idbCustomWords", idbCustomWords);
-			settingsChanged = true;
+		if (codeChoices) {
+			if (!arrayEqualBoolean(codeChoices, idbCodeChoices)) {
+				arrayCopyBoolean(codeChoices, idbCodeChoices);
+				idbStore.setValue("idbCodeChoices", idbCodeChoices);
+			}
 		}
-		if (!arraysEqualBoolean(idbCodeChoices, idbStore.getValue("idbCodeChoices") as boolean[])) {
-			idbStore.setValue("idbCodeChoices", idbCodeChoices);
-			settingsChanged = true;
+		if (customWords) {
+			if (!arrayEqualString(customWords, idbCustomWords)) {
+				idbStore.setValue("idbCustomWords", customWords);
+				arrayCopyString(customWords, idbCustomWords);
+			}
 		}
-		if (settingsChanged) {
-			console.log("onSettingsChanged() => initializeLesson");
-			typist?.initializeLesson();
-		}
+		typist?.initializeLesson();
 	}
-
-	onMount(() => {
-		// idbStore.clearDatabase(); // For testing purposes only, clear the database on each load
-		// localStorage.clear();
-	});
 </script>
 
 <div class="flex h-full w-full flex-col overflow-y-auto">
-	{#if idbLessons === null || idbSettings === null || idbCustomWords === null || idbCodeChoices === null || !idbSources.isLoaded() || !idbCodes.isLoaded()}
+	{#if idbLoading || !idbSources.isLoaded() || !idbCodes.isLoaded()}
 		Loading...
 	{:else}
 		<div class="flex items-start justify-between">
+			<div>
+				<button onclick={clearAll}>Clear All</button>
+			</div>
 			<div class="object-left p-6">
 				<Darklight>
 					<!-- 🌚🌑 🌓 🌔🌜🌕🌛☀️🌞 -->
@@ -186,8 +179,8 @@
 					bind:idbLessons
 					bind:currentLesson
 					bind:idbSettings
-					bind:idbCustomWords
-					bind:idbCodeChoices
+					{idbCodeChoices}
+					{idbCustomWords}
 					{onLessonChanged}
 					{onSettingsChanged}
 				></Settings>

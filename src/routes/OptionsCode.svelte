@@ -2,21 +2,26 @@
 	import { CodeNames } from "$lib/store/code";
 	import { Switch } from "@skeletonlabs/skeleton-svelte";
 
-	let { idbCodeChoices = $bindable() } = $props();
+	type Props = {
+		idbCodeChoices: boolean[];
+		codeChanged: (choice: boolean, i: number) => void;
+	};
+	let { idbCodeChoices, codeChanged }: Props = $props();
 
+	const codeChanges = $state<boolean[]>(idbCodeChoices);
 	const onCheckedChange = (event: { checked: boolean; i: number }) => {
 		var checked = !event.checked;
-		idbCodeChoices[event.i] = checked;
-		console.log(`Language ${CodeNames[event.i]} set to ${checked}`);
+		codeChanges[event.i] = checked;
+		codeChanged(checked, event.i);
 	};
 </script>
 
 {#each CodeNames as name, i (name)}
 	<Switch
 		{name}
-		checked={idbCodeChoices[i]}
+		checked={codeChanges[i]}
 		onchange={() => {
-			onCheckedChange({ checked: idbCodeChoices[i], i });
+			onCheckedChange({ checked: codeChanges[i], i });
 		}}
 	>
 		<Switch.Control class="preset-filled-secondary-50-950 data-[state=checked]:preset-filled-secondary-500">

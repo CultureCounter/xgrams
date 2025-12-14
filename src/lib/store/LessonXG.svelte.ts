@@ -22,14 +22,14 @@ export const ScopeIndex = {
 	top16000: 8,
 };
 
-export class LessonXG {
+export class LessonDB {
 	scope: number = ScopeValues[ScopeIndex.top50];
 	combination: number = 2;
 	repetition: number = 20;
 	filter: string = "";
 	WPMs: number[] = [];
 
-	constructor(init?: Partial<LessonXG>) {
+	constructor(init?: Partial<LessonDB>) {
 		if (init) {
 			if (init.scope !== undefined) this.scope = init.scope;
 			if (init.combination !== undefined) this.combination = init.combination;
@@ -37,6 +37,14 @@ export class LessonXG {
 			if (init.filter !== undefined) this.filter = init.filter;
 			if (init.WPMs !== undefined) this.WPMs = init.WPMs;
 		}
+	}
+
+	#isDirty: boolean = false;
+	set isDirty(value: boolean) {
+		this.#isDirty = value;
+	}
+	get isDirty() {
+		return this.#isDirty;
 	}
 }
 
@@ -47,7 +55,7 @@ export class LessonState {
 	filter: string = $state("");
 	WPMs: number[] = $state([]);
 
-	constructor(init?: Partial<LessonXG>) {
+	constructor(init?: Partial<LessonDB>) {
 		if (init) {
 			if (init.scope !== undefined) this.scope = init.scope;
 			if (init.combination !== undefined) this.combination = init.combination;
@@ -63,7 +71,7 @@ export class LessonState {
 		}
 	}
 
-	transferFromLesson(lesson: LessonXG): void {
+	transferFrom(lesson: LessonDB): void {
 		this.scope = lesson.scope;
 		this.combination = lesson.combination;
 		this.repetition = lesson.repetition;
@@ -75,7 +83,7 @@ export class LessonState {
 		});
 	}
 
-	transferToLesson(lesson: LessonXG): boolean {
+	transferTo(lesson: LessonDB): boolean {
 		let didChange = false;
 		if (this.scope !== lesson.scope) {
 			lesson.scope = this.scope;
@@ -93,16 +101,53 @@ export class LessonState {
 			lesson.filter = this.filter;
 			didChange = true;
 		}
-		if (this.WPMs !== lesson.WPMs) {
+
+		let wpmChanged = false;
+		this.WPMs.forEach((wpm, i) => {
+			if (lesson.WPMs[i] != wpm) wpmChanged = true;
+		});
+		if (wpmChanged) {
 			lesson.WPMs.length = 0;
-			this.WPMs.forEach((wpm, i) => {
-				if (lesson.WPMs[i] != wpm) return false;
-			});
 			this.WPMs.forEach((wpm) => {
 				lesson.WPMs.push(wpm);
 			});
 			didChange = true;
 		}
+
 		return didChange;
 	}
 }
+
+export const transferTo = (lesson: LessonDB, lessonDB: LessonDB): boolean => {
+	let didChange = false;
+	if (lessonDB.scope !== lesson.scope) {
+		lessonDB.scope = lesson.scope;
+		didChange = true;
+	}
+	if (lessonDB.combination !== lesson.combination) {
+		lessonDB.combination = lesson.combination;
+		didChange = true;
+	}
+	if (lessonDB.repetition !== lesson.repetition) {
+		lessonDB.repetition = lesson.repetition;
+		didChange = true;
+	}
+	if (lessonDB.filter !== lesson.filter) {
+		lessonDB.filter = lesson.filter;
+		didChange = true;
+	}
+
+	let wpmChanged = false;
+	lessonDB.WPMs.forEach((wpm, i) => {
+		if (lesson.WPMs[i] != wpm) wpmChanged = true;
+	});
+	if (wpmChanged) {
+		lessonDB.WPMs.length = 0;
+		lesson.WPMs.forEach((wpm) => {
+			lessonDB.WPMs.push(wpm);
+		});
+		didChange = true;
+	}
+
+	return didChange;
+};

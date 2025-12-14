@@ -121,7 +121,7 @@ export const ColorNames = [
 ];
 
 // These do not cause changes to typing lessons
-export class SettingsXG {
+export class SettingsDB {
 	minimumWPM: number = 40;
 	minimumAccuracy: number = 100;
 	sounds: boolean[] = [true, true, true, true, true];
@@ -131,7 +131,7 @@ export class SettingsXG {
 	keyboard: KeyboardIndex = KeyboardIndex.matrix;
 	layout: LayoutIndex = LayoutIndex.colemakDH;
 
-	constructor(init?: Partial<SettingsXG>) {
+	constructor(init?: Partial<SettingsDB>) {
 		if (init) {
 			if (init.minimumWPM !== undefined) this.minimumWPM = init.minimumWPM;
 			if (init.minimumAccuracy !== undefined) this.minimumAccuracy = init.minimumAccuracy;
@@ -151,24 +151,20 @@ export class SettingsXG {
 	get isDirty() {
 		return this.#isDirty;
 	}
-}
 
-// const key = "idbSettings";
-// const idbSettingsLoadState: LoadState = new LoadState("idbSettings", true);
-// export const idbSettings: SettingsXG =
-// 	!browser ?
-// 		$state(new SettingsXG())
-// 	:	$state(
-// 			get(key).then((val: SettingsXG | undefined): SettingsXG => {
-// 				if (val === undefined) {
-// 					idbSettingsLoadState.setState(LoadIndex.default);
-// 					const settings = new SettingsXG();
-// 					set(key, settings);
-// 					idbSettingsLoadState.setState(LoadIndex.loaded);
-// 					return settings;
-// 				} else {
-// 					idbSettingsLoadState.setState(LoadIndex.loaded);
-// 					return val;
-// 				}
-// 			})
-// 		);
+	transferTo(settings: SettingsDB): void {
+		console.log("SettingsState transferTo: ", this, settings);
+		settings.minimumWPM = this.minimumWPM;
+		settings.minimumAccuracy = this.minimumAccuracy;
+		settings.sounds.length = 0;
+		this.sounds.forEach((sound, i) => {
+			if (settings.sounds[i] != sound) return false;
+		});
+		settings.sounds = this.sounds;
+		settings.volume = this.volume;
+		settings.font = this.font;
+		settings.color = this.color;
+		settings.keyboard = this.keyboard;
+		settings.layout = this.layout;
+	}
+}

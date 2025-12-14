@@ -1,24 +1,36 @@
 <script lang="ts">
-	import { deepClone, LessonsXG } from "$lib/store/LessonsXG.svelte";
-	import { SettingsXG, SoundIndex } from "$lib/store/SettingsXG.svelte";
-	import { SourceAllIndex, SourceKeys, SourceNames, SourceXG } from "$lib/store/SourceXG.svelte";
+	import { LessonsDB } from "$lib/store/LessonsXG.svelte";
+	import { SettingsDB, SoundIndex } from "$lib/store/SettingsXG.svelte";
+	import { SourceAllIndex, SourceKeys, SourceXG } from "$lib/store/SourceXG.svelte";
 	import { CodeIndex, CodeXG } from "$lib/store/code";
 	import Celebration, { startCelebration } from "./Celebration.svelte";
 	// import Celebration, { startCelebration, unleashWorker } from './Celebration.svelte';
 	import PlaySounds, { playSound, Sounds } from "./PlaySounds.svelte";
 	import StopWatch from "../lib/utilities/StopWatch/StopWatch.svelte";
 	import { lapTime, resetStopWatch, resetLap, startLap, endLap } from "../lib/utilities/StopWatch/stopwatch";
-	import { LessonXG } from "$lib/store/LessonXG.svelte";
+	import { LessonDB } from "$lib/store/LessonXG.svelte";
+	import type { ServerStorage } from "$lib/ServerStorage.svelte";
+	import { deepClone } from "$lib/utilities/utils";
 
+	type Props = {
+		// Define the expected type for the prop
+		currentLesson: LessonDB;
+		idbLessons: LessonsDB;
+		idbSettings: SettingsDB;
+		idbSources: ServerStorage<SourceXG>;
+		idbCodes: ServerStorage<CodeXG>;
+		idbCodeChoices: boolean[];
+		idbCustomWords: string[];
+	};
 	let {
-		currentLesson = $bindable<LessonXG>(),
-		idbLessons = $bindable<LessonsXG>(),
-		idbSettings = $bindable<SettingsXG>(),
-		idbSources = $bindable<SourceXG>(),
-		idbCodes = $bindable<CodeXG>(),
+		currentLesson = $bindable<LessonDB>(),
+		idbLessons = $bindable<LessonsDB>(),
+		idbSettings = $bindable<SettingsDB>(),
+		idbSources = $bindable<ServerStorage<SourceXG>>(),
+		idbCodes = $bindable<ServerStorage<CodeXG>>(),
 		idbCodeChoices = $bindable<boolean[]>(),
 		idbCustomWords = $bindable<string[]>(),
-	} = $props();
+	}: Props = $props();
 	let codesSource: string[] = [];
 
 	function shuffle(array: string[]): void {
@@ -49,7 +61,7 @@
 	 * Lessons are a series of `lines`
 	 */
 	export function initializeLesson() {
-		if (currentLesson.source == SourceAllIndex.code) updateCodeWords(idbCodeChoices);
+		if (idbLessons.lessonIndex == SourceAllIndex.code) updateCodeWords(idbCodeChoices);
 		lines = generateLines();
 		expectedLine = lines[0] || "";
 		linesIndex = 0;
@@ -74,9 +86,8 @@
 		else if (index == SourceAllIndex.custom) source = idbCustomWords;
 		else source = idbSources.current[SourceKeys[index]];
 
-		let s: string = SourceNames[index];
-		console.log("Generating lines with source:", index, $state.snapshot(idbSources));
-		console.log("Generating lines with source length:", s, source?.length);
+		// let s: string = SourceNames[index];
+		// console.log("Generating lines with source length:", s, source?.length);
 		if (source == null) {
 			console.assert(source != null, "Generating lines with source == null:", index);
 			source = idbSources.current.bigrams.slice(0, scope);
@@ -108,6 +119,7 @@
 		}
 
 		let ngrams = deepClone(source);
+		if (ngrams.length == 0) ngrams.push("NoWordsSelectedCheckFilter");
 		shuffle(ngrams);
 		padToMultiple(ngrams, combinations); // Ensure all subLines have requested combinations
 
@@ -136,15 +148,15 @@
 	function updateCodeWords(idbCodeChoices: boolean[]) {
 		codesSource.length = 0;
 		codesSource.push(
-			...(idbCodeChoices[CodeIndex.cpp] ? idbCodes.cpp : []),
-			...(idbCodeChoices[CodeIndex.cs] ? idbCodes.cs : []),
-			...(idbCodeChoices[CodeIndex.go] ? idbCodes.go : []),
-			...(idbCodeChoices[CodeIndex.java] ? idbCodes.java : []),
-			...(idbCodeChoices[CodeIndex.javascript] ? idbCodes.javascript : []),
-			...(idbCodeChoices[CodeIndex.python] ? idbCodes.python : []),
-			...(idbCodeChoices[CodeIndex.rust] ? idbCodes.rust : []),
-			...(idbCodeChoices[CodeIndex.swift] ? idbCodes.swift : []),
-			...(idbCodeChoices[CodeIndex.typescript] ? idbCodes.typescript : [])
+			...(idbCodeChoices[CodeIndex.cpp] ? idbCodes.current.cpp : []),
+			...(idbCodeChoices[CodeIndex.cs] ? idbCodes.current.cs : []),
+			...(idbCodeChoices[CodeIndex.go] ? idbCodes.current.go : []),
+			...(idbCodeChoices[CodeIndex.java] ? idbCodes.current.java : []),
+			...(idbCodeChoices[CodeIndex.javascript] ? idbCodes.current.javascript : []),
+			...(idbCodeChoices[CodeIndex.python] ? idbCodes.current.python : []),
+			...(idbCodeChoices[CodeIndex.rust] ? idbCodes.current.rust : []),
+			...(idbCodeChoices[CodeIndex.swift] ? idbCodes.current.swift : []),
+			...(idbCodeChoices[CodeIndex.typescript] ? idbCodes.current.typescript : [])
 		);
 	}
 
@@ -348,7 +360,7 @@
 		return Math.round(average);
 	}
 
-	// function onLessonsChanged(lessons: LessonsXG) {
+	// function onLessonsChanged(lessons: LessonsDB) {
 	// 	console.log("onLessonsChanged, generateLines", lessons);
 	// 	// if (idbSources.bigrams == null) {
 	// 	// 	console.log("onLessonsChanged idbSources.bigrams == null, return");
@@ -381,11 +393,6 @@
 	// }
 	// 	onclick={handleClick}
 	// 	onkeyup={handleClick}
-
-	console.log("Typist idbLessons", $state.snapshot(idbLessons));
-	console.log("Typist idbSettings", $state.snapshot(idbSettings));
-	// console.log("then idbCustomWords", $state.snapshot(idbCustomWords));
-	// console.log("then idbCodeWords", $state.snapshot(idbCodeWords));
 
 	initializeLesson();
 </script>

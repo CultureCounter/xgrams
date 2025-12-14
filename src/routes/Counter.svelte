@@ -3,7 +3,14 @@
 	import PlusIcon from "@lucide/svelte/icons/plus";
 	import MinusIcon from "@lucide/svelte/icons/minus";
 
-	let { minCounter = 1, maxCounter = 100, stepCounter = 5, count = $bindable(), name = "name", onChange } = $props();
+	let {
+		minCounter = 1,
+		maxCounter = 100,
+		stepCounter = 5,
+		count = $bindable<number>(),
+		name = "name",
+		onChange,
+	} = $props();
 
 	// let displayed_count = $derived(count);
 	const offset = $derived(modulo(count, 1));

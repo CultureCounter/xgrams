@@ -1,10 +1,16 @@
 <script lang="ts">
-	let { currentLesson } = $props();
+	type Props = {
+		filter: string;
+		filterChanged: (filter: string) => void;
+	};
+	let { filter, filterChanged }: Props = $props();
 
 	let myTextArea: HTMLTextAreaElement;
-	function filterChanged() {
-		currentLesson.filter = myTextArea.value;
+	function saveFilter() {
+		filter = myTextArea.value;
+		filterChanged(filter);
 	}
+	let textAreaValue = $state<string>(filter);
 </script>
 
 <article>
@@ -16,20 +22,12 @@
 	><br />
 	Matches: <strong>exam empl mple mpel plem ...</strong>
 </article>
-<textarea
-	class="textarea"
-	id="filter-text"
-	name="Filter Text"
-	rows="10"
-	value={currentLesson.filter}
-	bind:this={myTextArea}
+<textarea class="textarea" id="filter-text" name="Filter Text" rows="10" value={textAreaValue} bind:this={myTextArea}
 ></textarea>
 <button
 	onclick={() => {
-		filterChanged();
+		saveFilter();
 	}}
 	type="button"
 	class="btn preset-filled">Save</button
 >
-<!-- <Dialog initialFocusEl={() => document.querySelector('[name="filter text"]')}>
-	</Dialog> -->
