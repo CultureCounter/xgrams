@@ -16,7 +16,7 @@
 	import { CodeXG } from "$lib/store/code";
 	import { SourceXG } from "$lib/store/SourceDB.svelte";
 	import { LoadState } from "$lib/store/LoadState.svelte";
-	import { ServerStorage } from "$lib/ServerStorage.svelte";
+	import { ServerStore } from "$lib/store/ServerStorage.svelte";
 	import { CodeNames } from "$lib/store/code";
 	import { SourceNames } from "$lib/store/SourceDB.svelte";
 	import { CodeKeys } from "$lib/store/code";
@@ -32,7 +32,7 @@
 	const isTracing = false;
 	const idbCodesLoadState = new LoadState("idbCodes", isTracing);
 	// svelte-ignore non_reactive_update
-	let idbCodes = new ServerStorage<CodeXG>(
+	let idbCodes = new ServerStore<CodeXG>(
 		"idbCodes",
 		CodeNames,
 		CodeKeys as (keyof CodeXG)[],
@@ -43,7 +43,7 @@
 
 	const idbSourcesLoadState = new LoadState("idbSources", isTracing);
 	// svelte-ignore non_reactive_update
-	let idbSources = new ServerStorage<SourceXG>(
+	let idbSources = new ServerStore<SourceXG>(
 		"idbSources",
 		SourceNames,
 		SourceKeys as (keyof SourceXG)[],

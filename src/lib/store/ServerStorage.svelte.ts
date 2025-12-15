@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { clear, getMany, setMany } from "idb-keyval";
-import { LoadIndex, LoadState } from "./store/LoadState.svelte.ts";
+import { LoadIndex, LoadState } from "./LoadState.svelte.ts";
 
-export class ServerStorage<T extends object> {
+export class ServerStore<T extends object> {
 	#name: string;
 	#keys: string[];
 	#props: (keyof T)[];
@@ -62,7 +62,7 @@ export class ServerStorage<T extends object> {
 		try {
 			const response = await fetch(this.#url);
 			if (!response.ok) {
-				console.error(`ServerStorage[${this.#name}] fetch failed:`, response.status, response.statusText);
+				console.error(`ServerStore[${this.#name}] fetch failed:`, response.status, response.statusText);
 				return;
 			}
 
@@ -71,7 +71,7 @@ export class ServerStorage<T extends object> {
 			try {
 				data = JSON.parse(text);
 			} catch (e) {
-				console.error(`ServerStorage[${this.#name}] parse failed:`, e);
+				console.error(`ServerStore[${this.#name}] parse failed:`, e);
 				// Fallback to initial or empty?
 				// For now, just return and keep initial
 				return;
@@ -95,7 +95,7 @@ export class ServerStorage<T extends object> {
 				this.#loadState.setState(LoadIndex.loaded);
 			});
 		} catch (e) {
-			console.error(`ServerStorage[${this.#name}] error:`, e);
+			console.error(`ServerStore[${this.#name}] error:`, e);
 			this.#loadState.setState(LoadIndex.error);
 		}
 	}

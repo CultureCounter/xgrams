@@ -51,4 +51,3 @@ I went on a Javascript adventure. It makes me miss how superior Swift is.
 
 - Other parts of the [`JamStack`](https://jamstack.org/) Architecture?
 - Host on GitHub Pages! Turns out you can host on [`vercel`](https://vercel.com/) in 3 minutes flat.
-- To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.

@@ -9,7 +9,7 @@
 	import StopWatch from "../lib/utilities/StopWatch/StopWatch.svelte";
 	import { lapTime, resetStopWatch, resetLap, startLap, endLap } from "../lib/utilities/StopWatch/stopwatch";
 	import { LessonDB } from "$lib/store/LessonDB.svelte";
-	import type { ServerStorage } from "$lib/ServerStorage.svelte";
+	import type { ServerStore } from "$lib/store/ServerStorage.svelte";
 	import { deepClone } from "$lib/utilities/utils";
 
 	type Props = {
@@ -17,8 +17,8 @@
 		currentLesson: LessonDB;
 		idbLessons: LessonsDB;
 		idbSettings: SettingsDB;
-		idbSources: ServerStorage<SourceXG>;
-		idbCodes: ServerStorage<CodeXG>;
+		idbSources: ServerStore<SourceXG>;
+		idbCodes: ServerStore<CodeXG>;
 		idbCodeChoices: boolean[];
 		idbCustomWords: string[];
 	};
@@ -26,8 +26,8 @@
 		currentLesson = $bindable<LessonDB>(),
 		idbLessons = $bindable<LessonsDB>(),
 		idbSettings = $bindable<SettingsDB>(),
-		idbSources = $bindable<ServerStorage<SourceXG>>(),
-		idbCodes = $bindable<ServerStorage<CodeXG>>(),
+		idbSources = $bindable<ServerStore<SourceXG>>(),
+		idbCodes = $bindable<ServerStore<CodeXG>>(),
 		idbCodeChoices = $bindable<boolean[]>(),
 		idbCustomWords = $bindable<string[]>(),
 	}: Props = $props();
