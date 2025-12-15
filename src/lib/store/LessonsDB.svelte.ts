@@ -1,5 +1,5 @@
-import { SourceIndex } from "./SourceXG.svelte";
-import { LessonDB } from "./LessonXG.svelte.ts";
+import { SourceIndex } from "./SourceDB.svelte.ts";
+import { LessonDB } from "./LessonDB.svelte.ts";
 
 export const currentVersion = 2; // increment for schema changes.
 

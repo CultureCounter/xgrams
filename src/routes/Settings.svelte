@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { LessonDB, ScopeIndex, ScopeNames, ScopeValues } from "$lib/store/LessonXG.svelte.ts";
-	import { LessonsDB } from "$lib/store/LessonsXG.svelte";
+	import { LessonDB, ScopeIndex, ScopeNames, ScopeValues } from "$lib/store/LessonDB.svelte";
+	import { LessonsDB } from "$lib/store/LessonsDB.svelte";
 	import {
 		ColorIndex,
 		ColorNames,
@@ -8,8 +8,8 @@
 		FontFamilyNames,
 		SettingsDB,
 		SoundNames,
-	} from "$lib/store/SettingsXG.svelte";
-	import { SourceIndex, SourceNames } from "$lib/store/SourceXG.svelte";
+	} from "$lib/store/SettingsDB.svelte";
+	import { SourceIndex, SourceNames } from "$lib/store/SourceDB.svelte";
 	import { OtherIndex, OtherNames } from "$lib/store/otherWords.svelte";
 	import { KeyboardIndex, KeyboardNames, LayoutIndex, LayoutNames } from "$lib/store/keyboard";
 	import { Dialog, Portal, SegmentedControl, Switch } from "@skeletonlabs/skeleton-svelte";

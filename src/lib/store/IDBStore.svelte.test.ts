@@ -1,10 +1,10 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { clear, getMany, setMany } from "idb-keyval";
 import { IDBStore } from "./IDBStore.svelte";
-import { LessonDB } from "./LessonXG.svelte";
-import { LessonsDB } from "./LessonsXG.svelte";
-import { SettingsDB, ColorIndex } from "./SettingsXG.svelte";
-import { SourceIndex } from "./SourceXG.svelte";
+import { LessonDB } from "./LessonDB.svelte";
+import { LessonsDB } from "./LessonsDB.svelte";
+import { SettingsDB, ColorIndex } from "./SettingsDB.svelte";
+import { SourceIndex } from "./SourceDB.svelte";
 import { KeyboardIndex, LayoutIndex } from "./keyboard";
 
 // Mock the $app/environment module
@@ -236,8 +236,7 @@ describe("IDBStore", () => {
 		describe("idbLessons (LessonsDB)", () => {
 			it("should handle LessonsDB object", async () => {
 				const lessons = new LessonsDB();
-				lessons.source = SourceIndex.trigrams;
-				lessons.lessonIndex = 3;
+				lessons.lessonIndex = SourceIndex.trigrams;
 				lessons.sourceLessons[1] = new LessonDB({
 					scope: 15,
 					combination: 25,
@@ -252,8 +251,7 @@ describe("IDBStore", () => {
 				const values = await store.getValues(keys, [new LessonsDB()]);
 				const retrieved = values[0] as LessonsDB;
 
-				expect(retrieved.source).toBe(SourceIndex.trigrams);
-				expect(retrieved.lessonIndex).toBe(3);
+				expect(retrieved.lessonIndex).toBe(SourceIndex.trigrams);
 				expect(retrieved.sourceLessons[1].scope).toBe(15);
 				expect(retrieved.sourceLessons[1].combination).toBe(25);
 				expect(retrieved.sourceLessons[1].repetition).toBe(35);
@@ -268,8 +266,7 @@ describe("IDBStore", () => {
 				const values = await store.getValues(keys, [defaultLessons]);
 				const retrieved = values[0] as LessonsDB;
 
-				expect(retrieved.source).toBe(SourceIndex.bigrams);
-				expect(retrieved.lessonIndex).toBe(0);
+				expect(retrieved.lessonIndex).toBe(SourceIndex.bigrams);
 				expect(retrieved.sourceLessons.length).toBe(defaultLessons.sourceLessons.length);
 			});
 		});
@@ -318,7 +315,7 @@ describe("IDBStore", () => {
 			const customWords = ["test", "words"];
 			const codeWords = [true, false, true, false, true, false, true, false, true];
 			const lessons = new LessonsDB();
-			lessons.source = SourceIndex.words;
+			lessons.lessonIndex = SourceIndex.words;
 			const settings = new SettingsDB();
 			settings.volume = 80;
 
@@ -337,7 +334,7 @@ describe("IDBStore", () => {
 
 			expect(values[0]).toEqual(customWords);
 			expect(values[1]).toEqual(codeWords);
-			expect((values[2] as LessonsDB).source).toBe(SourceIndex.words);
+			expect((values[2] as LessonsDB).lessonIndex).toBe(SourceIndex.words);
 			expect((values[3] as SettingsDB).volume).toBe(80);
 		});
 
@@ -375,7 +372,7 @@ describe("IDBStore", () => {
 			const customWords = ["updated", "custom"];
 			const codeWords = [true, true, false, false, true, true, false, false, true];
 			const lessons = new LessonsDB();
-			lessons.source = SourceIndex.pangrams;
+			lessons.lessonIndex = SourceIndex.pangrams;
 			const settings = new SettingsDB();
 			settings.minimumWPM = 60;
 
@@ -391,7 +388,7 @@ describe("IDBStore", () => {
 
 			expect(retrieved[0]).toEqual(customWords);
 			expect(retrieved[1]).toEqual(codeWords);
-			expect((retrieved[2] as LessonsDB).source).toBe(SourceIndex.pangrams);
+			expect((retrieved[2] as LessonsDB).lessonIndex).toBe(SourceIndex.pangrams);
 			expect((retrieved[3] as SettingsDB).minimumWPM).toBe(60);
 		});
 	});

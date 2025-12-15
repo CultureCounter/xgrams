@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from "svelte";
 	import { elapsedTime, destroyStopWatch, resetStopWatch, toggleStopWatch, lapTime } from "./stopwatch";
-	import { ColorNames, ColorIndex } from "$lib/store/SettingsXG.svelte";
+	import { ColorNames, ColorIndex } from "$lib/store/SettingsDB.svelte";
 
 	let { color = ColorNames[ColorIndex.fuchsia] } = $props();
 

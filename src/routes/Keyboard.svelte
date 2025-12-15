@@ -6,7 +6,7 @@
 <script lang="ts">
 	import KeyCap from "./KeyCap.svelte";
 	import { keyboards, getKeyCaps, KeyboardIndex, LayoutIndex } from "$lib/store/keyboard";
-	import type { SettingsDB } from "$lib/store/SettingsXG.svelte";
+	import type { SettingsDB } from "$lib/store/SettingsDB.svelte";
 
 	type Props = {
 		// Define the expected type for the prop

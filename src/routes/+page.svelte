@@ -10,17 +10,17 @@
 	import Typist from "./Typist.svelte";
 	import Keyboard from "./Keyboard.svelte";
 	import { IDBStore } from "$lib/store/IDBStore.svelte";
-	import { LessonsDB } from "$lib/store/LessonsXG.svelte";
-	import { LessonDB, transferTo } from "$lib/store/LessonXG.svelte";
-	import { SettingsDB } from "$lib/store/SettingsXG.svelte";
+	import { LessonsDB } from "$lib/store/LessonsDB.svelte";
+	import { LessonDB, transferTo } from "$lib/store/LessonDB.svelte";
+	import { SettingsDB } from "$lib/store/SettingsDB.svelte";
 	import { CodeXG } from "$lib/store/code";
-	import { SourceXG } from "$lib/store/SourceXG.svelte";
+	import { SourceXG } from "$lib/store/SourceDB.svelte";
 	import { LoadState } from "$lib/store/LoadState.svelte";
 	import { ServerStorage } from "$lib/ServerStorage.svelte";
 	import { CodeNames } from "$lib/store/code";
-	import { SourceNames } from "$lib/store/SourceXG.svelte";
+	import { SourceNames } from "$lib/store/SourceDB.svelte";
 	import { CodeKeys } from "$lib/store/code";
-	import { SourceKeys } from "$lib/store/SourceXG.svelte";
+	import { SourceKeys } from "$lib/store/SourceDB.svelte";
 	import { arrayCopyBoolean, arrayCopyString, arrayEqualBoolean, arrayEqualString } from "$lib/utilities/utils";
 
 	function clearAll() {
@@ -84,6 +84,10 @@
 			arrayCopyBoolean(values[3] as boolean[], idbCodeChoices);
 			currentLesson = new LessonDB(idbLessons.sourceLessons[idbLessons.lessonIndex]);
 			idbLoading = false;
+		})
+		.catch((error) => {
+			console.error("Error loading values from IDB:", error);
+			idbLoading = true;
 		});
 
 	// svelte-ignore non_reactive_update

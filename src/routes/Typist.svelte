@@ -1,14 +1,14 @@
 <script lang="ts">
-	import { LessonsDB } from "$lib/store/LessonsXG.svelte";
-	import { SettingsDB, SoundIndex } from "$lib/store/SettingsXG.svelte";
-	import { SourceAllIndex, SourceKeys, SourceXG } from "$lib/store/SourceXG.svelte";
+	import { LessonsDB } from "$lib/store/LessonsDB.svelte";
+	import { SettingsDB, SoundIndex } from "$lib/store/SettingsDB.svelte";
+	import { SourceAllIndex, SourceKeys, SourceXG } from "$lib/store/SourceDB.svelte";
 	import { CodeIndex, CodeXG } from "$lib/store/code";
 	import Celebration, { startCelebration } from "./Celebration.svelte";
 	// import Celebration, { startCelebration, unleashWorker } from './Celebration.svelte';
 	import PlaySounds, { playSound, Sounds } from "./PlaySounds.svelte";
 	import StopWatch from "../lib/utilities/StopWatch/StopWatch.svelte";
 	import { lapTime, resetStopWatch, resetLap, startLap, endLap } from "../lib/utilities/StopWatch/stopwatch";
-	import { LessonDB } from "$lib/store/LessonXG.svelte";
+	import { LessonDB } from "$lib/store/LessonDB.svelte";
 	import type { ServerStorage } from "$lib/ServerStorage.svelte";
 	import { deepClone } from "$lib/utilities/utils";
 
