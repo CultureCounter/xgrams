@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { OtherIndex, OtherNames } from "$lib/store/otherWords.svelte";
+	import { OtherNames } from "$lib/store/LessonsDB.svelte";
 
 	type Props = {
 		customString: string;
@@ -17,7 +17,7 @@
 <textarea
 	class="textarea"
 	id="custom-text"
-	name={OtherNames[OtherIndex.custom]}
+	name={OtherNames.custom}
 	rows="10"
 	value={customString}
 	bind:this={myTextArea}

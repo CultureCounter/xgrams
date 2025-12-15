@@ -10,7 +10,6 @@
 		SoundNames,
 	} from "$lib/store/SettingsDB.svelte";
 	import { SourceIndex, SourceNames } from "$lib/store/SourceDB.svelte";
-	import { OtherIndex, OtherNames } from "$lib/store/otherWords.svelte";
 	import { KeyboardIndex, KeyboardNames, LayoutIndex, LayoutNames } from "$lib/store/keyboard";
 	import { Dialog, Portal, SegmentedControl, Switch } from "@skeletonlabs/skeleton-svelte";
 	import { setVolume } from "./PlaySounds.svelte";
@@ -20,6 +19,7 @@
 	import Counter from "./Counter.svelte";
 	import OptionsCode from "./OptionsCode.svelte";
 	import OptionsCustom from "./OptionsCustom.svelte";
+	import { OtherNames } from "$lib/store/LessonsDB.svelte";
 	import OptionsFilter from "./OptionsFilter.svelte";
 	import { findStrings, replaceStrings } from "$lib/utilities/utils";
 
@@ -289,7 +289,7 @@
 								<SegmentedControl.Control>
 									<SegmentedControl.Indicator />
 									{#each SourceNames as name (name)}
-										{#if name == OtherNames[OtherIndex.code]}
+										{#if name == OtherNames.code}
 											<SegmentedControl.Item value={name}>
 												<SegmentedControl.ItemText
 													>Code <button
@@ -304,7 +304,7 @@
 												</SegmentedControl.ItemText>
 												<SegmentedControl.ItemHiddenInput />
 											</SegmentedControl.Item>
-										{:else if name == OtherNames[OtherIndex.custom]}
+										{:else if name == OtherNames.custom}
 											<SegmentedControl.Item value={name}>
 												<SegmentedControl.ItemText
 													>Custom <button
