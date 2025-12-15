@@ -9,7 +9,7 @@
 	import StopWatch from "../lib/utilities/StopWatch/StopWatch.svelte";
 	import { lapTime, resetStopWatch, resetLap, startLap, endLap } from "../lib/utilities/StopWatch/stopwatch";
 	import { LessonDB } from "$lib/store/LessonDB.svelte";
-	import type { ServerStore } from "$lib/store/ServerStorage.svelte";
+	import type { ServerStore } from "$lib/store/ServerStore.svelte";
 	import { deepClone } from "$lib/utilities/utils";
 
 	type Props = {

@@ -9,6 +9,7 @@ export class ServerStore<T extends object> {
 	#url: string;
 	#version = $state(0);
 	#value: T;
+	s;
 	#loadState: LoadState;
 
 	constructor(name: string, keys: string[], props: (keyof T)[], url: string, initial: T, loadState: LoadState) {

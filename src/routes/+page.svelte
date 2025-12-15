@@ -16,7 +16,7 @@
 	import { CodeXG } from "$lib/store/code";
 	import { SourceXG } from "$lib/store/SourceDB.svelte";
 	import { LoadState } from "$lib/store/LoadState.svelte";
-	import { ServerStore } from "$lib/store/ServerStorage.svelte";
+	import { ServerStore } from "$lib/store/ServerStore.svelte";
 	import { CodeNames } from "$lib/store/code";
 	import { SourceNames } from "$lib/store/SourceDB.svelte";
 	import { CodeKeys } from "$lib/store/code";
