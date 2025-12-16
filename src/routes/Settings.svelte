@@ -1,21 +1,14 @@
 <script lang="ts">
+	import { BGColors, BorderColors, ColorIndex, ColorNames, getHourStrokeFill } from "$lib/store/Colors.svelte";
 	import { LessonDB, ScopeIndex, ScopeNames, ScopeValues } from "$lib/store/LessonDB.svelte";
 	import { LessonsDB } from "$lib/store/LessonsDB.svelte";
-	import {
-		ColorIndex,
-		ColorNames,
-		FontFamilyCSS,
-		FontFamilyNames,
-		SettingsDB,
-		SoundNames,
-	} from "$lib/store/SettingsDB.svelte";
+	import { FontFamilyCSS, FontFamilyNames, SettingsDB, SoundNames } from "$lib/store/SettingsDB.svelte";
 	import { SourceIndex, SourceNames } from "$lib/store/SourceDB.svelte";
 	import { KeyboardIndex, KeyboardNames, LayoutIndex, LayoutNames } from "$lib/store/keyboard";
 	import { Dialog, Portal, SegmentedControl, Switch } from "@skeletonlabs/skeleton-svelte";
 	import { setVolume } from "./PlaySounds.svelte";
 	import MusicIcon from "@lucide/svelte/icons/music";
-	import { CheckIcon } from "@lucide/svelte";
-
+	import { CheckIcon, FunnelIcon } from "@lucide/svelte";
 	import Counter from "./Counter.svelte";
 	import OptionsCode from "./OptionsCode.svelte";
 	import OptionsCustom from "./OptionsCustom.svelte";
@@ -44,6 +37,8 @@
 			codeChoices?: boolean[],
 			customWords?: string[]
 		) => void;
+		colorIndex: ColorIndex;
+		font: string;
 	};
 	let {
 		currentLesson = $bindable(),
@@ -53,6 +48,8 @@
 		idbCodeChoices,
 		onLessonChanged,
 		onSettingsChanged,
+		colorIndex = $bindable(),
+		font = $bindable(),
 	}: Props = $props();
 
 	// Avoid Aria whining using conditional display not popups
@@ -88,9 +85,9 @@
 		idbSettings.isDirty = true;
 	}
 
-	let selectedFontFamily: string = $state(findStrings(idbSettings.font ?? "", FontFamilyCSS));
+	let selectedFontFamily: string = $state(findStrings(font ?? "", FontFamilyCSS));
 	function setFontFamily(): void {
-		idbSettings.font = replaceStrings(idbSettings.font, FontFamilyCSS, selectedFontFamily);
+		font = replaceStrings(font, FontFamilyCSS, selectedFontFamily);
 		idbSettings.isDirty = true;
 	}
 
@@ -110,9 +107,9 @@
 		"text-9xl ",
 	];
 	let fontSizeNames = ["xs", "sm", "base", "lg", "xl", "2xl", "3xl", "4xl", "5xl", "6xl", "7xl", "8xl", "9xl"];
-	let selectedFontSize: string = $state(findStrings(idbSettings.font ?? "", fontSizeCSS));
+	let selectedFontSize: string = $state(findStrings(font ?? "", fontSizeCSS));
 	function setFontSize(): void {
-		idbSettings.font = replaceStrings(idbSettings.font, fontSizeCSS, selectedFontSize);
+		font = replaceStrings(font, fontSizeCSS, selectedFontSize);
 		idbSettings.isDirty = true;
 	}
 
@@ -138,9 +135,9 @@
 		"extrabold",
 		"black",
 	];
-	let selectedFontWeight: string = $state(findStrings(idbSettings.font ?? "", fontWeightCSS));
+	let selectedFontWeight: string = $state(findStrings(font ?? "", fontWeightCSS));
 	function setFontWeight(): void {
-		idbSettings.font = replaceStrings(idbSettings.font, fontWeightCSS, selectedFontWeight);
+		font = replaceStrings(font, fontWeightCSS, selectedFontWeight);
 		idbSettings.isDirty = true;
 	}
 
@@ -153,15 +150,16 @@
 		"tracking-widest ",
 	];
 	let fontSpacingNames = ["tighter", "tight", "normal", "wide", "wider", "widest"];
-	let selectedFontSpacing: string = $state(findStrings(idbSettings.font ?? "", fontSpacingCSS));
+	let selectedFontSpacing: string = $state(findStrings(font ?? "", fontSpacingCSS));
 	function setFontSpacing(): void {
-		idbSettings.font = replaceStrings(idbSettings.font, fontSpacingCSS, selectedFontSpacing);
+		font = replaceStrings(font, fontSpacingCSS, selectedFontSpacing);
 		idbSettings.isDirty = true;
 	}
 
-	let selectedColor: ColorIndex = $state(idbSettings?.color ?? ColorIndex.fuchsia);
+	let selectedColor: ColorIndex = $state(idbSettings?.colorIndex ?? ColorIndex.fuchsia);
 	function setColor(): void {
-		idbSettings.color = selectedColor;
+		idbSettings.colorIndex = selectedColor;
+		colorIndex = selectedColor;
 		idbSettings.isDirty = true;
 	}
 
@@ -250,11 +248,14 @@
 	const animModal =
 		"transition transition-discrete opacity-0 -translate-x-full starting:data-[state=open]:opacity-0 starting:data-[state=open]:-translate-x-full data-[state=open]:opacity-100 data-[state=open]:translate-x-0";
 
-	const card1Classes = "card p-4 preset-outlined-primary-500 space-y-4";
-	// const card3Classes = 'card bg-noise bg-surface-50-950 border-[1px] border-surface-200-800 p-8';
-	// const card2Classes =
-	// 	'card preset-filled-surface-100-900 border-[1px] border-surface-200-800 card-hover divide-surface-200-800 block max-w-md divide-y overflow-hidden';
-	const cardClass = card1Classes;
+	let contentClass = "space-y-4 card backdrop-blur-lg shadow-xl";
+	let cardClass = $derived(
+		"card p-4 backdrop-blur-xl space-y-4 border-2 "
+			+ BorderColors[colorIndex]
+			+ " "
+			+ BGColors[colorIndex]
+			+ " rounded-lg"
+	);
 	const iconButtonClass =
 		"focus:ring-opacity-50 rounded-full text-white hover:bg-blue-600 focus:ring-2 focus:ring-blue-900 focus:outline-none";
 	const articleClassV = "flex flex-col justify-center space-y-2";
@@ -266,18 +267,16 @@
 <Dialog restoreFocus={true} onOpenChange={saveSettings}>
 	<Dialog.Trigger class="btn"><h1 style="font-size: 3em">🧜‍♀️</h1></Dialog.Trigger>
 	<Portal>
-		<Dialog.Backdrop
-			class="fixed inset-0 z-50 bg-surface-50-950/50 transition transition-discrete {animBackdrop}"
-		/>
-		<Dialog.Positioner class="fixed inset-0 z-50 flex flex-col justify-center">
-			<Dialog.Content class="size-min space-y-4 card bg-surface-100-900 shadow-xl {animModal}">
+		<Dialog.Backdrop class="fixed top-10 left-0 w-full h-full z-50 transition transition-discrete {animBackdrop}" />
+		<Dialog.Positioner class="fixed top-10 left-0 w-full h-full z-50 flex flex-col justify-center">
+			<Dialog.Content class="{contentClass} w-full {animModal}">
 				<header class="flex justify-between">
 					<Dialog.Title class="text-2xl font-bold">Settings</Dialog.Title>
 					<Dialog.CloseTrigger class="btn preset-tonal">
 						<CheckIcon class="size-4" />
 					</Dialog.CloseTrigger>
 				</header>
-				<article class="flex place-content-between gap-2">
+				<article class="flex place-content-evenly w-full gap-2">
 					<div class={cardClass}>
 						<header class="card-header">Source</header>
 						<article class={articleClassV}>
@@ -361,6 +360,7 @@
 								stepCounter={1}
 								count={combination}
 								onChange={setCombination}
+								{colorIndex}
 							/>
 							<Counter
 								name="Repetition"
@@ -368,6 +368,7 @@
 								minCounter={1}
 								count={repetition}
 								onChange={setRepetition}
+								{colorIndex}
 							/>
 							<div>
 								Filter<button
@@ -375,7 +376,8 @@
 									onclick={() => {
 										conditionalDisplay = conditionalDisplay !== "filter" ? "filter" : "fonts";
 									}}
-									>🌪️
+								>
+									<FunnelIcon class={getHourStrokeFill(colorIndex)} size={18} />
 								</button>
 							</div>
 						</article>
@@ -390,6 +392,7 @@
 								stepCounter={10}
 								onChange={setMinimumWPM}
 								bind:count={minimumWPM}
+								{colorIndex}
 							/>
 							<Counter
 								name="Minimum&nbsp;Accuracy"
@@ -397,6 +400,7 @@
 								maxCounter={100}
 								onChange={setMinimumAccuracy}
 								bind:count={minimumAccuracy}
+								{colorIndex}
 							/>
 						</article>
 					</div>
@@ -410,6 +414,7 @@
 								stepCounter={5}
 								count={volume}
 								onChange={setNewVolume}
+								{colorIndex}
 							></Counter>
 
 							{#each SoundNames as name, i (name)}
@@ -433,41 +438,65 @@
 								</Switch>
 							{/each}
 						</article>
-						<header class="card-header pt-3">Keyboard</header>
-						<article>
-							<select
-								class="select"
-								id="select-keyboard"
-								name="Keyboard Selection"
-								bind:value={selectedKeyboard}
-								onchange={() => {
-									setKeyboard();
-								}}
-							>
-								{#each KeyboardNames as name, i (name)}
-									<option value={i}>
-										{name}
-									</option>
-								{/each}
-							</select>
-						</article>
-						<header class="card-header pt-3">Layout</header>
-						<article>
-							<select
-								class="select"
-								id="select-keyboard-layout"
-								name="Keyboard Layout Selection"
-								bind:value={selectedLayout}
-								onchange={() => {
-									setLayout();
-								}}
-							>
-								{#each LayoutNames as name, i (name)}
-									<option value={i}>
-										{name}
-									</option>
-								{/each}
-							</select>
+					</div>
+				</article>
+				<article class="flex flex-col gap-2">
+					<div class={cardClass}>
+						<article class={articleClassH}>
+							<label class="label" for="color-select">
+								<span>Color</span>
+								<select
+									class="select"
+									id="color-select"
+									name="Color Selection"
+									bind:value={selectedColor}
+									onchange={() => {
+										setColor();
+									}}
+								>
+									{#each ColorNames as name, i (name)}
+										<option value={i}>
+											{name}
+										</option>
+									{/each}
+								</select>
+							</label>
+							<label class="label" for="select-keyboard">
+								<span>Keyboard</span>
+								<select
+									class="select"
+									id="select-keyboard"
+									name="Keyboard Selection"
+									bind:value={selectedKeyboard}
+									onchange={() => {
+										setKeyboard();
+									}}
+								>
+									{#each KeyboardNames as name, i (name)}
+										<option value={i}>
+											{name}
+										</option>
+									{/each}
+								</select>
+							</label>
+							<label class="label" for="select-keyboard-layout">
+								<span>Layout</span>
+								<select
+									class="select"
+									id="select-keyboard-layout"
+									name="Keyboard Layout Selection"
+									bind:value={selectedLayout}
+									onchange={() => {
+										setLayout();
+									}}
+								>
+									{#each LayoutNames as name, i (name)}
+										<option value={i}>
+											{name}
+										</option>
+									{/each}
+								</select>
+							</label>
 						</article>
 					</div>
 				</article>
@@ -476,24 +505,6 @@
 						<div class={cardClass}>
 							<header class="card-header">Font</header>
 							<article class={articleClassH}>
-								<label class="label" for="color-select">
-									<span>Color</span>
-									<select
-										class="select"
-										id="color-select"
-										name="Color Selection"
-										bind:value={selectedColor}
-										onchange={() => {
-											setColor();
-										}}
-									>
-										{#each ColorNames as name, i (name)}
-											<option value={i}>
-												{name}
-											</option>
-										{/each}
-									</select>
-								</label>
 								<button class="btn h-0 px-0" onclick={clearFont}>Clear Font {keyBackspace}</button>
 								<label class="label" for="font-family-select">
 									<span>Font Family</span>
@@ -570,12 +581,10 @@
 							</article>
 							<header class="card-header">Legibility Test</header>
 							<article class={articleClassV}>
-								<span class="bg-transparent {idbSettings.font ?? ''}"
+								<span class="bg-transparent {font}"
 									>il1IL1 dbdqpq DBDQPQ ij., fgjty rnmrn RNMRN o0O</span
 								>
-								<span class="bg-transparent {idbSettings.font ?? ''}"
-									>Sphinx of black quartz, judge my vow!</span
-								>
+								<span class="bg-transparent {font}">Sphinx of black quartz, judge my vow!</span>
 							</article>
 						</div>
 					{:else if conditionalDisplay === "filter"}
@@ -611,9 +620,6 @@
 						</section>
 					{/if}
 				</article>
-				<div class="flex place-content-center">
-					<div class="loader">Loading...</div>
-				</div>
 			</Dialog.Content>
 		</Dialog.Positioner>
 	</Portal>

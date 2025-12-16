@@ -2,7 +2,17 @@
 	import { Slider } from "@skeletonlabs/skeleton-svelte";
 	import PlusIcon from "@lucide/svelte/icons/plus";
 	import MinusIcon from "@lucide/svelte/icons/minus";
+	import { ColorIndex, BorderColors, BGColors } from "$lib/store/Colors.svelte";
 
+	type Props = {
+		minCounter?: number;
+		maxCounter?: number;
+		stepCounter?: number;
+		count?: number;
+		name?: string;
+		onChange?: (count: number) => void;
+		colorIndex: ColorIndex;
+	};
 	let {
 		minCounter = 1,
 		maxCounter = 100,
@@ -10,7 +20,8 @@
 		count = $bindable<number>(),
 		name = "name",
 		onChange,
-	} = $props();
+		colorIndex,
+	}: Props = $props();
 
 	// let displayed_count = $derived(count);
 	const offset = $derived(modulo(count, 1));
@@ -32,9 +43,11 @@
 		count = values.value[0];
 		onChange?.(count);
 	}
+
+	let cardClass = $derived("card p-4 backdrop-blur-x3 space-y-4 " + BGColors[colorIndex] + " rounded-xl");
 </script>
 
-<div class="card preset-outlined-primary-500 p-4 shadow-xl">
+<div class={cardClass}>
 	<header class="card-header text-center">{name}</header>
 	<div class="grid grid-rows-1 justify-between sm:grid-cols-3">
 		<button onmouseup={onMouseUp} aria-label="Decrease the counter by one">

@@ -9,7 +9,6 @@ export class ServerStore<T extends object> {
 	#url: string;
 	#version = $state(0);
 	#value: T;
-	s;
 	#loadState: LoadState;
 
 	constructor(name: string, keys: string[], props: (keyof T)[], url: string, initial: T, loadState: LoadState) {
@@ -32,18 +31,23 @@ export class ServerStore<T extends object> {
 		}
 
 		this.#loadState.setState(LoadIndex.loadingIDB);
-		getMany(this.#keys).then((vals) => {
-			// Check if we have data for all keys
-			const hasAllData = vals.every((v) => v !== undefined);
-			if (hasAllData) {
-				this.#updateValueFromIDB(vals);
-				this.#version += 1;
-				this.#loadState.setState(LoadIndex.loaded);
-			} else {
-				this.#loadState.setState(LoadIndex.loadingServer);
-				this.#fetchFromServer();
-			}
-		});
+		getMany(this.#keys)
+			.then((vals) => {
+				// Check if we have data for all keys
+				const hasAllData = vals.every((v) => v !== undefined);
+				if (hasAllData) {
+					this.#updateValueFromIDB(vals);
+					this.#version += 1;
+					this.#loadState.setState(LoadIndex.loaded);
+				} else {
+					this.#loadState.setState(LoadIndex.loadingServer);
+					this.#fetchFromServer();
+				}
+			})
+			.catch((e) => {
+				console.error(`ServerStore[${this.#name}] getMany failed:`, e);
+				this.#loadState.setState(LoadIndex.error);
+			});
 	}
 
 	isLoaded(): boolean {
@@ -61,9 +65,12 @@ export class ServerStore<T extends object> {
 
 	async #fetchFromServer() {
 		try {
-			const response = await fetch(this.#url);
-			if (!response.ok) {
-				console.error(`ServerStore[${this.#name}] fetch failed:`, response.status, response.statusText);
+			const response: void | Response = await fetch(this.#url).catch((e) => {
+				console.error(`ServerStore[${this.#name}] fetch failed:`, e);
+				return;
+			});
+			if (!response || !response.ok) {
+				console.error(`ServerStore[${this.#name}] fetch failed:`, response?.status, response?.statusText);
 				return;
 			}
 
@@ -92,9 +99,14 @@ export class ServerStore<T extends object> {
 			}
 
 			this.#loadState.setState(LoadIndex.savingIDB);
-			await setMany(entries).then(() => {
-				this.#loadState.setState(LoadIndex.loaded);
-			});
+			setMany(entries)
+				.then(() => {
+					this.#loadState.setState(LoadIndex.loaded);
+				})
+				.catch((e) => {
+					console.error(`ServerStore[${this.#name}] save failed:`, e);
+					this.#loadState.setState(LoadIndex.error);
+				});
 		} catch (e) {
 			console.error(`ServerStore[${this.#name}] error:`, e);
 			this.#loadState.setState(LoadIndex.error);
@@ -140,8 +152,9 @@ export class ServerStore<T extends object> {
 								const index = this.#props.indexOf(property as keyof T);
 								if (index !== -1) {
 									const key = this.#keys[index];
-									setMany([[key, value]]);
-									return true;
+									setMany([[key, value]]).catch((e) => {
+										console.error(`ServerStore[${this.#name}] setMany failed:`, e);
+									});
 								}
 							}
 
@@ -163,7 +176,9 @@ export class ServerStore<T extends object> {
 								const key = this.#keys[i];
 								entries.push([key, this.#value[prop]]);
 							}
-							setMany(entries);
+							setMany(entries).catch((e) => {
+								console.error(`ServerStore[${this.#name}] setMany failed:`, e);
+							});
 						}
 
 						return true;
@@ -190,7 +205,9 @@ export class ServerStore<T extends object> {
 				const key = this.#keys[i];
 				entries.push([key, value[prop]]);
 			}
-			setMany(entries);
+			setMany(entries).catch((e) => {
+				console.error(`ServerStore[${this.#name}] setMany failed:`, e);
+			});
 		}
 	}
 }

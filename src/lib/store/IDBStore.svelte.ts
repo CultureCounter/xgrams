@@ -37,45 +37,57 @@ export class IDBStore {
 		if (LoadState.clearDatabase) {
 			return [];
 		}
-		if (!browser) {
-			keys.forEach((key) => {
-				this.#loadStates.set(key, new LoadState(key, trace));
-			});
-			// Pure defaults on the server
-			return defaultValues;
-		}
 
 		keys.forEach((key) => {
 			if (this.#loadStates.has(key)) {
 				return;
 			}
-			const loadState = new LoadState(key, trace);
-			loadState.setState(LoadIndex.loadingIDB);
-			this.#loadStates.set(key, loadState);
 			this.#defaults.set(key, defaultValues[keys.indexOf(key)]);
 		});
 
-		const values: unknown[] = await getMany(keys).then((vals) => {
-			// Use existing values, defaults otherwise
-			const values: unknown[] = [];
-			const setValues: [string, unknown][] = [];
-			vals.forEach((val, index) => {
-				if (val === undefined) {
-					values.push(defaultValues[index]);
-					this.#values.set(keys[index], defaultValues[index]);
-					setValues.push([keys[index], defaultValues[index]]);
-				} else {
-					values.push(val);
-					this.#values.set(keys[index], val);
-					setValues.push([keys[index], val]);
-				}
-				this.#loadStates.get(keys[index])?.setState(LoadIndex.loaded);
-			});
-			if (setValues.length > 0) {
-				setMany(setValues);
+		keys.forEach((key) => {
+			const loadState = new LoadState(key, trace);
+			this.#loadStates.set(key, loadState);
+			if (!browser) {
+				loadState.setState(LoadIndex.loaded);
+			} else {
+				loadState.setState(LoadIndex.loadingIDB);
 			}
-			return values;
 		});
+
+		if (!browser) {
+			// Pure defaults on the server
+			return defaultValues;
+		}
+
+		const values: unknown[] = await getMany(keys)
+			.then((vals) => {
+				// Use existing values, defaults otherwise
+				const values: unknown[] = [];
+				const setValues: [string, unknown][] = [];
+				vals.forEach((val, index) => {
+					if (val === undefined) {
+						values.push(defaultValues[index]);
+						this.#values.set(keys[index], defaultValues[index]);
+						setValues.push([keys[index], defaultValues[index]]);
+					} else {
+						values.push(val);
+						this.#values.set(keys[index], val);
+						setValues.push([keys[index], val]);
+					}
+					this.#loadStates.get(keys[index])?.setState(LoadIndex.loaded);
+				});
+				if (setValues.length > 0) {
+					setMany(setValues).catch((e) => {
+						console.error("IDBStore: Error setting values", e);
+					});
+				}
+				return values;
+			})
+			.catch((e) => {
+				console.error("IDBStore: Error getting values", e);
+				return defaultValues;
+			});
 
 		return values;
 	}

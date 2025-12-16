@@ -276,7 +276,7 @@ describe("IDBStore", () => {
 				const settings = new SettingsDB();
 				settings.minimumWPM = 50;
 				settings.minimumAccuracy = 95;
-				settings.color = ColorIndex.blue;
+				settings.colorIndex = ColorIndex.blue;
 				settings.keyboard = KeyboardIndex.matrix;
 				settings.layout = LayoutIndex.colemakDH;
 				settings.volume = 75;
@@ -289,7 +289,7 @@ describe("IDBStore", () => {
 
 				expect(retrieved.minimumWPM).toBe(50);
 				expect(retrieved.minimumAccuracy).toBe(95);
-				expect(retrieved.color).toBe(ColorIndex.blue);
+				expect(retrieved.colorIndex).toBe(ColorIndex.blue);
 				expect(retrieved.keyboard).toBe(KeyboardIndex.matrix);
 				expect(retrieved.layout).toBe(LayoutIndex.colemakDH);
 				expect(retrieved.volume).toBe(75);
@@ -304,7 +304,7 @@ describe("IDBStore", () => {
 
 				expect(retrieved.minimumWPM).toBe(40);
 				expect(retrieved.minimumAccuracy).toBe(100);
-				expect(retrieved.color).toBe(ColorIndex.fuchsia);
+				expect(retrieved.colorIndex).toBe(ColorIndex.fuchsia);
 				expect(retrieved.volume).toBe(100);
 			});
 		});

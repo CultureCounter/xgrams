@@ -7,12 +7,15 @@
 	import KeyCap from "./KeyCap.svelte";
 	import { keyboards, getKeyCaps, KeyboardIndex, LayoutIndex } from "$lib/store/keyboard";
 	import type { SettingsDB } from "$lib/store/SettingsDB.svelte";
+	import type { ColorIndex } from "$lib/store/Colors.svelte";
 
 	type Props = {
 		// Define the expected type for the prop
 		idbSettings: SettingsDB;
+		colorIndex: ColorIndex;
+		font: string;
 	};
-	let { idbSettings = $bindable<SettingsDB>() }: Props = $props();
+	let { idbSettings = $bindable<SettingsDB>(), colorIndex, font }: Props = $props();
 
 	let isLargeKey = true;
 	// console.log("Keyboard.svelte rendered", $state.snapshot(idbSettings));
@@ -30,20 +33,20 @@
 						{#if keyboards[idbSettings.keyboard].leftKeys[i] != ""}
 							<KeyCap
 								letter={keyboards[idbSettings.keyboard].leftKeys[i]}
+								{colorIndex}
+								{font}
 								{isLargeKey}
-								color={idbSettings.color}
-								font={idbSettings.font}
 							/>
 						{/if}
 						{#each row as letter (letter)}
-							<KeyCap {letter} color={idbSettings.color} font={idbSettings.font} />
+							<KeyCap {letter} {colorIndex} {font} />
 						{/each}
 						{#if keyboards[idbSettings.keyboard].rightKeys[i] != ""}
 							<KeyCap
 								letter={keyboards[idbSettings.keyboard].rightKeys[i]}
+								{colorIndex}
+								{font}
 								{isLargeKey}
-								color={idbSettings.color}
-								font={idbSettings.font}
 							/>
 						{/if}
 					</div>

@@ -1,3 +1,4 @@
+import { ColorIndex } from "./Colors.svelte";
 import { KeyboardIndex, LayoutIndex } from "./keyboard";
 
 export enum SoundIndex {
@@ -71,55 +72,6 @@ export const FontFamilyNames = [
 	"Comic Sans MS",
 ];
 
-export enum ColorIndex {
-	red = 0,
-	orange,
-	amber,
-	yellow,
-	lime,
-	green,
-	emerald,
-	teal,
-	cyan,
-	sky,
-	blue,
-	indigo,
-	violet,
-	purple,
-	fuchsia,
-	pink,
-	rose,
-	slate,
-	gray,
-	zinc,
-	neutral,
-	stone,
-}
-export const ColorNames = [
-	"red",
-	"orange",
-	"amber",
-	"yellow",
-	"lime",
-	"green",
-	"emerald",
-	"teal",
-	"cyan",
-	"sky",
-	"blue",
-	"indigo",
-	"violet",
-	"purple",
-	"fuchsia",
-	"pink",
-	"rose",
-	"slate",
-	"gray",
-	"zinc",
-	"neutral",
-	"stone",
-];
-
 // These do not cause changes to typing lessons
 export class SettingsDB {
 	minimumWPM: number = 40;
@@ -127,7 +79,7 @@ export class SettingsDB {
 	sounds: boolean[] = [true, true, true, true, true];
 	volume: number = 100;
 	font: string = " ";
-	color: ColorIndex = ColorIndex.fuchsia;
+	colorIndex: ColorIndex = ColorIndex.fuchsia;
 	keyboard: KeyboardIndex = KeyboardIndex.matrix;
 	layout: LayoutIndex = LayoutIndex.colemakDH;
 
@@ -138,7 +90,7 @@ export class SettingsDB {
 			if (init.sounds !== undefined) this.sounds = init.sounds;
 			if (init.volume !== undefined) this.volume = init.volume;
 			if (init.font !== undefined) this.font = init.font;
-			if (init.color !== undefined) this.color = init.color;
+			if (init.colorIndex !== undefined) this.colorIndex = init.colorIndex;
 			if (init.keyboard !== undefined) this.keyboard = init.keyboard;
 			if (init.layout !== undefined) this.layout = init.layout;
 		}
@@ -163,7 +115,7 @@ export class SettingsDB {
 		settings.sounds = this.sounds;
 		settings.volume = this.volume;
 		settings.font = this.font;
-		settings.color = this.color;
+		settings.colorIndex = this.colorIndex;
 		settings.keyboard = this.keyboard;
 		settings.layout = this.layout;
 	}

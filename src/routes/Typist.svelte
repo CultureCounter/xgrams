@@ -11,6 +11,7 @@
 	import { LessonDB } from "$lib/store/LessonDB.svelte";
 	import type { ServerStore } from "$lib/store/ServerStore.svelte";
 	import { deepClone } from "$lib/utilities/utils";
+	import type { ColorIndex } from "$lib/store/Colors.svelte";
 
 	type Props = {
 		// Define the expected type for the prop
@@ -21,6 +22,8 @@
 		idbCodes: ServerStore<CodeXG>;
 		idbCodeChoices: boolean[];
 		idbCustomWords: string[];
+		colorIndex: ColorIndex;
+		font: string;
 	};
 	let {
 		currentLesson = $bindable<LessonDB>(),
@@ -30,6 +33,8 @@
 		idbCodes = $bindable<ServerStore<CodeXG>>(),
 		idbCodeChoices = $bindable<boolean[]>(),
 		idbCustomWords = $bindable<string[]>(),
+		colorIndex = $bindable<ColorIndex>(),
+		font = $bindable<string>(),
 	}: Props = $props();
 	let codesSource: string[] = [];
 
@@ -407,7 +412,7 @@
 		onmouseleave={handleMouseLeave}
 		tabindex="-1"
 	>
-		<div class="p-2 {idbSettings.font}">
+		<div class="p-2 {font}">
 			{#each classLine as cp, i (cp.chars + i)}
 				{#if cp.typing}
 					<span class={cp.class + " " + ClassSpan[ColorChars.typingChar]}>{cp.chars}</span>
@@ -429,7 +434,7 @@
 	</div>
 </div>
 <div class="flex justify-center">
-	<div class="w-4/12"><StopWatch color={idbSettings.color} /></div>
+	<div class="w-4/12"><StopWatch {colorIndex} /></div>
 </div>
 <svelte:window on:keydown={onKeyDown} />
 <!-- on:keyup={on_key_up} -->

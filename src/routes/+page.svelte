@@ -22,12 +22,15 @@
 	import { CodeKeys } from "$lib/store/code";
 	import { SourceKeys } from "$lib/store/SourceDB.svelte";
 	import { arrayCopyBoolean, arrayCopyString, arrayEqualBoolean, arrayEqualString } from "$lib/utilities/utils";
+	import type { ColorIndex } from "$lib/store/Colors.svelte";
 
 	function clearAll() {
 		idbStore.clearDatabase(); // For testing purposes only, clear the database on each load
 		localStorage.clear();
 		LoadState.clearDatabase = true;
 	}
+
+	// TODO: https://svelte.dev/tutorial/svelte/svelte-head
 
 	const isTracing = false;
 	const idbCodesLoadState = new LoadState("idbCodes", isTracing);
@@ -63,6 +66,8 @@
 
 	// svelte-ignore non_reactive_update
 	let currentLesson = null as unknown as LessonDB;
+	let colorIndex = $state<ColorIndex>(0);
+	let font = $state<string>(" ");
 
 	let idbStore = new IDBStore();
 	let idbLoading = $state(true);
@@ -83,6 +88,8 @@
 			arrayCopyString(values[2] as string[], idbCustomWords);
 			arrayCopyBoolean(values[3] as boolean[], idbCodeChoices);
 			currentLesson = new LessonDB(idbLessons.sourceLessons[idbLessons.lessonIndex]);
+			colorIndex = idbSettings.colorIndex;
+			font = idbSettings.font;
 			idbLoading = false;
 		})
 		.catch((error) => {
@@ -122,6 +129,8 @@
 	) {
 		if (settingsDB.isDirty) {
 			idbStore.setValue("idbSettings", settingsDB);
+			colorIndex = settingsDB.colorIndex;
+			font = settingsDB.font;
 			idbSettings.isDirty = false;
 			settingsDB.isDirty = false;
 		}
@@ -153,9 +162,6 @@
 		Loading...
 	{:else}
 		<div class="flex items-start justify-between">
-			<div>
-				<button onclick={clearAll}>Clear All</button>
-			</div>
 			<div class="object-left p-6">
 				<Darklight>
 					<!-- 🌚🌑 🌓 🌔🌜🌕🌛☀️🌞 -->
@@ -169,6 +175,9 @@
 						<button class="btn-icon"><h1 style="font-size: 3em">☀️</h1></button>
 					{/snippet}
 				</Darklight>
+			</div>
+			<div class="object-left p-6">
+				<button onclick={clearAll}>Debug Clear Data</button>
 			</div>
 			<div class="object-center">
 				<h1
@@ -187,6 +196,8 @@
 					{idbCustomWords}
 					{onLessonChanged}
 					{onSettingsChanged}
+					bind:colorIndex
+					bind:font
 				></Settings>
 			</div>
 		</div>
@@ -199,8 +210,10 @@
 			bind:idbCodes
 			bind:idbCodeChoices
 			bind:idbCustomWords
+			{colorIndex}
+			{font}
 		></Typist>
-		<Keyboard bind:idbSettings></Keyboard>
+		<Keyboard bind:idbSettings {colorIndex} {font}></Keyboard>
 	{/if}
 	<div class="flex items-center justify-center gap-8 p-4">
 		<a

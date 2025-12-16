@@ -50,13 +50,11 @@
 			case TrinaryValue.true:
 				finalDarkLight = true;
 				// Whenever the user explicitly chooses dark mode
-				console.log("getFinalDarkLight() finalDarkLight light:" + finalDarkLight);
 				document.documentElement.classList.toggle("dark", true);
 				break;
 			default:
 				finalDarkLight = false;
 				// Whenever the user explicitly chooses light mode
-				console.log("getFinalDarkLight() finalDarkLight dark:" + finalDarkLight);
 				document.documentElement.classList.toggle("dark", false);
 				break;
 		}
