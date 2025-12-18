@@ -29,36 +29,6 @@ export default {
 				0.5: "0.5px",
 				1.5: "1.5px",
 			},
-			fontFamily: {
-				// sans
-				arial: ["Arial", "font-sans"],
-				notoSans: ["Noto Sans", "font-sans"],
-				roboto: ["Roboto", "font-sans"],
-				segoeUI: ["Segoe UI Variable Text", "font-sans"],
-				tahoma: ["Tahoma", "font-sans"],
-				verdana: ["Verdana", "Geneva", "font-sans"],
-
-				// serif
-				century: ["Century", "Gothic", "CenturyGothic", "AppleGothic", "font-serif"],
-				garamond: ["Garamond", "Baskerville", "Baskerville Old Face", "Hoefler Text", "font-serif"],
-				georgia: ["Georgia", "Times", "font-serif"],
-				notoSerif: ["Noto Serif", "font-serif"],
-				palatino: ["Palatino Linotype", "font-serif"],
-				timesNewRoman: ["Times New Roman", "Times", "font-serif"],
-
-				// mono
-				andaleMono: ["Andale Mono", "font-mono"],
-				cascadiaMono: ["Cascadia Mono", "font-mono"],
-				courierNew: ["Courier New", "Courier", "Lucida Sans Typewriter", "Lucida Typewriter", "font-mono"],
-				ubuntuMono: ["Ubuntu Mono", "font-mono"],
-			},
-			// https://kinsta.com/blog/web-safe-fonts/
-			// https://blog.hubspot.com/website/web-safe-html-css-fonts
-
-			// colors: {
-			// 	'primary-color': 'var(--primary-color)',
-			// 	'secondary-color': 'var(--secondary-color)'
-			// }
 		},
 	},
 	plugins: [forms, typography, lineClamp, ...skeleton()],

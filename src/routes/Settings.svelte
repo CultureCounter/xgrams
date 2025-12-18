@@ -1,30 +1,28 @@
 <script lang="ts">
-	import { BGColors, BorderColors, ColorIndex, ColorNames, getHourStrokeFill } from "$lib/store/Colors.svelte";
+	import {
+		BGColors,
+		BorderColors,
+		ColorIndex,
+		ColorNames,
+		getHourStrokeFill,
+		HourStrokeColors,
+	} from "$lib/store/Colors.svelte";
 	import { LessonDB, ScopeIndex, ScopeNames, ScopeValues } from "$lib/store/LessonDB.svelte";
 	import { LessonsDB } from "$lib/store/LessonsDB.svelte";
-	import {
-		FontFamilyCSS,
-		FontFamilyNames,
-		FontSizeCSS,
-		FontSizeNames,
-		FontSpacingCSS,
-		FontWeightCSS,
-		FontWeightNames,
-		SettingsDB,
-		SoundNames,
-	} from "$lib/store/SettingsDB.svelte";
+	import { SettingsDB, SoundNames } from "$lib/store/SettingsDB.svelte";
 	import { SourceIndex, SourceNames } from "$lib/store/SourceDB.svelte";
 	import { KeyboardIndex, KeyboardNames, LayoutIndex, LayoutNames } from "$lib/store/keyboard";
 	import { Dialog, Portal, SegmentedControl, Switch } from "@skeletonlabs/skeleton-svelte";
 	import { setVolume } from "./PlaySounds.svelte";
 	import MusicIcon from "@lucide/svelte/icons/music";
-	import { CheckIcon, FunnelIcon } from "@lucide/svelte";
+	import { CheckIcon, FunnelIcon, InfoIcon } from "@lucide/svelte";
 	import Counter from "./Counter.svelte";
+	import Fonts from "./Fonts.svelte";
 	import OptionsCode from "./OptionsCode.svelte";
 	import OptionsCustom from "./OptionsCustom.svelte";
-	import { OtherNames } from "$lib/store/LessonsDB.svelte";
 	import OptionsFilter from "./OptionsFilter.svelte";
-	import { findStrings, replaceStrings } from "$lib/utilities/utils";
+	import { OtherNames } from "$lib/store/LessonsDB.svelte";
+	import FontInfo from "./FontInfo.svelte";
 
 	type Props = {
 		// Define the expected type for the prop
@@ -63,7 +61,7 @@
 	}: Props = $props();
 
 	// Avoid Aria whining using conditional display not popups
-	type ConditionalDisplay = "fonts" | "filter" | "code" | "custom";
+	type ConditionalDisplay = "fonts" | "fontInfo" | "filter" | "code" | "custom";
 	let conditionalDisplay = $state<ConditionalDisplay>("fonts");
 
 	let minimumWPM = $state(idbSettings.minimumWPM);
@@ -95,65 +93,6 @@
 		idbSettings.isDirty = true;
 	}
 
-	async function getAvailableFonts() {
-		console.log("getAvailableFonts");
-		try {
-			// A permission prompt will appear for the user
-			window.queryLocalFonts().then((fonts) => {
-				console.log("Available Fonts:", fonts.length);
-				// console.log("Family | Full Name | Styles");
-				let currentFont = "";
-				let systemFonts: string[] = [];
-				// eslint-disable-next-line svelte/prefer-svelte-reactivity
-				const systemFontNames = new Map<string, string>();
-				for (const fontData of fonts) {
-					let family = fontData.family;
-					let fullName = fontData.fullName;
-					let style = fontData.style;
-					console.log(family, "|", fullName, "|", style);
-					if (family.includes("Mono") && family !== currentFont) {
-						currentFont = family;
-						systemFonts.push(family);
-						systemFontNames.set(family, style);
-					}
-				}
-				console.log("systemFonts", systemFonts.length, systemFonts);
-				console.log("systemFontNames", systemFontNames.size, systemFontNames);
-			});
-		} catch (err) {
-			console.error("Could not access local fonts:", (err as Error).message);
-		}
-	}
-
-	let selectedFontFamily: string = $state(findStrings(font ?? "", FontFamilyCSS));
-	function setFontFamily(): void {
-		font = replaceStrings(font, FontFamilyCSS, selectedFontFamily);
-		idbSettings.font = font;
-		idbSettings.isDirty = true;
-	}
-
-	let selectedFontSize: string = $state(findStrings(font ?? "", FontSizeCSS));
-	function setFontSize(): void {
-		font = replaceStrings(font, FontSizeCSS, selectedFontSize);
-		idbSettings.font = font;
-		idbSettings.isDirty = true;
-	}
-
-	let selectedFontWeight: string = $state(findStrings(font ?? "", FontWeightCSS));
-	function setFontWeight(): void {
-		font = replaceStrings(font, FontWeightCSS, selectedFontWeight);
-		idbSettings.font = font;
-		idbSettings.isDirty = true;
-	}
-
-	let fontSpacingNames = ["tighter", "tight", "normal", "wide", "wider", "widest"];
-	let selectedFontSpacing: string = $state(findStrings(font ?? "", FontSpacingCSS));
-	function setFontSpacing(): void {
-		font = replaceStrings(font, FontSpacingCSS, selectedFontSpacing);
-		idbSettings.font = font;
-		idbSettings.isDirty = true;
-	}
-
 	let selectedColor: ColorIndex = $state(idbSettings?.colorIndex ?? ColorIndex.fuchsia);
 	function setColor(): void {
 		colorIndex = selectedColor;
@@ -172,16 +111,6 @@
 		idbSettings.layout = selectedLayout;
 		idbSettings.isDirty = true;
 	}
-
-	function clearFont(): void {
-		idbSettings.font = "";
-		selectedFontFamily = findStrings(idbSettings.font ?? "", FontFamilyCSS);
-		selectedFontSize = findStrings(idbSettings.font ?? "", FontSizeCSS);
-		selectedFontWeight = findStrings(idbSettings.font ?? "", FontWeightCSS);
-		selectedFontSpacing = findStrings(idbSettings.font ?? "", FontSpacingCSS);
-		idbSettings.isDirty = true;
-	}
-	let keyBackspace = `\u232B`;
 
 	let sourceValue = $state<string>(SourceNames[idbLessons.lessonIndex]);
 	function setSource(newSource: string | null): void {
@@ -256,6 +185,8 @@
 			+ BGColors[colorIndex]
 			+ " rounded-lg"
 	);
+	const clickButtonClass = "btn backdrop-blur-xl space-y-4 border-2 " + BorderColors[colorIndex];
+
 	const iconButtonClass =
 		"focus:ring-opacity-50 rounded-full text-white hover:bg-blue-600 focus:ring-2 focus:ring-blue-900 focus:outline-none";
 	const articleClassV = "flex flex-col justify-center space-y-2";
@@ -294,8 +225,7 @@
 													>Code <button
 														class={iconButtonClass}
 														onclick={() => {
-															conditionalDisplay =
-																conditionalDisplay !== "code" ? "code" : "fonts";
+															conditionalDisplay = "code";
 															setSource(name);
 														}}
 														>🤖
@@ -309,8 +239,7 @@
 													>Custom <button
 														class={iconButtonClass}
 														onclick={() => {
-															conditionalDisplay =
-																conditionalDisplay !== "custom" ? "custom" : "fonts";
+															conditionalDisplay = "custom";
 															setSource(name);
 														}}
 														>🛠️
@@ -374,7 +303,7 @@
 								Filter<button
 									class={iconButtonClass}
 									onclick={() => {
-										conditionalDisplay = conditionalDisplay !== "filter" ? "filter" : "fonts";
+										conditionalDisplay = "filter";
 									}}
 								>
 									<FunnelIcon class={getHourStrokeFill(colorIndex)} size={18} />
@@ -443,6 +372,27 @@
 				<article class="flex flex-col gap-2">
 					<div class={cardClass}>
 						<article class={articleClassH}>
+							<div class={articleClassV}>
+								<div>
+									<button
+										type="button"
+										class={clickButtonClass}
+										onclick={() => {
+											conditionalDisplay = "fonts";
+										}}>Fonts</button
+									>
+								</div>
+								<div>
+									<button
+										class={iconButtonClass}
+										onclick={() => {
+											conditionalDisplay = "fontInfo";
+										}}
+									>
+										<InfoIcon class={HourStrokeColors[colorIndex]} size={24} />
+									</button>
+								</div>
+							</div>
 							<label class="label" for="color-select">
 								<span>Color</span>
 								<select
@@ -504,88 +454,13 @@
 					{#if conditionalDisplay === "fonts"}
 						<div class={cardClass}>
 							<header class="card-header">Font</header>
+							<Fonts bind:font bind:idbSettings />
+						</div>
+					{:else if conditionalDisplay === "fontInfo"}
+						<div class={cardClass}>
+							<header class="card-header">Font Info</header>
 							<article class={articleClassH}>
-								<button class="btn h-0 px-0" onclick={clearFont}>Clear Font {keyBackspace}</button>
-								<button class="btn h-0 px-0" onclick={getAvailableFonts}>Get Available Fonts</button>
-								<label class="label" for="font-family-select">
-									<span>Font Family</span>
-									<select
-										class="select"
-										id="font-family-select"
-										name="Font Family"
-										bind:value={selectedFontFamily}
-										onchange={() => {
-											setFontFamily();
-										}}
-									>
-										{#each FontFamilyCSS as name, i (name)}
-											<option value={name}>
-												{FontFamilyNames[i]}
-											</option>
-										{/each}
-									</select>
-								</label>
-								<label class="label" for="font-size-select">
-									<span>Font Size</span>
-									<select
-										class="select"
-										id="font-size-select"
-										name="Font Size"
-										bind:value={selectedFontSize}
-										onchange={() => {
-											setFontSize();
-										}}
-									>
-										{#each FontSizeCSS as name, i (name)}
-											<option value={name}>
-												{FontSizeNames[i]}
-											</option>
-										{/each}
-									</select>
-								</label>
-								<label class="label" for="font-weight-select">
-									<span>Font Weight</span>
-									<select
-										class="select"
-										id="font-weight-select"
-										name="Font Weight"
-										bind:value={selectedFontWeight}
-										onchange={() => {
-											setFontWeight();
-										}}
-									>
-										{#each FontWeightCSS as name, i (name)}
-											<option value={name}>
-												{FontWeightNames[i]}
-											</option>
-										{/each}
-									</select>
-								</label>
-								<label class="label" for="font-spacing-select">
-									<span>Font Spacing</span>
-									<select
-										class="select"
-										id="font-spacing-select"
-										name="Font Spacing"
-										bind:value={selectedFontSpacing}
-										onchange={() => {
-											setFontSpacing();
-										}}
-									>
-										{#each FontSpacingCSS as name, i (name)}
-											<option value={name}>
-												{fontSpacingNames[i]}
-											</option>
-										{/each}
-									</select>
-								</label>
-							</article>
-							<header class="card-header">Legibility Test</header>
-							<article class={articleClassV}>
-								<span class="bg-transparent {font}"
-									>il1IL1 dbdqpq DBDQPQ ij., fgjty rnmrn RNMRN o0O</span
-								>
-								<span class="bg-transparent {font}">Sphinx of black quartz, judge my vow!</span>
+								<FontInfo />
 							</article>
 						</div>
 					{:else if conditionalDisplay === "filter"}

@@ -7,3 +7,24 @@
 @import "@skeletonlabs/skeleton/themes/cerberus";
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    --font-arial: "Arial", sans-serif;
+    --font-notoSans: "Noto Sans", sans-serif;
+    --font-roboto: "Roboto", sans-serif;
+    --font-segoeUI: "Segoe UI Variable Text", sans-serif;
+    --font-tahoma: "Tahoma", sans-serif;
+    --font-verdana: "Verdana", sans-serif;
+
+    --font-century: "Century", "Gothic", "CenturyGothic", "AppleGothic", serif;
+    --font-garamond: "Garamond", "Baskerville", "Baskerville Old Face", "Hoefler Text", serif;
+    --font-georgia: "Georgia", "Times", serif;
+    --font-notoSerif: "Noto Serif", serif;
+    --font-palatino: "Palatino Linotype", serif;
+    --font-timesNewRoman: "Times New Roman", serif;
+
+    --font-cascadiaMono: "Cascadia Mono", monospace;
+    --font-courierNew: "Courier New", monospace;
+    --font-sourceCodePro: "Source Code Pro", monospace;
+    --font-ubuntuMono: "Ubuntu Mono", monospace;
+}

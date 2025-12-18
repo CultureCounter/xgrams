@@ -422,15 +422,15 @@
 				{/if}
 			{/each}
 		</div>
-		<h2 class="mt-6 flex place-content-evenly gap-x-3">
+		<h2 class="mt-6 flex place-content-center gap-x-3">
 			<div>
-				<strong>Lesson {linesIndex} / {lines.length} (Font: {font})</strong>
+				<strong>Lesson {linesIndex} / {lines.length}</strong>
 			</div>
 		</h2>
-		<h3 class="mt-0 flex place-content-evenly gap-x-3">
-			<div>WPM: {rawWPM}</div>
-			<div>Accuracy: {accuracy}%</div>
-			<div>Average WPM: {averageWPM()}</div>
+		<h3 class="mt-0 flex place-content-center gap-x-3">
+			<span>WPM: {rawWPM}</span>
+			<span>Accuracy: {accuracy}%</span>
+			<span>Average WPM: {averageWPM()}</span>
 		</h3>
 	</div>
 </div>
