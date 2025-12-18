@@ -2,7 +2,17 @@
 	import { BGColors, BorderColors, ColorIndex, ColorNames, getHourStrokeFill } from "$lib/store/Colors.svelte";
 	import { LessonDB, ScopeIndex, ScopeNames, ScopeValues } from "$lib/store/LessonDB.svelte";
 	import { LessonsDB } from "$lib/store/LessonsDB.svelte";
-	import { FontFamilyCSS, FontFamilyNames, SettingsDB, SoundNames } from "$lib/store/SettingsDB.svelte";
+	import {
+		FontFamilyCSS,
+		FontFamilyNames,
+		FontSizeCSS,
+		FontSizeNames,
+		FontSpacingCSS,
+		FontWeightCSS,
+		FontWeightNames,
+		SettingsDB,
+		SoundNames,
+	} from "$lib/store/SettingsDB.svelte";
 	import { SourceIndex, SourceNames } from "$lib/store/SourceDB.svelte";
 	import { KeyboardIndex, KeyboardNames, LayoutIndex, LayoutNames } from "$lib/store/keyboard";
 	import { Dialog, Portal, SegmentedControl, Switch } from "@skeletonlabs/skeleton-svelte";
@@ -85,81 +95,69 @@
 		idbSettings.isDirty = true;
 	}
 
+	async function getAvailableFonts() {
+		console.log("getAvailableFonts");
+		try {
+			// A permission prompt will appear for the user
+			window.queryLocalFonts().then((fonts) => {
+				console.log("Available Fonts:", fonts.length);
+				// console.log("Family | Full Name | Styles");
+				let currentFont = "";
+				let systemFonts: string[] = [];
+				// eslint-disable-next-line svelte/prefer-svelte-reactivity
+				const systemFontNames = new Map<string, string>();
+				for (const fontData of fonts) {
+					let family = fontData.family;
+					let fullName = fontData.fullName;
+					let style = fontData.style;
+					console.log(family, "|", fullName, "|", style);
+					if (family.includes("Mono") && family !== currentFont) {
+						currentFont = family;
+						systemFonts.push(family);
+						systemFontNames.set(family, style);
+					}
+				}
+				console.log("systemFonts", systemFonts.length, systemFonts);
+				console.log("systemFontNames", systemFontNames.size, systemFontNames);
+			});
+		} catch (err) {
+			console.error("Could not access local fonts:", (err as Error).message);
+		}
+	}
+
 	let selectedFontFamily: string = $state(findStrings(font ?? "", FontFamilyCSS));
 	function setFontFamily(): void {
 		font = replaceStrings(font, FontFamilyCSS, selectedFontFamily);
+		idbSettings.font = font;
 		idbSettings.isDirty = true;
 	}
 
-	let fontSizeCSS = [
-		"text-xs ",
-		"text-sm ",
-		"text-base ",
-		"text-lg ",
-		"text-xl ",
-		"text-2xl ",
-		"text-3xl ",
-		"text-4xl ",
-		"text-5xl ",
-		"text-6xl ",
-		"text-7xl ",
-		"text-8xl ",
-		"text-9xl ",
-	];
-	let fontSizeNames = ["xs", "sm", "base", "lg", "xl", "2xl", "3xl", "4xl", "5xl", "6xl", "7xl", "8xl", "9xl"];
-	let selectedFontSize: string = $state(findStrings(font ?? "", fontSizeCSS));
+	let selectedFontSize: string = $state(findStrings(font ?? "", FontSizeCSS));
 	function setFontSize(): void {
-		font = replaceStrings(font, fontSizeCSS, selectedFontSize);
+		font = replaceStrings(font, FontSizeCSS, selectedFontSize);
+		idbSettings.font = font;
 		idbSettings.isDirty = true;
 	}
 
-	let fontWeightCSS = [
-		"font-thin ",
-		"font-extralight ",
-		"font-light ",
-		"font-normal ",
-		"font-medium ",
-		"font-semibold ",
-		"font-bold ",
-		"font-extrabold ",
-		"font-black ",
-	];
-	let fontWeightNames = [
-		"thin",
-		"extra light",
-		"light",
-		"normal",
-		"medium",
-		"bold",
-		"semibold",
-		"extrabold",
-		"black",
-	];
-	let selectedFontWeight: string = $state(findStrings(font ?? "", fontWeightCSS));
+	let selectedFontWeight: string = $state(findStrings(font ?? "", FontWeightCSS));
 	function setFontWeight(): void {
-		font = replaceStrings(font, fontWeightCSS, selectedFontWeight);
+		font = replaceStrings(font, FontWeightCSS, selectedFontWeight);
+		idbSettings.font = font;
 		idbSettings.isDirty = true;
 	}
 
-	let fontSpacingCSS = [
-		"tracking-tighter ",
-		"tracking-tight ",
-		"tracking-normal ",
-		"tracking-wide ",
-		"tracking-wider ",
-		"tracking-widest ",
-	];
 	let fontSpacingNames = ["tighter", "tight", "normal", "wide", "wider", "widest"];
-	let selectedFontSpacing: string = $state(findStrings(font ?? "", fontSpacingCSS));
+	let selectedFontSpacing: string = $state(findStrings(font ?? "", FontSpacingCSS));
 	function setFontSpacing(): void {
-		font = replaceStrings(font, fontSpacingCSS, selectedFontSpacing);
+		font = replaceStrings(font, FontSpacingCSS, selectedFontSpacing);
+		idbSettings.font = font;
 		idbSettings.isDirty = true;
 	}
 
 	let selectedColor: ColorIndex = $state(idbSettings?.colorIndex ?? ColorIndex.fuchsia);
 	function setColor(): void {
-		idbSettings.colorIndex = selectedColor;
 		colorIndex = selectedColor;
+		idbSettings.colorIndex = selectedColor;
 		idbSettings.isDirty = true;
 	}
 
@@ -178,9 +176,9 @@
 	function clearFont(): void {
 		idbSettings.font = "";
 		selectedFontFamily = findStrings(idbSettings.font ?? "", FontFamilyCSS);
-		selectedFontSize = findStrings(idbSettings.font ?? "", fontSizeCSS);
-		selectedFontWeight = findStrings(idbSettings.font ?? "", fontWeightCSS);
-		selectedFontSpacing = findStrings(idbSettings.font ?? "", fontSpacingCSS);
+		selectedFontSize = findStrings(idbSettings.font ?? "", FontSizeCSS);
+		selectedFontWeight = findStrings(idbSettings.font ?? "", FontWeightCSS);
+		selectedFontSpacing = findStrings(idbSettings.font ?? "", FontSpacingCSS);
 		idbSettings.isDirty = true;
 	}
 	let keyBackspace = `\u232B`;
@@ -223,11 +221,13 @@
 		idbLessons.isDirty = true;
 	}
 
+	// svelte-ignore state_referenced_locally
 	const newCodeChoices = [...idbCodeChoices];
 	function codeChanged(choice: boolean, i: number): void {
 		newCodeChoices[i] = choice;
 	}
 
+	// svelte-ignore state_referenced_locally
 	// svelte-ignore non_reactive_update
 	let customString = idbCustomWords.join(" ");
 	function customChanged(newCustom: string): void {
@@ -506,6 +506,7 @@
 							<header class="card-header">Font</header>
 							<article class={articleClassH}>
 								<button class="btn h-0 px-0" onclick={clearFont}>Clear Font {keyBackspace}</button>
+								<button class="btn h-0 px-0" onclick={getAvailableFonts}>Get Available Fonts</button>
 								<label class="label" for="font-family-select">
 									<span>Font Family</span>
 									<select
@@ -535,9 +536,9 @@
 											setFontSize();
 										}}
 									>
-										{#each fontSizeCSS as name, i (name)}
+										{#each FontSizeCSS as name, i (name)}
 											<option value={name}>
-												{fontSizeNames[i]}
+												{FontSizeNames[i]}
 											</option>
 										{/each}
 									</select>
@@ -553,9 +554,9 @@
 											setFontWeight();
 										}}
 									>
-										{#each fontWeightCSS as name, i (name)}
+										{#each FontWeightCSS as name, i (name)}
 											<option value={name}>
-												{fontWeightNames[i]}
+												{FontWeightNames[i]}
 											</option>
 										{/each}
 									</select>
@@ -571,7 +572,7 @@
 											setFontSpacing();
 										}}
 									>
-										{#each fontSpacingCSS as name, i (name)}
+										{#each FontSpacingCSS as name, i (name)}
 											<option value={name}>
 												{fontSpacingNames[i]}
 											</option>

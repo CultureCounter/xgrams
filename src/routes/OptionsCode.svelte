@@ -8,6 +8,8 @@
 	};
 	let { idbCodeChoices, codeChanged }: Props = $props();
 
+	// eslint-disable-next-line
+	// svelte-ignore state_referenced_locally
 	const codeChanges = $state<boolean[]>(idbCodeChoices);
 	const onCheckedChange = (event: { checked: boolean; i: number }) => {
 		var checked = !event.checked;

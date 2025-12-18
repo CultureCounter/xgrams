@@ -410,7 +410,8 @@
 		onblur={handleBlur}
 		onmouseover={handleMouseOver}
 		onmouseleave={handleMouseLeave}
-		tabindex="-1"
+		tabindex="0"
+		aria-label="Typing area"
 	>
 		<div class="p-2 {font}">
 			{#each classLine as cp, i (cp.chars + i)}
@@ -421,16 +422,16 @@
 				{/if}
 			{/each}
 		</div>
-		<h4 class="mt-6 flex place-content-evenly gap-x-3">
+		<h2 class="mt-6 flex place-content-evenly gap-x-3">
 			<div>
-				<strong>Lesson {linesIndex} / {lines.length}</strong>
+				<strong>Lesson {linesIndex} / {lines.length} (Font: {font})</strong>
 			</div>
-		</h4>
-		<h4 class="mt-0 flex place-content-evenly gap-x-3">
+		</h2>
+		<h3 class="mt-0 flex place-content-evenly gap-x-3">
 			<div>WPM: {rawWPM}</div>
 			<div>Accuracy: {accuracy}%</div>
 			<div>Average WPM: {averageWPM()}</div>
-		</h4>
+		</h3>
 	</div>
 </div>
 <div class="flex justify-center">

@@ -2,7 +2,7 @@
 	import { Slider } from "@skeletonlabs/skeleton-svelte";
 	import PlusIcon from "@lucide/svelte/icons/plus";
 	import MinusIcon from "@lucide/svelte/icons/minus";
-	import { ColorIndex, BorderColors, BGColors } from "$lib/store/Colors.svelte";
+	import { ColorIndex, BGColors } from "$lib/store/Colors.svelte";
 
 	type Props = {
 		minCounter?: number;

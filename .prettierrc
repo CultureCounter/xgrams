@@ -22,8 +22,6 @@
 	"quoteProps": "consistent",
 	"semi": true,
 	"singleQuote": false,
-	"svelteSortOrder": "options-scripts-markup-styles",
-	"svelteStrictMode": true,
 	"tabWidth": 4,
 	"tailwindStylesheet": "./src/app.css",
 	"trailingComma": "es5",

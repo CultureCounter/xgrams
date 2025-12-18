@@ -10,7 +10,7 @@
 		filter = myTextArea.value;
 		filterChanged(filter);
 	}
-	let textAreaValue = $state<string>(filter);
+	let textAreaValue = $derived<string>(filter);
 </script>
 
 <article>

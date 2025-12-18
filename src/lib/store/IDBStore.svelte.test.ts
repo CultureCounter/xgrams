@@ -3,7 +3,8 @@ import { clear, getMany, setMany } from "idb-keyval";
 import { IDBStore } from "./IDBStore.svelte";
 import { LessonDB } from "./LessonDB.svelte";
 import { LessonsDB } from "./LessonsDB.svelte";
-import { SettingsDB, ColorIndex } from "./SettingsDB.svelte";
+import { SettingsDB } from "./SettingsDB.svelte";
+import { ColorIndex } from "./Colors.svelte";
 import { SourceIndex } from "./SourceDB.svelte";
 import { KeyboardIndex, LayoutIndex } from "./keyboard";
 

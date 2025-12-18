@@ -159,7 +159,7 @@
 
 <div class="flex h-full w-full flex-col overflow-y-auto">
 	{#if idbLoading || !idbSources.isLoaded() || !idbCodes.isLoaded()}
-		Loading...
+		<div class="flex h-full w-full items-center justify-center"><h1>Loading...</h1></div>
 	{:else}
 		<div class="flex items-start justify-between">
 			<div class="object-left p-6">

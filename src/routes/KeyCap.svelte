@@ -30,7 +30,15 @@
 			class="items-top relative m-1 flex justify-start space-x-1 rounded-lg bg-white p-0 leading-none ring-1 ring-gray-900/5"
 		>
 			<div>
-				<button class={keyLargeCSS} data-key={letter} name="key" value={letter} aria-label={letter}>
+				<button
+					class={keyLargeCSS}
+					data-key={letter}
+					name="key"
+					value={letter}
+					aria-label={letter}
+					disabled={true}
+					tabindex="-1"
+				>
 					<span class={font}>{letter}</span>
 				</button>
 			</div>
@@ -43,7 +51,15 @@
 			class="items-top relative m-1 flex justify-start space-x-1 rounded-lg bg-white p-0 leading-none ring-1 ring-gray-900/5"
 		>
 			<div>
-				<button class={keyCSS} data-key={letter} name="key" value={letter} aria-label={letter}>
+				<button
+					class={keyCSS}
+					data-key={letter}
+					name="key"
+					value={letter}
+					aria-label={letter}
+					disabled={true}
+					tabindex="-1"
+				>
 					<span class={font}>{letter}</span>
 				</button>
 			</div>

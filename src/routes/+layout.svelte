@@ -1,12 +1,11 @@
 <script lang="ts">
 	let { children } = $props();
 	import "../app.css";
-	// TODO: Re-enable xgtheme
-	// import '../xgtheme.postcss';
 	import favicon from "$lib/images/favicon.png";
 </script>
 
 <svelte:head>
+	<title>Xgrams typing tutor</title>
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
