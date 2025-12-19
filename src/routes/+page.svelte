@@ -161,7 +161,7 @@
 	{#if idbLoading || !idbSources.isLoaded() || !idbCodes.isLoaded()}
 		<div class="flex h-full w-full items-center justify-center"><h1>Loading...</h1></div>
 	{:else}
-		<div class="flex items-start justify-between">
+		<div class="flex items-start justify-between h-24">
 			<div class="object-left p-6">
 				<Darklight>
 					<!-- 🌚🌑 🌓 🌔🌜🌕🌛☀️🌞 -->

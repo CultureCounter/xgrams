@@ -1,14 +1,5 @@
 <script lang="ts">
-	import {
-		FontFamilyCSS,
-		FontFamilyNames,
-		FontSizeCSS,
-		FontSizeNames,
-		FontSpacingCSS,
-		FontWeightCSS,
-		FontWeightNames,
-		SettingsDB,
-	} from "$lib/store/SettingsDB.svelte";
+	import { SettingsDB } from "$lib/store/SettingsDB.svelte";
 	import { findStrings, replaceStrings } from "$lib/utilities/utils";
 
 	let {
@@ -18,6 +9,118 @@
 		font: string;
 		idbSettings: SettingsDB;
 	} = $props();
+
+	export const FontFamilyCSS = [
+		"font-sans ",
+		"font-arial ",
+		"font-dejaVuSans ",
+		"font-notoSans ",
+		"font-roboto ",
+		"font-segoeUI ",
+		"font-tahoma ",
+		"font-verdana ",
+		"font-serif ",
+		"font-century ",
+		"font-dejaVuSerif ",
+		"font-garamond ",
+		"font-georgia ",
+		"font-notoSerif ",
+		"font-palatino ",
+		"font-timesNewRoman ",
+		"font-mono ",
+		"font-cascadiaMono ",
+		"font-courierNew ",
+		"font-ibmPlexMono ",
+		"font-robotoMono ",
+		"font-sourceCodePro ",
+		"font-ubuntuMono ",
+	];
+
+	export const FontFamilyNames = [
+		"---Sans-Serif---",
+		"Arial",
+		"DejaVu Sans",
+		"Noto Sans",
+		"Roboto",
+		"Segoe UI",
+		"Tahoma",
+		"Verdana",
+		"---Serif---",
+		"Century",
+		"DejaVu Serif",
+		"Garamond",
+		"Georgia",
+		"Noto Serif",
+		"Palatino Linotype",
+		"Times New Roman",
+		"---Mono---",
+		"Cascadia Mono",
+		"Courier New",
+		"IBM Plex Mono",
+		"Roboto Mono",
+		"Source Code Pro",
+		"Ubuntu Mono",
+	];
+	export const FontSizeCSS = [
+		"text-xs ",
+		"text-sm ",
+		"text-base ",
+		"text-lg ",
+		"text-xl ",
+		"text-2xl ",
+		"text-3xl ",
+		"text-4xl ",
+		"text-5xl ",
+		"text-6xl ",
+		"text-7xl ",
+		"text-8xl ",
+		"text-9xl ",
+	];
+	export const FontSizeNames = [
+		"xs",
+		"sm",
+		"base",
+		"lg",
+		"xl",
+		"2xl",
+		"3xl",
+		"4xl",
+		"5xl",
+		"6xl",
+		"7xl",
+		"8xl",
+		"9xl",
+	];
+	export const FontWeightCSS = [
+		"font-thin ",
+		"font-extralight ",
+		"font-light ",
+		"font-normal ",
+		"font-medium ",
+		"font-semibold ",
+		"font-bold ",
+		"font-extrabold ",
+		"font-black ",
+	];
+	export const FontWeightNames = [
+		"thin",
+		"extra light",
+		"light",
+		"normal",
+		"medium",
+		"bold",
+		"semibold",
+		"extrabold",
+		"black",
+	];
+	export const FontSpacingCSS = [
+		"tracking-tighter ",
+		"tracking-tight ",
+		"tracking-normal ",
+		"tracking-wide ",
+		"tracking-wider ",
+		"tracking-widest ",
+	];
 
 	let selectedFontFamily: string = $state(findStrings(font ?? "", FontFamilyCSS));
 	function setFontFamily(): void {
@@ -161,5 +264,5 @@
 <header class="card-header">Font Legibility Test</header>
 <article class={articleClassV}>
 	<span class="bg-transparent {font}">il1IL1 dbdqpq DBDQPQ ij., fgjty rnmrn RNMRN o0O</span>
-	<span class="bg-transparent {font}">Sphinx of black quartz, judge my vow!</span>
+	<span class="bg-transparent {font}">Sphinx of black quartz, judge my vow! 1234567890</span>
 </article>

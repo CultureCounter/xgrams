@@ -10,103 +10,13 @@ export enum SoundIndex {
 }
 export const SoundNames = ["Right Letter", "Wrong Letter", "Passed Goals", "Failed Goals", "Lessons Done"];
 
-export const FontFamilyCSS = [
-	"font-sans ",
-	"font-arial ",
-	"font-notoSans ",
-	"font-roboto ",
-	"font-segoeUI ",
-	"font-tahoma ",
-	"font-verdana ",
-	"font-serif ",
-	"font-century ",
-	"font-garamond ",
-	"font-georgia ",
-	"font-notoSerif ",
-	"font-palatino ",
-	"font-timesNewRoman ",
-	"font-mono ",
-	"font-cascadiaMono ",
-	"font-courierNew ",
-	"font-sourceCodePro ",
-	"font-ubuntuMono ",
-];
-
-export const FontFamilyNames = [
-	"---Sans-Serif---",
-	"Arial",
-	"Noto Sans",
-	"Roboto",
-	"Segoe UI",
-	"Tahoma",
-	"Verdana",
-	"---Serif---",
-	"Century",
-	"Garamond",
-	"Georgia",
-	"Noto Serif",
-	"Palatino Linotype",
-	"Times New Roman",
-	"---Mono---",
-	"Cascadia Mono",
-	"Courier New",
-	"Source Code Pro",
-	"Ubuntu Mono",
-];
-export const FontSizeCSS = [
-	"text-xs ",
-	"text-sm ",
-	"text-base ",
-	"text-lg ",
-	"text-xl ",
-	"text-2xl ",
-	"text-3xl ",
-	"text-4xl ",
-	"text-5xl ",
-	"text-6xl ",
-	"text-7xl ",
-	"text-8xl ",
-	"text-9xl ",
-];
-export const FontSizeNames = ["xs", "sm", "base", "lg", "xl", "2xl", "3xl", "4xl", "5xl", "6xl", "7xl", "8xl", "9xl"];
-export const FontWeightCSS = [
-	"font-thin ",
-	"font-extralight ",
-	"font-light ",
-	"font-normal ",
-	"font-medium ",
-	"font-semibold ",
-	"font-bold ",
-	"font-extrabold ",
-	"font-black ",
-];
-export const FontWeightNames = [
-	"thin",
-	"extra light",
-	"light",
-	"normal",
-	"medium",
-	"bold",
-	"semibold",
-	"extrabold",
-	"black",
-];
-export const FontSpacingCSS = [
-	"tracking-tighter ",
-	"tracking-tight ",
-	"tracking-normal ",
-	"tracking-wide ",
-	"tracking-wider ",
-	"tracking-widest ",
-];
-
 // These do not cause changes to typing lessons
 export class SettingsDB {
 	minimumWPM: number = 40;
 	minimumAccuracy: number = 100;
 	sounds: boolean[] = [true, true, true, true, true];
 	volume: number = 100;
-	font: string = " ";
+	font: string = "font-sourceCodePro ";
 	colorIndex: ColorIndex = ColorIndex.fuchsia;
 	keyboard: KeyboardIndex = KeyboardIndex.matrix;
 	layout: LayoutIndex = LayoutIndex.colemakDH;

@@ -198,13 +198,13 @@
 <Dialog restoreFocus={true} onOpenChange={saveSettings}>
 	<Dialog.Trigger class="btn"><h1 style="font-size: 3em">🧜‍♀️</h1></Dialog.Trigger>
 	<Portal>
-		<Dialog.Backdrop class="fixed top-10 left-0 w-full h-full z-50 transition transition-discrete {animBackdrop}" />
-		<Dialog.Positioner class="fixed top-10 left-0 w-full h-full z-50 flex flex-col justify-center">
-			<Dialog.Content class="{contentClass} w-full {animModal}">
+		<Dialog.Backdrop class="fixed top-24 left-0 w-full h-full z-50 transition transition-discrete {animBackdrop}" />
+		<Dialog.Positioner class="fixed top-24 left-0 w-full h-full z-50 ">
+			<Dialog.Content class="{contentClass} w-full flex flex-col content-start justify-center {animModal}">
 				<header class="flex justify-between">
 					<Dialog.Title class="text-2xl font-bold">Settings</Dialog.Title>
 					<Dialog.CloseTrigger class="btn preset-tonal">
-						<CheckIcon class="size-4" />
+						<CheckIcon class="size-8 {HourStrokeColors[ColorIndex.emerald]}" />
 					</Dialog.CloseTrigger>
 				</header>
 				<article class="flex place-content-evenly w-full gap-2">
@@ -458,7 +458,7 @@
 						</div>
 					{:else if conditionalDisplay === "fontInfo"}
 						<div class={cardClass}>
-							<header class="card-header">Font Info</header>
+							<header class="card-header">Font Download Links</header>
 							<article class={articleClassH}>
 								<FontInfo />
 							</article>
