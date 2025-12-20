@@ -39,19 +39,15 @@ export class IDBStore {
 		}
 
 		keys.forEach((key) => {
-			if (this.#loadStates.has(key)) {
-				return;
-			}
-			this.#defaults.set(key, defaultValues[keys.indexOf(key)]);
-		});
-
-		keys.forEach((key) => {
-			const loadState = new LoadState(key, trace);
-			this.#loadStates.set(key, loadState);
-			if (!browser) {
-				loadState.setState(LoadIndex.loaded);
-			} else {
-				loadState.setState(LoadIndex.loadingIDB);
+			if (!this.#loadStates.has(key)) {
+				this.#defaults.set(key, defaultValues[keys.indexOf(key)]);
+				const loadState = new LoadState(key, trace);
+				this.#loadStates.set(key, loadState);
+				if (!browser) {
+					loadState.setState(LoadIndex.loaded);
+				} else {
+					loadState.setState(LoadIndex.loadingIDB);
+				}
 			}
 		});
 

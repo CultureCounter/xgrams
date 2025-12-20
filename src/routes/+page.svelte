@@ -33,7 +33,6 @@
 	// TODO: https://svelte.dev/tutorial/svelte/svelte-head
 
 	const isTracing = false;
-	const idbCodesLoadState = new LoadState("idbCodes", isTracing);
 	// svelte-ignore non_reactive_update
 	let idbCodes = new ServerStore<CodeXG>(
 		"idbCodes",
@@ -41,10 +40,9 @@
 		CodeKeys as (keyof CodeXG)[],
 		"/api/code",
 		new CodeXG(),
-		idbCodesLoadState
+		isTracing
 	);
 
-	const idbSourcesLoadState = new LoadState("idbSources", isTracing);
 	// svelte-ignore non_reactive_update
 	let idbSources = new ServerStore<SourceXG>(
 		"idbSources",
@@ -52,7 +50,7 @@
 		SourceKeys as (keyof SourceXG)[],
 		"/api/sources",
 		new SourceXG(),
-		idbSourcesLoadState
+		isTracing
 	);
 
 	// svelte-ignore non_reactive_update

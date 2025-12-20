@@ -11,13 +11,13 @@ export class ServerStore<T extends object> {
 	#value: T;
 	#loadState: LoadState;
 
-	constructor(name: string, keys: string[], props: (keyof T)[], url: string, initial: T, loadState: LoadState) {
+	constructor(name: string, keys: string[], props: (keyof T)[], url: string, initial: T, trace: boolean = false) {
 		this.#name = name;
 		this.#keys = keys;
 		this.#props = props;
 		this.#url = url;
 		this.#value = initial;
-		this.#loadState = loadState;
+		this.#loadState = new LoadState(name, trace);
 
 		if (typeof window === "undefined") {
 			return;
@@ -111,6 +111,10 @@ export class ServerStore<T extends object> {
 			console.error(`ServerStore[${this.#name}] error:`, e);
 			this.#loadState.setState(LoadIndex.error);
 		}
+	}
+
+	getLoadState(): LoadState {
+		return this.#loadState;
 	}
 
 	get current(): T {
