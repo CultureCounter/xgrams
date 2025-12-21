@@ -72,7 +72,7 @@
 		idbCodeChoices,
 		onLessonChanged,
 		onSettingsChanged,
-		colorIndex = $bindable(),
+		colorIndex = $bindable<ColorIndex>(),
 		font = $bindable(),
 	}: Props = $props();
 
@@ -185,8 +185,6 @@
 	const animModal =
 		"transition transition-discrete opacity-0 -translate-x-full starting:data-[state=open]:opacity-0 starting:data-[state=open]:-translate-x-full data-[state=open]:opacity-100 data-[state=open]:translate-x-0";
 
-	// let contentClass =
-	// "card w-full flex-1 overflow-y-auto flex-col content-start justify-center backdrop-blur-lg shadow-xl pt-16";
 	let contentClass = "card space-y-4 backdrop-blur-lg shadow-xl";
 	//   3xs:bg-lime-600 2xs:text-yellow-100 xs:bg-digital-blue-200 sm:bg-digital-blue-300 md:bg-digital-blue-400 lg:bg-digital-blue-500 xl:bg-digital-blue-600 2xl:bg-amber-700 3xl:bg-lime-800
 	let cardClass = $derived(
@@ -196,13 +194,13 @@
 			+ BGColors[colorIndex]
 			+ " rounded-lg"
 	);
-	const clickButtonClass =
+	const clickButtonClass = $derived(
 		"btn backdrop-blur-xl space-y-4 border-2 "
-		+ BorderColors[colorIndex]
-		+ " "
-		+ BGColors[colorIndex]
-		+ " rounded-lg";
-
+			+ BorderColors[colorIndex]
+			+ " "
+			+ BGColors[colorIndex]
+			+ " rounded-lg"
+	);
 	const iconButtonClass =
 		"focus:ring-opacity-50 rounded-full text-white hover:bg-blue-600 focus:ring-2 focus:ring-blue-900 focus:outline-none";
 	const articleClassV = "flex flex-col justify-between space-y-2";
@@ -519,7 +517,8 @@
 						<div class={cardClass}>
 							<header class="card-header">Filter</header>
 							<article class={articleClassH}>
-								<OptionsFilter filter={currentLesson.filter} {filterChanged}></OptionsFilter>
+								<OptionsFilter filter={currentLesson.filter} {filterChanged} {colorIndex}
+								></OptionsFilter>
 							</article>
 						</div>
 					{:else if conditionalDisplay === "code"}
@@ -533,7 +532,7 @@
 						<div class={cardClass}>
 							<header class="card-header">Custom</header>
 							<article class={articleClassH}>
-								<OptionsCustom {customString} {customChanged}></OptionsCustom>
+								<OptionsCustom {customString} {customChanged} {colorIndex}></OptionsCustom>
 							</article>
 						</div>
 					{/if}

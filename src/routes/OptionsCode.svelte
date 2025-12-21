@@ -20,6 +20,7 @@
 
 {#each CodeNames as name, i (name)}
 	<Switch
+		class="flex flex-col"
 		{name}
 		checked={codeChanges[i]}
 		onchange={() => {

@@ -1,9 +1,13 @@
 <script lang="ts">
+	import { BGColors, BorderColors, ColorIndex, HourStrokeColors } from "$lib/store/Colors.svelte";
+	import CheckIcon from "@lucide/svelte/icons/check";
+
 	type Props = {
 		filter: string;
 		filterChanged: (filter: string) => void;
+		colorIndex: ColorIndex;
 	};
-	let { filter, filterChanged }: Props = $props();
+	let { filter, filterChanged, colorIndex = $bindable<ColorIndex>() }: Props = $props();
 
 	let myTextArea: HTMLTextAreaElement;
 	function saveFilter() {
@@ -11,6 +15,14 @@
 		filterChanged(filter);
 	}
 	let textAreaValue = $derived<string>(filter);
+
+	const clickButtonClass = $derived(
+		"btn backdrop-blur-xl space-y-4 border-2 "
+			+ BorderColors[colorIndex]
+			+ " "
+			+ BGColors[colorIndex]
+			+ " rounded-lg"
+	);
 </script>
 
 <article>
@@ -29,5 +41,5 @@
 		saveFilter();
 	}}
 	type="button"
-	class="btn preset-filled">Save</button
+	class={clickButtonClass}><CheckIcon class="size-8 {HourStrokeColors[ColorIndex.emerald]}" /></button
 >
