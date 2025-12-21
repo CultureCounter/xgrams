@@ -205,8 +205,8 @@
 
 	const iconButtonClass =
 		"focus:ring-opacity-50 rounded-full text-white hover:bg-blue-600 focus:ring-2 focus:ring-blue-900 focus:outline-none";
-	const articleClassV = "flex flex-col justify-center space-y-2";
-	const articleClassH = "flex flex-row justify-stretch space-x-2";
+	const articleClassV = "flex flex-col justify-between space-y-2";
+	const articleClassH = "flex flex-row justify-between space-x-2";
 </script>
 
 <Dialog restoreFocus={true} onOpenChange={saveSettings}>
@@ -221,7 +221,7 @@
 						<CheckIcon class="size-8 {HourStrokeColors[ColorIndex.emerald]}" />
 					</Dialog.CloseTrigger>
 				</header>
-				<article class="flex place-content-evenly w-full gap-2 space-y-2">
+				<article class={articleClassH}>
 					<div class={cardClass}>
 						<header class="card-header">Source</header>
 						<article class={articleClassV}>
@@ -502,7 +502,7 @@
 						</article>
 					</div>
 				</article>
-				<article class="flex flex-col justify-stretch gap-2">
+				<article class="flex flex-col justify-between gap-2">
 					{#if conditionalDisplay === "fonts"}
 						<div class={cardClass}>
 							<header class="card-header">Font</header>
@@ -516,36 +516,26 @@
 							</article>
 						</div>
 					{:else if conditionalDisplay === "filter"}
-						<section class="flex place-content-between gap-2">
-							<div class={cardClass}>
-								<header class="card-header">Filter</header>
-								<article class={articleClassH}>
-									<OptionsFilter filter={currentLesson.filter} {filterChanged}></OptionsFilter>
-								</article>
-							</div>
-						</section>
+						<div class={cardClass}>
+							<header class="card-header">Filter</header>
+							<article class={articleClassH}>
+								<OptionsFilter filter={currentLesson.filter} {filterChanged}></OptionsFilter>
+							</article>
+						</div>
 					{:else if conditionalDisplay === "code"}
-						<section class="flex place-content-between gap-2">
-							<div>
-								<div class={cardClass}>
-									<header class="card-header">Code</header>
-									<article class={articleClassH}>
-										<OptionsCode {idbCodeChoices} {codeChanged}></OptionsCode>
-									</article>
-								</div>
-							</div>
-						</section>
+						<div class={cardClass}>
+							<header class="card-header">Code</header>
+							<article class={articleClassH}>
+								<OptionsCode {idbCodeChoices} {codeChanged}></OptionsCode>
+							</article>
+						</div>
 					{:else if conditionalDisplay === "custom"}
-						<section class="flex place-content-between gap-2">
-							<div>
-								<div class={cardClass}>
-									<header class="card-header">Custom</header>
-									<article class={articleClassH}>
-										<OptionsCustom {customString} {customChanged}></OptionsCustom>
-									</article>
-								</div>
-							</div>
-						</section>
+						<div class={cardClass}>
+							<header class="card-header">Custom</header>
+							<article class={articleClassH}>
+								<OptionsCustom {customString} {customChanged}></OptionsCustom>
+							</article>
+						</div>
 					{/if}
 				</article>
 			</Dialog.Content>
