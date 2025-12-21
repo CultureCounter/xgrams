@@ -10,33 +10,35 @@
 	import Typist from "./Typist.svelte";
 	import Keyboard from "./Keyboard.svelte";
 	import { IDBStore } from "$lib/store/IDBStore.svelte";
-	import { LessonsDB } from "$lib/store/LessonsDB.svelte";
+	import { currentVersion, LessonsDB } from "$lib/store/LessonsDB.svelte";
 	import { LessonDB, transferTo } from "$lib/store/LessonDB.svelte";
 	import { SettingsDB } from "$lib/store/SettingsDB.svelte";
 	import { CodeXG } from "$lib/store/code";
 	import { SourceXG } from "$lib/store/SourceDB.svelte";
 	import { LoadState } from "$lib/store/LoadState.svelte";
 	import { ServerStore } from "$lib/store/ServerStore.svelte";
-	import { CodeNames } from "$lib/store/code";
-	import { SourceNames } from "$lib/store/SourceDB.svelte";
 	import { CodeKeys } from "$lib/store/code";
 	import { SourceKeys } from "$lib/store/SourceDB.svelte";
 	import { arrayCopyBoolean, arrayCopyString, arrayEqualBoolean, arrayEqualString } from "$lib/utilities/utils";
 	import type { ColorIndex } from "$lib/store/Colors.svelte";
 
 	function clearAll() {
-		idbStore.clearDatabase(); // For testing purposes only, clear the database on each load
+		idbStore.clearIDB(); // For testing purposes only, clear the database on each load
 		localStorage.clear();
 		LoadState.clearDatabase = true;
 	}
 
 	// TODO: https://svelte.dev/tutorial/svelte/svelte-head
+	// TODO: minimal defaults
+
+	const IDBKeys = ["idbLessons", "idbSettings", "idbCustomWords", "idbCodeChoices"];
+	const AllKeys = [...IDBKeys, ...CodeKeys, ...SourceKeys];
 
 	const isTracing = false;
 	// svelte-ignore non_reactive_update
 	let idbCodes = new ServerStore<CodeXG>(
 		"idbCodes",
-		CodeNames,
+		CodeKeys,
 		CodeKeys as (keyof CodeXG)[],
 		"/api/code",
 		new CodeXG(),
@@ -46,7 +48,7 @@
 	// svelte-ignore non_reactive_update
 	let idbSources = new ServerStore<SourceXG>(
 		"idbSources",
-		SourceNames,
+		SourceKeys,
 		SourceKeys as (keyof SourceXG)[],
 		"/api/sources",
 		new SourceXG(),
@@ -71,17 +73,23 @@
 	let idbLoading = $state(true);
 	idbStore
 		.getValues(
-			["idbLessons", "idbSettings", "idbCustomWords", "idbCodeChoices"],
+			IDBKeys,
 			[
 				new LessonsDB(),
 				new SettingsDB(),
 				[] as string[],
-				[false, false, false, false, false, false, false, false, false] as boolean[],
+				[true, false, false, false, false, false, false, false, false] as boolean[],
 			],
 			isTracing
 		)
 		.then((values) => {
 			idbLessons = new LessonsDB(values[0] as LessonsDB);
+			if (currentVersion > idbLessons.version) {
+				console.log("currentVersion > idbLessons.version: " + currentVersion + " > " + idbLessons.version);
+				idbStore.cleanIDB(AllKeys, idbLessons.version, currentVersion);
+				idbLessons.version = currentVersion;
+				idbStore.setValue("idbLessons", idbLessons);
+			}
 			idbSettings = new SettingsDB(values[1] as SettingsDB);
 			arrayCopyString(values[2] as string[], idbCustomWords);
 			arrayCopyBoolean(values[3] as boolean[], idbCodeChoices);
@@ -175,7 +183,7 @@
 				</Darklight>
 			</div>
 			<div class="object-left p-6">
-				<button onclick={clearAll}>Debug Clear Data</button>
+				<button class="btn" onclick={clearAll}>Debug Clears Data</button>
 			</div>
 			<div class="object-center">
 				<h1

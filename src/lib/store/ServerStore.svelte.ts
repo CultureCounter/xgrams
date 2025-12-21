@@ -34,7 +34,13 @@ export class ServerStore<T extends object> {
 		getMany(this.#keys)
 			.then((vals) => {
 				// Check if we have data for all keys
-				const hasAllData = vals.every((v) => v !== undefined);
+				const hasAllData = vals.every((v, i) => {
+					if (v !== undefined) return true;
+					else {
+						console.error(`ServerStore[${this.#name}] getMany failed:`, this.#keys[i], v);
+						return false;
+					}
+				});
 				if (hasAllData) {
 					this.#updateValueFromIDB(vals);
 					this.#version += 1;

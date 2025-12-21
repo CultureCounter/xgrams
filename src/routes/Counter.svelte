@@ -44,11 +44,17 @@
 		onChange?.(count);
 	}
 
-	let cardClass = $derived("card p-4 backdrop-blur-x3 space-y-4 " + BGColors[colorIndex] + " rounded-xl");
+	let cardClass = $derived(
+		"card p-4 backdrop-blur-x3 space-y-4 hover:bg-digital-blue-50 hover:dark:bg-digital-blue-950 "
+			+ BGColors[colorIndex]
+			+ " rounded-xl"
+	);
 </script>
 
 <div class={cardClass}>
-	<header class="card-header text-center">{name}</header>
+	<header class="card-header text-center">
+		<p class="hidden md:inline">{name}</p>
+	</header>
 	<div class="grid grid-rows-1 justify-between sm:grid-cols-3">
 		<button onmouseup={onMouseUp} aria-label="Decrease the counter by one">
 			<MinusIcon class="size-4" />
@@ -64,7 +70,7 @@
 		</button>
 	</div>
 
-	<div class="mt-3">
+	<div class="mt-3 hidden xs:block">
 		<Slider
 			{name}
 			defaultValue={[50]}

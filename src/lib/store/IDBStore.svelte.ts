@@ -1,5 +1,5 @@
 import { browser } from "$app/environment";
-import { clear, getMany, set, setMany } from "idb-keyval";
+import { clear, getMany, set, setMany, keys, delMany } from "idb-keyval";
 import { LoadIndex, LoadState } from "./LoadState.svelte";
 
 export class IDBStore {
@@ -24,13 +24,27 @@ export class IDBStore {
 		}
 	}
 
-	clearDatabase() {
+	clearIDB() {
 		clear();
 		this.#values.clear();
 		this.#loadStates.forEach((loadState) => {
 			loadState.setState(LoadIndex.initialized);
 		});
 		// TODO: Keep defaults in case we want to reinitialize
+	}
+
+	async cleanIDB(goodKeys: string[], version: number, currentVersion: number) {
+		// Remove obsolete keys
+		keys().then((keys) => {
+			if (!(keys instanceof Array)) {
+				return;
+			}
+			const badKeys: string[] = keys.filter((key) => !goodKeys.includes(key as string)) as string[];
+			console.log("badKeys: " + badKeys);
+			delMany(badKeys);
+		});
+		// Update version specific stuff
+		this.setValue("version", currentVersion);
 	}
 
 	async getValues(keys: string[], defaultValues: unknown[], trace: boolean = false): Promise<unknown[]> {

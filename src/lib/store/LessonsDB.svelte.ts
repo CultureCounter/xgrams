@@ -1,7 +1,7 @@
 import { SourceIndex } from "./SourceDB.svelte.ts";
 import { LessonDB } from "./LessonDB.svelte.ts";
 
-export const currentVersion = 2; // increment for schema changes.
+export const currentVersion = 3; // increment for schema changes.
 
 export const OtherNames: { code: string; custom: string } = { code: "Code", custom: "Custom" };
 

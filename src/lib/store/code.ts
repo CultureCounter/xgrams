@@ -3,16 +3,16 @@ export enum CodeIndex {
 	cs,
 	go,
 	java,
-	javascript,
+	js,
 	python,
 	rust,
 	swift,
-	typescript,
+	ts,
 }
 
 export const CodeNames: string[] = ["C++", "C#", "Go", "Java", "Javascript", "Python", "Rust", "Swift", "Typescript"];
 
-export const CodeKeys: string[] = ["cpp", "cs", "go", "java", "javascript", "python", "rust", "swift", "typescript"];
+export const CodeKeys: string[] = ["cpp", "cs", "go", "java", "js", "python", "rust", "swift", "ts"];
 
 export class CodeXG {
 	[key: string]: string[];
@@ -21,11 +21,11 @@ export class CodeXG {
 	cs: string[] = [];
 	go: string[] = [];
 	java: string[] = [];
-	javascript: string[] = [];
+	js: string[] = [];
 	python: string[] = [];
 	rust: string[] = [];
 	swift: string[] = [];
-	typescript: string[] = [];
+	ts: string[] = [];
 }
 
 const code: CodeXG = {
@@ -329,7 +329,7 @@ const code: CodeXG = {
 		"volatile",
 		"while",
 	],
-	javascript: [
+	js: [
 		"await",
 		"break",
 		"case",
@@ -522,7 +522,7 @@ const code: CodeXG = {
 		"while",
 		"willSet",
 	],
-	typescript: [
+	ts: [
 		"any",
 		"as",
 		"boolean",

@@ -1,25 +1,15 @@
-export const ScopeNames = [
-	"Top 50",
-	"Top 100",
-	"Top 200",
-	"Top 500",
-	"Top 1000",
-	"Top 2000",
-	"Top 4000",
-	"Top 8000",
-	"Top 16000",
-];
+export const ScopeNames = ["50", "100", "200", "500", "1k", "2k", "4k", "8k", "16k"];
 export const ScopeValues = [50, 100, 200, 500, 1000, 2000, 4000, 8000, 16000];
 export const ScopeIndex = {
 	top50: 0,
 	top100: 1,
 	top200: 2,
 	top500: 3,
-	top1000: 4,
-	top2000: 5,
-	top4000: 6,
-	top8000: 7,
-	top16000: 8,
+	top1k: 4,
+	top2k: 5,
+	top4k: 6,
+	top8k: 7,
+	top16k: 8,
 };
 
 export class LessonDB {

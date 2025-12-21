@@ -159,7 +159,7 @@ describe("IDBStore", () => {
 				["key3", "value3"],
 			]);
 
-			store.clearDatabase();
+			store.clearIDB();
 
 			// Wait a moment for async clear
 			await new Promise((resolve) => setTimeout(resolve, 50));
@@ -177,7 +177,7 @@ describe("IDBStore", () => {
 			await store.getValues(keys, defaults);
 
 			// Clear the database
-			store.clearDatabase();
+			store.clearIDB();
 
 			// The LoadStates should be reset (though we can't directly verify internal state)
 			// We can verify the database is cleared

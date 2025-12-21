@@ -96,10 +96,11 @@ export const layouts = [
 	"NTESIROALPUFYW;QHD,C.X/ZMGJBKV7483920165'`\\\"_:=-+[]{}()<>|?~&$*#@!^%",
 	"HUTENOSAGPC.R,L'MKWJVQZ;DIFYBX8594032176-`\\\"_:][+/={}()<>|?~&$*#@!^%",
 	"JFKDLS;AURIEOWPQMV,C.X/ZHGYTNB7483920165'`\\\"_:=-+[]{}()<>|?~&$*#@!^%",
-	"",
-	"",
-	"",
-	"",
+	// TODO fix these fake ones:
+	"NTESIROALPUFYW;QHD,C.X/ZMGJBKV7483920165'`\\\"_:=-+[]{}()<>|?~&$*#@!^%",
+	"NTESIROALPUFYW;QHD,C.X/ZMGJBKV7483920165'`\\\"_:=-+[]{}()<>|?~&$*#@!^%",
+	"NTESIROALPUFYW;QHD,C.X/ZMGJBKV7483920165'`\\\"_:=-+[]{}()<>|?~&$*#@!^%",
+	"NTESIROALPUFYW;QHD,C.X/ZMGJBKV7483920165'`\\\"_:=-+[]{}()<>|?~&$*#@!^%",
 ];
 
 /**
@@ -115,7 +116,7 @@ export function getKeyCaps(keyboardIndex: KeyboardIndex, layoutIndex: LayoutInde
 	const keyboardSettings = keyboards[keyboardIndex];
 	const keyCaps = keyboardSettings.keyCaps;
 	const layout = layouts[layoutIndex];
-	// console.log("\ngetKeyCaps layout:"+layout);
+	// console.log("\ngetKeyCaps keyboardIndex:", keyboardIndex, "layoutIndex:", layoutIndex, "layout:", layout);
 	let i = 0;
 	for (const row of keyboardSettings.keyMaps) {
 		let s = "";
