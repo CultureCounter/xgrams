@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import { clear, getMany, setMany } from "idb-keyval";
+import { clear, keys, getMany, setMany } from "idb-keyval";
 import { LoadIndex, LoadState } from "./LoadState.svelte.ts";
 
 export class ServerStore<T extends object> {
@@ -11,9 +11,9 @@ export class ServerStore<T extends object> {
 	#value: T;
 	#loadState: LoadState;
 
-	constructor(name: string, keys: string[], props: (keyof T)[], url: string, initial: T, trace: boolean = false) {
+	constructor(name: string, myKeys: string[], props: (keyof T)[], url: string, initial: T, trace: boolean = false) {
 		this.#name = name;
-		this.#keys = keys;
+		this.#keys = myKeys;
 		this.#props = props;
 		this.#url = url;
 		this.#value = initial;
@@ -31,27 +31,41 @@ export class ServerStore<T extends object> {
 		}
 
 		this.#loadState.setState(LoadIndex.loadingIDB);
-		getMany(this.#keys)
-			.then((vals) => {
-				// Check if we have data for all keys
-				const hasAllData = vals.every((v, i) => {
-					if (v !== undefined) return true;
-					else {
-						console.error(`ServerStore[${this.#name}] getMany failed:`, this.#keys[i], v);
-						return false;
-					}
-				});
-				if (hasAllData) {
-					this.#updateValueFromIDB(vals);
-					this.#version += 1;
-					this.#loadState.setState(LoadIndex.loaded);
-				} else {
+		keys()
+			.then((keys) => {
+				const hasAllKeys = this.#keys.every((k) => keys.includes(k as string));
+				if (!hasAllKeys) {
+					console.log(`ServerStore[${this.#name}] hasAllKeys:`, hasAllKeys, keys, this.#keys);
 					this.#loadState.setState(LoadIndex.loadingServer);
 					this.#fetchFromServer();
+					return;
 				}
+				getMany(this.#keys)
+					.then((vals) => {
+						// Check if we have data for all keys
+						const hasAllData = vals.every((v, i) => {
+							if (v !== undefined) return true;
+							else {
+								console.error(`ServerStore[${this.#name}] getMany failed:`, this.#keys[i], v);
+								return false;
+							}
+						});
+						if (hasAllData) {
+							this.#updateValueFromIDB(vals);
+							this.#version += 1;
+							this.#loadState.setState(LoadIndex.loaded);
+						} else {
+							this.#loadState.setState(LoadIndex.loadingServer);
+							this.#fetchFromServer();
+						}
+					})
+					.catch((e) => {
+						console.error(`ServerStore[${this.#name}] getMany failed:`, e);
+						this.#loadState.setState(LoadIndex.error);
+					});
 			})
 			.catch((e) => {
-				console.error(`ServerStore[${this.#name}] getMany failed:`, e);
+				console.error(`ServerStore[${this.#name}] keys failed:`, e);
 				this.#loadState.setState(LoadIndex.error);
 			});
 	}

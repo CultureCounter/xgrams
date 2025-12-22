@@ -353,6 +353,7 @@
 		}
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function averageWPM(lineIndex: number): number {
 		if (currentLesson.WPMs?.length == 0) {
 			return 0;
@@ -364,15 +365,6 @@
 		let average = sum / currentLesson.WPMs?.length;
 		return Math.round(average);
 	}
-
-	// function onLessonsChanged(lessons: LessonsDB) {
-	// 	console.log("onLessonsChanged, generateLines", lessons);
-	// 	// if (idbSources.bigrams == null) {
-	// 	// 	console.log("onLessonsChanged idbSources.bigrams == null, return");
-	// 	// 	return;
-	// 	// }
-	// 	lines = generateLines(currentLesson.combination, currentLesson.repetition, currentLesson.filter);
-	// }
 
 	function handleMouseOver() {
 		isMouseInside = true;

@@ -184,11 +184,12 @@
 
 	const articleClassV = "flex flex-col justify-center space-y-2";
 	const articleClassH = "flex flex-row justify-stretch space-x-2";
+	const dropdownLabelClass = "label w-full max-w-48";
 </script>
 
 <!-- <button class="btn h-0 px-0" onclick={getAvailableFonts}>Get Available Fonts</button> -->
 <article class={articleClassH}>
-	<label class="label" for="font-family-select">
+	<label class={dropdownLabelClass} for="font-family-select">
 		<span>Font Family</span>
 		<select
 			class="select"
@@ -206,7 +207,7 @@
 			{/each}
 		</select>
 	</label>
-	<label class="label" for="font-size-select">
+	<label class={dropdownLabelClass} for="font-size-select">
 		<span>Font Size</span>
 		<select
 			class="select"
@@ -224,7 +225,7 @@
 			{/each}
 		</select>
 	</label>
-	<label class="label" for="font-weight-select">
+	<label class={dropdownLabelClass} for="font-weight-select">
 		<span>Font Weight</span>
 		<select
 			class="select"
@@ -242,7 +243,7 @@
 			{/each}
 		</select>
 	</label>
-	<label class="label" for="font-spacing-select">
+	<label class={dropdownLabelClass} for="font-spacing-select">
 		<span>Font Spacing</span>
 		<select
 			class="select"
@@ -263,6 +264,10 @@
 </article>
 <header class="card-header">Font Legibility Test</header>
 <article class={articleClassV}>
-	<span class="bg-transparent {font}">il1IL1 dbdqpq DBDQPQ ij., fgjty rnmrn RNMRN o0O</span>
-	<span class="bg-transparent {font}">Sphinx of black quartz, judge my vow! 1234567890</span>
+	<span class="bg-transparent {font} align-middle"
+		>il1IL1 dbdqpq DBDQPQ ij., fgjty rnmrn RNMRN o0O ABCDEFGHIJKLMNOPQRSTUVWXYZ</span
+	>
+	<span class="bg-transparent {font} align-middle"
+		>Sphinx of black quartz, judge my vow! 1234567890 abcdefghijklmnopqrstuvwxyz</span
+	>
 </article>
