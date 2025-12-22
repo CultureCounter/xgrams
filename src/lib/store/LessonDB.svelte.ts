@@ -38,6 +38,12 @@ export class LessonDB {
 	}
 }
 
+/**
+ * Transfer values from lesson to lessonDB
+ * @param lesson temporary cancellable lesson
+ * @param lessonDB persistent to DB
+ * @returns true if any values changed
+ */
 export const transferTo = (lesson: LessonDB, lessonDB: LessonDB): boolean => {
 	let didChange = false;
 	if (lessonDB.scope !== lesson.scope) {

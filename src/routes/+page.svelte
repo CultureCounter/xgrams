@@ -14,7 +14,7 @@
 	import { LessonDB, transferTo } from "$lib/store/LessonDB.svelte";
 	import { SettingsDB } from "$lib/store/SettingsDB.svelte";
 	import { CodeXG } from "$lib/store/code";
-	import { SourceXG } from "$lib/store/SourceDB.svelte";
+	import { SourceAllIndex, SourceXG } from "$lib/store/SourceDB.svelte";
 	import { LoadState } from "$lib/store/LoadState.svelte";
 	import { ServerStore } from "$lib/store/ServerStore.svelte";
 	import { CodeKeys } from "$lib/store/code";
@@ -22,6 +22,7 @@
 	import { arrayCopyBoolean, arrayCopyString, arrayEqualBoolean, arrayEqualString } from "$lib/utilities/utils";
 	import type { ColorIndex } from "$lib/store/Colors.svelte";
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function clearAll() {
 		idbStore.clearIDB(); // For testing purposes only, clear the database on each load
 		localStorage.clear();
@@ -31,7 +32,7 @@
 	// TODO: https://svelte.dev/tutorial/svelte/svelte-head
 	// TODO: minimal defaults
 
-	const IDBKeys = ["idbLessons", "idbSettings", "idbCustomWords", "idbCodeChoices"];
+	const IDBKeys = ["idbLessons", "idbSettings", "idbCustomWords", "idbCodeChoices", "idbLessonIndex"];
 	const AllKeys = [...IDBKeys, ...CodeKeys, ...SourceKeys];
 
 	const isTracing = false;
@@ -63,6 +64,8 @@
 	let idbCustomWords: string[] = [];
 	// svelte-ignore non_reactive_update
 	let idbCodeChoices: boolean[] = [];
+	// svelte-ignore non_reactive_update
+	let idbLessonIndex = SourceAllIndex.bigrams;
 
 	// svelte-ignore non_reactive_update
 	let currentLesson = null as unknown as LessonDB;
@@ -79,6 +82,7 @@
 				new SettingsDB(),
 				[] as string[],
 				[true, false, false, false, false, false, false, false, false] as boolean[],
+				SourceAllIndex.bigrams,
 			],
 			isTracing
 		)
@@ -93,7 +97,8 @@
 			idbSettings = new SettingsDB(values[1] as SettingsDB);
 			arrayCopyString(values[2] as string[], idbCustomWords);
 			arrayCopyBoolean(values[3] as boolean[], idbCodeChoices);
-			currentLesson = new LessonDB(idbLessons.sourceLessons[idbLessons.lessonIndex]);
+			idbLessonIndex = (values[4] as SourceAllIndex) || SourceAllIndex.bigrams;
+			currentLesson = new LessonDB(idbLessons.sourceLessons[idbLessonIndex]);
 			colorIndex = idbSettings.colorIndex;
 			font = idbSettings.font;
 			idbLoading = false;
@@ -108,17 +113,19 @@
 
 	function onLessonChanged(
 		settingsDB: SettingsDB,
+		newLessonIndex: SourceAllIndex,
 		currentLesson: LessonDB,
 		lessonsDB: LessonsDB,
 		codeChoices?: boolean[],
 		customWords?: string[]
 	) {
 		// Save dirty settings
-		onSettingsChanged(settingsDB, currentLesson, lessonsDB, codeChoices, customWords);
+		onSettingsChanged(settingsDB, idbLessonIndex, currentLesson, lessonsDB, codeChoices, customWords);
 
-		if (currentLesson !== idbLessons.sourceLessons[idbLessons.lessonIndex]) {
-			transferTo(currentLesson, idbLessons.sourceLessons[idbLessons.lessonIndex]);
-			console.log("onLessonChanged(): " + idbLessons.lessonIndex);
+		if (currentLesson !== idbLessons.sourceLessons[newLessonIndex]) {
+			transferTo(idbLessons.sourceLessons[newLessonIndex], currentLesson);
+			idbLessonIndex = newLessonIndex;
+			idbStore.setValue("idbLessonIndex", idbLessonIndex);
 			typist?.initializeLesson();
 		}
 	}
@@ -128,6 +135,7 @@
 	 */
 	function onSettingsChanged(
 		settingsDB: SettingsDB,
+		lessonIndex: SourceAllIndex,
 		currentLesson: LessonDB,
 		lessonsDB: LessonsDB,
 		codeChoices?: boolean[],
@@ -141,7 +149,7 @@
 			settingsDB.isDirty = false;
 		}
 		if (lessonsDB.isDirty) {
-			let target = lessonsDB.sourceLessons[lessonsDB.lessonIndex];
+			let target = lessonsDB.sourceLessons[idbLessonIndex];
 			transferTo(currentLesson, target);
 			idbStore.setValue("idbLessons", lessonsDB);
 			lessonsDB.isDirty = false;
@@ -195,8 +203,9 @@
 			</div>
 			<div class="object-right">
 				<Settings
-					bind:idbLessons
+					bind:idbLessonIndex
 					bind:currentLesson
+					bind:idbLessons
 					bind:idbSettings
 					{idbCodeChoices}
 					{idbCustomWords}
@@ -208,7 +217,7 @@
 			</div>
 		</div>
 		<Typist
-			bind:this={typist}
+			bind:idbLessonIndex
 			bind:idbLessons
 			bind:currentLesson
 			bind:idbSettings
@@ -218,6 +227,7 @@
 			bind:idbCustomWords
 			{colorIndex}
 			{font}
+			bind:this={typist}
 		></Typist>
 		<Keyboard bind:idbSettings {colorIndex} {font}></Keyboard>
 	{/if}

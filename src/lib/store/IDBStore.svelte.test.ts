@@ -237,8 +237,8 @@ describe("IDBStore", () => {
 		describe("idbLessons (LessonsDB)", () => {
 			it("should handle LessonsDB object", async () => {
 				const lessons = new LessonsDB();
-				lessons.lessonIndex = SourceIndex.trigrams;
-				lessons.sourceLessons[1] = new LessonDB({
+				const lessonIndex = SourceIndex.trigrams;
+				lessons.sourceLessons[lessonIndex] = new LessonDB({
 					scope: 15,
 					combination: 25,
 					repetition: 35,
@@ -252,12 +252,11 @@ describe("IDBStore", () => {
 				const values = await store.getValues(keys, [new LessonsDB()]);
 				const retrieved = values[0] as LessonsDB;
 
-				expect(retrieved.lessonIndex).toBe(SourceIndex.trigrams);
-				expect(retrieved.sourceLessons[1].scope).toBe(15);
-				expect(retrieved.sourceLessons[1].combination).toBe(25);
-				expect(retrieved.sourceLessons[1].repetition).toBe(35);
-				expect(retrieved.sourceLessons[1].filter).toBe("test filter");
-				expect(retrieved.sourceLessons[1].WPMs).toEqual([50, 60, 70]);
+				expect(retrieved.sourceLessons[lessonIndex].scope).toBe(15);
+				expect(retrieved.sourceLessons[lessonIndex].combination).toBe(25);
+				expect(retrieved.sourceLessons[lessonIndex].repetition).toBe(35);
+				expect(retrieved.sourceLessons[lessonIndex].filter).toBe("test filter");
+				expect(retrieved.sourceLessons[lessonIndex].WPMs).toEqual([50, 60, 70]);
 			});
 
 			it("should handle default LessonsDB when nothing is stored", async () => {
@@ -267,7 +266,6 @@ describe("IDBStore", () => {
 				const values = await store.getValues(keys, [defaultLessons]);
 				const retrieved = values[0] as LessonsDB;
 
-				expect(retrieved.lessonIndex).toBe(SourceIndex.bigrams);
 				expect(retrieved.sourceLessons.length).toBe(defaultLessons.sourceLessons.length);
 			});
 		});
@@ -316,7 +314,6 @@ describe("IDBStore", () => {
 			const customWords = ["test", "words"];
 			const codeWords = [true, false, true, false, true, false, true, false, true];
 			const lessons = new LessonsDB();
-			lessons.lessonIndex = SourceIndex.words;
 			const settings = new SettingsDB();
 			settings.volume = 80;
 
@@ -335,14 +332,12 @@ describe("IDBStore", () => {
 
 			expect(values[0]).toEqual(customWords);
 			expect(values[1]).toEqual(codeWords);
-			expect((values[2] as LessonsDB).lessonIndex).toBe(SourceIndex.words);
 			expect((values[3] as SettingsDB).volume).toBe(80);
 		});
 
 		it("should handle mixed defaults and existing values for all four types", async () => {
 			const customWords = ["existing", "words"];
 			const lessons = new LessonsDB();
-			lessons.lessonIndex = 5;
 
 			// Store only two of the four
 			await setMany([
@@ -362,7 +357,6 @@ describe("IDBStore", () => {
 
 			// Existing values
 			expect(values[0]).toEqual(customWords);
-			expect((values[2] as LessonsDB).lessonIndex).toBe(5);
 
 			// Default values
 			expect(values[1]).toEqual([false, false, false, false, false, false, false, false, false]);
@@ -373,7 +367,6 @@ describe("IDBStore", () => {
 			const customWords = ["updated", "custom"];
 			const codeWords = [true, true, false, false, true, true, false, false, true];
 			const lessons = new LessonsDB();
-			lessons.lessonIndex = SourceIndex.pangrams;
 			const settings = new SettingsDB();
 			settings.minimumWPM = 60;
 
@@ -389,7 +382,6 @@ describe("IDBStore", () => {
 
 			expect(retrieved[0]).toEqual(customWords);
 			expect(retrieved[1]).toEqual(codeWords);
-			expect((retrieved[2] as LessonsDB).lessonIndex).toBe(SourceIndex.pangrams);
 			expect((retrieved[3] as SettingsDB).minimumWPM).toBe(60);
 		});
 	});

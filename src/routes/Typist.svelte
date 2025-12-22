@@ -15,6 +15,7 @@
 
 	type Props = {
 		// Define the expected type for the prop
+		idbLessonIndex: SourceAllIndex;
 		currentLesson: LessonDB;
 		idbLessons: LessonsDB;
 		idbSettings: SettingsDB;
@@ -26,6 +27,7 @@
 		font: string;
 	};
 	let {
+		idbLessonIndex = $bindable<SourceAllIndex>(),
 		currentLesson = $bindable<LessonDB>(),
 		idbLessons = $bindable<LessonsDB>(),
 		idbSettings = $bindable<SettingsDB>(),
@@ -66,7 +68,7 @@
 	 * Lessons are a series of `lines`
 	 */
 	export function initializeLesson() {
-		if (idbLessons.lessonIndex == SourceAllIndex.code) updateCodeWords(idbCodeChoices);
+		if (idbLessonIndex == SourceAllIndex.code) updateCodeWords(idbCodeChoices);
 		lines = generateLines();
 		expectedLine = lines[0] || "";
 		linesIndex = 0;
@@ -85,7 +87,7 @@
 		let repetitions = currentLesson.repetition;
 		let filter = currentLesson.filter;
 		let scope = currentLesson.scope;
-		let index = idbLessons.lessonIndex;
+		let index = idbLessonIndex;
 		let source: string[];
 		if (index == SourceAllIndex.code) source = codesSource;
 		else if (index == SourceAllIndex.custom) source = idbCustomWords;

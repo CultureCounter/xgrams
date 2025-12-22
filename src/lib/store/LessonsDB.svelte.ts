@@ -1,4 +1,3 @@
-import { SourceIndex } from "./SourceDB.svelte.ts";
 import { LessonDB } from "./LessonDB.svelte.ts";
 
 export const currentVersion = 3; // increment for schema changes.
@@ -24,15 +23,10 @@ export class LessonsDB {
 		new LessonDB(),
 	];
 
-	// public source: number = SourceIndex.bigrams;
-	public lessonIndex: number = SourceIndex.bigrams;
-
 	constructor(init?: Partial<LessonsDB>) {
 		if (init) {
 			if (init.version !== undefined) this.version = init.version;
-			// if (init.source !== undefined) this.source = init.source;
 			if (init.sourceLessons !== undefined) this.sourceLessons = init.sourceLessons;
-			if (init.lessonIndex !== undefined) this.lessonIndex = init.lessonIndex;
 		}
 	}
 

@@ -3,18 +3,17 @@
 	import CheckIcon from "@lucide/svelte/icons/check";
 
 	type Props = {
-		filter: string;
+		filterString: string;
 		filterChanged: (filter: string) => void;
 		colorIndex: ColorIndex;
 	};
-	let { filter, filterChanged, colorIndex = $bindable<ColorIndex>() }: Props = $props();
+	let { filterString = $bindable<string>(), filterChanged, colorIndex = $bindable<ColorIndex>() }: Props = $props();
 
 	let myTextArea: HTMLTextAreaElement;
 	function saveFilter() {
-		filter = myTextArea.value;
-		filterChanged(filter);
+		filterChanged(myTextArea.value);
 	}
-	let textAreaValue = $derived<string>(filter);
+	let textAreaValue = $derived<string>(filterString);
 
 	const clickButtonClass = $derived(
 		"btn backdrop-blur-xl space-y-4 border-2 "

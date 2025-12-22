@@ -10,7 +10,7 @@
 	import { LessonDB, ScopeIndex, ScopeNames, ScopeValues } from "$lib/store/LessonDB.svelte";
 	import { LessonsDB } from "$lib/store/LessonsDB.svelte";
 	import { SettingsDB, SoundIndex, SoundNames } from "$lib/store/SettingsDB.svelte";
-	import { SourceIndex, SourceNames } from "$lib/store/SourceDB.svelte";
+	import { SourceAllIndex, SourceIndex, SourceNames } from "$lib/store/SourceDB.svelte";
 	import { KeyboardIndex, KeyboardNames, LayoutIndex, LayoutNames } from "$lib/store/keyboard";
 	import { Dialog, Portal, SegmentedControl, Switch } from "@skeletonlabs/skeleton-svelte";
 	import { setVolume } from "./PlaySounds.svelte";
@@ -42,6 +42,7 @@
 
 	type Props = {
 		// Define the expected type for the prop
+		idbLessonIndex: SourceAllIndex;
 		currentLesson: LessonDB;
 		idbLessons: LessonsDB;
 		idbSettings: SettingsDB;
@@ -49,6 +50,7 @@
 		idbCodeChoices: boolean[];
 		onLessonChanged: (
 			settingsDB: SettingsDB,
+			newLessonIndex: SourceAllIndex,
 			currentLesson: LessonDB,
 			lessonsDB: LessonsDB,
 			codeChoices?: boolean[],
@@ -56,6 +58,7 @@
 		) => void;
 		onSettingsChanged: (
 			settingsDB: SettingsDB,
+			lessonIndex: SourceAllIndex,
 			currentLesson: LessonDB,
 			lessonsDB: LessonsDB,
 			codeChoices?: boolean[],
@@ -65,15 +68,16 @@
 		font: string;
 	};
 	let {
-		currentLesson = $bindable(),
-		idbLessons = $bindable(),
-		idbSettings = $bindable(),
+		idbLessonIndex = $bindable<SourceAllIndex>(),
+		currentLesson = $bindable<LessonDB>(),
+		idbLessons = $bindable<LessonsDB>(),
+		idbSettings = $bindable<SettingsDB>(),
 		idbCustomWords,
 		idbCodeChoices,
 		onLessonChanged,
 		onSettingsChanged,
 		colorIndex = $bindable<ColorIndex>(),
-		font = $bindable(),
+		font = $bindable<string>(),
 	}: Props = $props();
 
 	// Avoid Aria whining using conditional display not popups
@@ -128,13 +132,21 @@
 		idbSettings.isDirty = true;
 	}
 
-	let sourceValue = $state<string>(SourceNames[idbLessons.lessonIndex]);
+	let sourceValue = $state<string>(SourceNames[idbLessonIndex]);
 	function setSource(newSource: string | null): void {
-		sourceValue = newSource ?? SourceNames[SourceIndex.bigrams];
-		let index = SourceNames.indexOf(sourceValue);
-		idbLessons.lessonIndex = index;
-		idbLessons.isDirty = true;
-		onLessonChanged(idbSettings, currentLesson, idbLessons, idbCodeChoices, idbCustomWords);
+		if (newSource === null) {
+			return;
+		}
+		let newIndex = SourceNames.indexOf(newSource);
+		if (newIndex === idbLessonIndex) {
+			return;
+		}
+		onLessonChanged(idbSettings, newIndex, currentLesson, idbLessons, idbCodeChoices, idbCustomWords);
+		scopeValue = currentLesson.scope.toString();
+		combination = currentLesson.combination;
+		repetition = currentLesson.repetition;
+		filterString = currentLesson.filter;
+		sourceValue = SourceNames[idbLessonIndex];
 	}
 
 	let scopeValue = $state<string>(currentLesson.scope.toString());
@@ -171,13 +183,16 @@
 		customString = newCustom;
 	}
 
+	let filterString = $state<string>(currentLesson.filter);
 	function filterChanged(newFilter: string): void {
+		filterString = newFilter;
 		currentLesson.filter = newFilter;
+		idbLessons.isDirty = true;
 	}
 
 	function saveSettings(): void {
 		const customArray = customString.split(/\s+/);
-		onSettingsChanged(idbSettings, currentLesson, idbLessons, newCodeChoices, customArray);
+		onSettingsChanged(idbSettings, idbLessonIndex, currentLesson, idbLessons, newCodeChoices, customArray);
 	}
 
 	const animBackdrop =
@@ -201,6 +216,7 @@
 			+ BGColors[colorIndex]
 			+ " rounded-lg"
 	);
+	const dropdownLabelClass = "label w-full max-w-48";
 	const iconButtonClass =
 		"focus:ring-opacity-50 rounded-full text-white hover:bg-blue-600 focus:ring-2 focus:ring-blue-900 focus:outline-none";
 	const articleClassV = "flex flex-col justify-between space-y-2";
@@ -443,7 +459,7 @@
 									</button>
 								</div>
 							</div>
-							<label class="label" for="color-select">
+							<label class={dropdownLabelClass} for="color-select">
 								<span>Color</span>
 								<select
 									class="select"
@@ -461,7 +477,7 @@
 									{/each}
 								</select>
 							</label>
-							<label class="label" for="select-keyboard">
+							<label class={dropdownLabelClass} for="select-keyboard">
 								<span>Keyboard</span>
 								<select
 									class="select"
@@ -479,7 +495,7 @@
 									{/each}
 								</select>
 							</label>
-							<label class="label" for="select-keyboard-layout">
+							<label class={dropdownLabelClass} for="select-keyboard-layout">
 								<span>Layout</span>
 								<select
 									class="select"
@@ -517,8 +533,7 @@
 						<div class={cardClass}>
 							<header class="card-header">Filter</header>
 							<article class={articleClassH}>
-								<OptionsFilter filter={currentLesson.filter} {filterChanged} {colorIndex}
-								></OptionsFilter>
+								<OptionsFilter {filterString} {filterChanged} {colorIndex}></OptionsFilter>
 							</article>
 						</div>
 					{:else if conditionalDisplay === "code"}
