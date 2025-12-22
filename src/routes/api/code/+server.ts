@@ -6,11 +6,11 @@ data.cpp = code.cpp;
 data.cs = code.cs;
 data.go = code.go;
 data.java = code.java;
-data.javascript = code.javascript;
+data.js = code.js;
 data.python = code.python;
 data.rust = code.rust;
 data.swift = code.swift;
-data.typescript = code.typescript;
+data.ts = code.ts;
 
 const jsonString = JSON.stringify(data);
 

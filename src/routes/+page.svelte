@@ -182,9 +182,9 @@
 					{/snippet}
 				</Darklight>
 			</div>
-			<div class="object-left p-6">
+			<!-- <div class="object-left p-6">
 				<button class="btn" onclick={clearAll}>Debug Clears Data</button>
-			</div>
+			</div> -->
 			<div class="object-center">
 				<h1
 					style="font-size: 3em"

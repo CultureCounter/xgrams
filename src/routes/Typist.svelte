@@ -157,11 +157,11 @@
 			...(idbCodeChoices[CodeIndex.cs] ? idbCodes.current.cs : []),
 			...(idbCodeChoices[CodeIndex.go] ? idbCodes.current.go : []),
 			...(idbCodeChoices[CodeIndex.java] ? idbCodes.current.java : []),
-			...(idbCodeChoices[CodeIndex.javascript] ? idbCodes.current.javascript : []),
+			...(idbCodeChoices[CodeIndex.js] ? idbCodes.current.js : []),
 			...(idbCodeChoices[CodeIndex.python] ? idbCodes.current.python : []),
 			...(idbCodeChoices[CodeIndex.rust] ? idbCodes.current.rust : []),
 			...(idbCodeChoices[CodeIndex.swift] ? idbCodes.current.swift : []),
-			...(idbCodeChoices[CodeIndex.typescript] ? idbCodes.current.typescript : [])
+			...(idbCodeChoices[CodeIndex.ts] ? idbCodes.current.ts : [])
 		);
 	}
 
@@ -353,7 +353,7 @@
 		}
 	}
 
-	function averageWPM(): number {
+	function averageWPM(lineIndex: number): number {
 		if (currentLesson.WPMs?.length == 0) {
 			return 0;
 		}
@@ -428,9 +428,9 @@
 			</div>
 		</h2>
 		<h3 class="mt-0 flex place-content-center gap-x-3">
-			<span>WPM: {rawWPM}</span>
-			<span>Accuracy: {accuracy}%</span>
-			<span>Average WPM: {averageWPM()}</span>
+			<span>WPM: {rawWPM} / {idbSettings.minimumWPM}</span>
+			<span>Accuracy: {accuracy}% / {idbSettings.minimumAccuracy}</span>
+			<span>Average WPM: {averageWPM(linesIndex)}</span>
 		</h3>
 	</div>
 </div>
