@@ -1,3 +1,5 @@
+import type { FingerIndex } from "./keyboard";
+
 export enum ColorIndex {
 	red = 0,
 	orange,
@@ -321,3 +323,35 @@ export const BorderColors: string[] = [
 // ColorNames.forEach((colorName) => {
 // 	BorderColor.push("border-" + colorName + "-900 dark:border-" + colorName + "-400");
 // });
+
+// Finger colors for 10-finger touch typing (indexed by FingerIndex from keyboard.ts)
+// Symmetric colors: same finger on each hand gets the same color
+export const FingerColors = [
+	"bg-red-200 dark:bg-red-800", // leftPinky (0)
+	"bg-orange-200 dark:bg-orange-800", // leftRing (1)
+	"bg-yellow-200 dark:bg-yellow-800", // leftMiddle (2)
+	"bg-fuchsia-200 dark:bg-fuchsia-800", // leftIndex (3)
+	"bg-violet-200 dark:bg-violet-800", // leftThumb (4)
+	"bg-sky-200 dark:bg-sky-800", // rightThumb (5)
+	"bg-blue-200 dark:bg-blue-800", // rightIndex (6)
+	"bg-yellow-200 dark:bg-yellow-800", // rightMiddle (7)
+	"bg-orange-200 dark:bg-orange-800", // rightRing (8)
+	"bg-red-200 dark:bg-red-800", // rightPinky (9)
+];
+
+// Highlight ring for next key to type
+export const NextFingerColor = [
+	"ring-red-700 dark:ring-red-300", // leftPinky (0)
+	"ring-orange-700 dark:ring-orange-300", // leftRing (1)
+	"ring-yellow-700 dark:ring-yellow-300", // leftMiddle (2)
+	"ring-fuchsia-700 dark:ring-fuchsia-300", // leftIndex (3)
+	"ring-violet-700 dark:ring-violet-300", // leftThumb (4)
+	"ring-sky-700 dark:ring-sky-300", // rightThumb (5)
+	"ring-blue-700 dark:ring-blue-300", // rightIndex (6)
+	"ring-yellow-700 dark:ring-yellow-300", // rightMiddle (7)
+	"ring-orange-700 dark:ring-orange-300", // rightRing (8)
+	"ring-red-700 dark:ring-red-300", // rightPinky (9)
+];
+export const getNextFingerColor = (fingerIndex: FingerIndex) => {
+	return " ring-6 " + NextFingerColor[fingerIndex] + " animate-pulse";
+};

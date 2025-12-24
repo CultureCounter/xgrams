@@ -7,13 +7,22 @@
 		getHourStrokeFill,
 		HourStrokeColors,
 	} from "$lib/store/Colors.svelte";
+	import Counter from "./Counter.svelte";
 	import { LessonDB, ScopeIndex, ScopeNames, ScopeValues } from "$lib/store/LessonDB.svelte";
 	import { LessonsDB } from "$lib/store/LessonsDB.svelte";
 	import { SettingsDB, SoundIndex, SoundNames } from "$lib/store/SettingsDB.svelte";
 	import { SourceAllIndex, SourceIndex, SourceNames } from "$lib/store/SourceDB.svelte";
-	import { KeyboardIndex, KeyboardNames, LayoutIndex, LayoutNames } from "$lib/store/keyboard";
 	import { Dialog, Portal, SegmentedControl, Switch } from "@skeletonlabs/skeleton-svelte";
 	import { setVolume } from "./PlaySounds.svelte";
+
+	import Fonts from "./Fonts.svelte";
+	import FontInfo from "./FontInfo.svelte";
+	import OptionsCode from "./OptionsCode.svelte";
+	import OptionsCustom from "./OptionsCustom.svelte";
+	import OptionsFilter from "./OptionsFilter.svelte";
+	import OptionsKeyboard from "./OptionsKeyboard.svelte";
+	import { OtherNames } from "$lib/store/LessonsDB.svelte";
+
 	import MusicIcon from "@lucide/svelte/icons/music";
 	import PawPrintIcon from "@lucide/svelte/icons/paw-print";
 	import BugIcon from "@lucide/svelte/icons/bug";
@@ -31,14 +40,6 @@
 	import Dice6Icon from "@lucide/svelte/icons/dice-6";
 	import PandaIcon from "@lucide/svelte/icons/panda";
 	import BookOpenTextIcon from "@lucide/svelte/icons/book-open-text";
-
-	import Counter from "./Counter.svelte";
-	import Fonts from "./Fonts.svelte";
-	import OptionsCode from "./OptionsCode.svelte";
-	import OptionsCustom from "./OptionsCustom.svelte";
-	import OptionsFilter from "./OptionsFilter.svelte";
-	import { OtherNames } from "$lib/store/LessonsDB.svelte";
-	import FontInfo from "./FontInfo.svelte";
 
 	type Props = {
 		// Define the expected type for the prop
@@ -81,7 +82,7 @@
 	}: Props = $props();
 
 	// Avoid Aria whining using conditional display not popups
-	type ConditionalDisplay = "fonts" | "fontInfo" | "filter" | "code" | "custom";
+	type ConditionalDisplay = "code" | "custom" | "filter" | "fonts" | "fontInfo" | "keyboard";
 	let conditionalDisplay = $state<ConditionalDisplay>("fonts");
 
 	let minimumWPM = $state(idbSettings.minimumWPM);
@@ -117,18 +118,6 @@
 	function setColor(): void {
 		colorIndex = selectedColor;
 		idbSettings.colorIndex = selectedColor;
-		idbSettings.isDirty = true;
-	}
-
-	let selectedKeyboard: KeyboardIndex = $state(idbSettings?.keyboard ?? KeyboardIndex.matrix);
-	function setKeyboard(): void {
-		idbSettings.keyboard = selectedKeyboard;
-		idbSettings.isDirty = true;
-	}
-
-	let selectedLayout: LayoutIndex = $state(idbSettings?.layout ?? LayoutIndex.colemakDH);
-	function setLayout(): void {
-		idbSettings.layout = selectedLayout;
 		idbSettings.isDirty = true;
 	}
 
@@ -216,11 +205,12 @@
 			+ BGColors[colorIndex]
 			+ " rounded-lg"
 	);
-	const dropdownLabelClass = "label w-full max-w-48";
 	const iconButtonClass =
 		"focus:ring-opacity-50 rounded-full text-white hover:bg-blue-600 focus:ring-2 focus:ring-blue-900 focus:outline-none";
 	const articleClassV = "flex flex-col justify-between space-y-2";
 	const articleClassH = "flex flex-row justify-between space-x-2";
+
+	const dropdownLabelClass = "label w-full max-w-48";
 </script>
 
 <Dialog restoreFocus={true} onOpenChange={saveSettings}>
@@ -438,26 +428,33 @@
 				<article class="flex flex-col gap-2">
 					<div class={cardClass}>
 						<article class={articleClassH}>
-							<div class={articleClassV}>
-								<div>
-									<button
-										type="button"
-										class={clickButtonClass}
-										onclick={() => {
-											conditionalDisplay = "fonts";
-										}}>Fonts</button
-									>
-								</div>
-								<div>
-									<button
-										class={iconButtonClass}
-										onclick={() => {
-											conditionalDisplay = "fontInfo";
-										}}
-									>
-										<InfoIcon class={HourStrokeColors[colorIndex]} size={24} />
-									</button>
-								</div>
+							<div>
+								<button
+									type="button"
+									class={clickButtonClass}
+									onclick={() => {
+										conditionalDisplay = "fonts";
+									}}>Fonts</button
+								>
+							</div>
+							<div>
+								<button
+									class={iconButtonClass}
+									onclick={() => {
+										conditionalDisplay = "fontInfo";
+									}}
+								>
+									<InfoIcon class={HourStrokeColors[colorIndex]} size={24} />
+								</button>
+							</div>
+							<div>
+								<button
+									type="button"
+									class={clickButtonClass}
+									onclick={() => {
+										conditionalDisplay = "keyboard";
+									}}>Keyboard</button
+								>
 							</div>
 							<label class={dropdownLabelClass} for="color-select">
 								<span>Color</span>
@@ -477,66 +474,11 @@
 									{/each}
 								</select>
 							</label>
-							<label class={dropdownLabelClass} for="select-keyboard">
-								<span>Keyboard</span>
-								<select
-									class="select"
-									id="select-keyboard"
-									name="Keyboard Selection"
-									bind:value={selectedKeyboard}
-									onchange={() => {
-										setKeyboard();
-									}}
-								>
-									{#each KeyboardNames as name, i (name)}
-										<option value={i}>
-											{name}
-										</option>
-									{/each}
-								</select>
-							</label>
-							<label class={dropdownLabelClass} for="select-keyboard-layout">
-								<span>Layout</span>
-								<select
-									class="select"
-									id="select-keyboard-layout"
-									name="Keyboard Layout Selection"
-									bind:value={selectedLayout}
-									onchange={() => {
-										setLayout();
-									}}
-								>
-									{#each LayoutNames as name, i (name)}
-										<option value={i}>
-											{name}
-										</option>
-									{/each}
-								</select>
-							</label>
 						</article>
 					</div>
 				</article>
 				<article class="flex flex-col justify-between gap-2">
-					{#if conditionalDisplay === "fonts"}
-						<div class={cardClass}>
-							<header class="card-header">Font</header>
-							<Fonts bind:font bind:idbSettings />
-						</div>
-					{:else if conditionalDisplay === "fontInfo"}
-						<div class={cardClass}>
-							<header class="card-header">Font Download Links</header>
-							<article class={articleClassH}>
-								<FontInfo />
-							</article>
-						</div>
-					{:else if conditionalDisplay === "filter"}
-						<div class={cardClass}>
-							<header class="card-header">Filter</header>
-							<article class={articleClassH}>
-								<OptionsFilter {filterString} {filterChanged} {colorIndex}></OptionsFilter>
-							</article>
-						</div>
-					{:else if conditionalDisplay === "code"}
+					{#if conditionalDisplay === "code"}
 						<div class={cardClass}>
 							<header class="card-header">Code</header>
 							<article class={articleClassH}>
@@ -548,6 +490,32 @@
 							<header class="card-header">Custom</header>
 							<article class={articleClassH}>
 								<OptionsCustom {customString} {customChanged} {colorIndex}></OptionsCustom>
+							</article>
+						</div>
+					{:else if conditionalDisplay === "filter"}
+						<div class={cardClass}>
+							<header class="card-header">Filter</header>
+							<article class={articleClassH}>
+								<OptionsFilter {filterString} {filterChanged} {colorIndex}></OptionsFilter>
+							</article>
+						</div>
+					{:else if conditionalDisplay === "fonts"}
+						<div class={cardClass}>
+							<header class="card-header">Font</header>
+							<Fonts bind:font bind:idbSettings />
+						</div>
+					{:else if conditionalDisplay === "fontInfo"}
+						<div class={cardClass}>
+							<header class="card-header">Font Download Links</header>
+							<article class={articleClassH}>
+								<FontInfo />
+							</article>
+						</div>
+					{:else if conditionalDisplay === "keyboard"}
+						<div class={cardClass}>
+							<header class="card-header">Keyboard</header>
+							<article class={articleClassH}>
+								<OptionsKeyboard {idbSettings}></OptionsKeyboard>
 							</article>
 						</div>
 					{/if}

@@ -5,53 +5,64 @@
  -->
 <script lang="ts">
 	import KeyCap from "./KeyCap.svelte";
-	import { keyboards, getKeyCaps, KeyboardIndex, LayoutIndex } from "$lib/store/keyboard";
-	import type { SettingsDB } from "$lib/store/SettingsDB.svelte";
+	import { keyboards, getKeyCaps, fingerAssignments, FingerIndex } from "$lib/store/keyboard";
 	import type { ColorIndex } from "$lib/store/Colors.svelte";
+	import { keyboardState } from "$lib/store/KeyboardState.svelte";
 
 	type Props = {
-		// Define the expected type for the prop
-		idbSettings: SettingsDB;
 		colorIndex: ColorIndex;
 		font: string;
 	};
-	let { idbSettings = $bindable<SettingsDB>(), colorIndex, font }: Props = $props();
+	let { colorIndex, font }: Props = $props();
 
 	let isLargeKey = true;
-	// console.log("Keyboard.svelte rendered", $state.snapshot(idbSettings));
-	let keyCaps = $state(
-		getKeyCaps(idbSettings?.keyboard ?? KeyboardIndex.matrix, idbSettings?.layout ?? LayoutIndex.colemakDH)
-	);
+	let keyCaps = $derived(getKeyCaps(keyboardState.keyboard, keyboardState.layout));
+
+	/** Get finger assignments for current keyboard type */
+	let currentFingerAssignments: FingerIndex[][] = $derived(fingerAssignments[keyboardState.keyboard]);
+
+	/** Check if a letter should be highlighted (next key to type) */
+	function isHighlighted(letter: string): boolean {
+		if (!keyboardState.nextChar) return false;
+		return letter.toUpperCase() === keyboardState.nextChar.toUpperCase();
+	}
 </script>
 
 <div class="relative flex flex-col justify-center overflow-hidden p-5">
 	<div class="mx-auto">
 		<svelte:boundary>
-			{#if true}
-				{#each keyCaps as row, i (row)}
-					<div class="row flex {keyboards[idbSettings.keyboard].justify}">
-						{#if keyboards[idbSettings.keyboard].leftKeys[i] != ""}
-							<KeyCap
-								letter={keyboards[idbSettings.keyboard].leftKeys[i]}
-								{colorIndex}
-								{font}
-								{isLargeKey}
-							/>
-						{/if}
-						{#each row as letter (letter)}
-							<KeyCap {letter} {colorIndex} {font} />
-						{/each}
-						{#if keyboards[idbSettings.keyboard].rightKeys[i] != ""}
-							<KeyCap
-								letter={keyboards[idbSettings.keyboard].rightKeys[i]}
-								{colorIndex}
-								{font}
-								{isLargeKey}
-							/>
-						{/if}
-					</div>
-				{/each}
-			{/if}
+			{#each keyCaps as row, rowIndex (row)}
+				<div class="row flex {keyboards[keyboardState.keyboard].justify}">
+					{#if keyboards[keyboardState.keyboard].leftKeys[rowIndex] != ""}
+						<KeyCap
+							bind:letter={keyboards[keyboardState.keyboard].leftKeys[rowIndex]}
+							bind:colorIndex
+							bind:font
+							bind:isLargeKey
+							bind:showFingerColor={keyboardState.showFingerColors}
+						/>
+					{/if}
+					{#each row as letter, colIndex (letter + colIndex)}
+						<KeyCap
+							{letter}
+							bind:colorIndex
+							bind:font
+							fingerIndex={currentFingerAssignments[rowIndex][colIndex]}
+							bind:showFingerColor={keyboardState.showFingerColors}
+							isHighlighted={isHighlighted(letter)}
+						/>
+					{/each}
+					{#if keyboards[keyboardState.keyboard].rightKeys[rowIndex] != ""}
+						<KeyCap
+							letter={keyboards[keyboardState.keyboard].rightKeys[rowIndex]}
+							{colorIndex}
+							{font}
+							{isLargeKey}
+							showFingerColor={keyboardState.showFingerColors}
+						/>
+					{/if}
+				</div>
+			{/each}
 		</svelte:boundary>
 	</div>
 </div>

@@ -21,6 +21,7 @@
 	import { SourceKeys } from "$lib/store/SourceDB.svelte";
 	import { arrayCopyBoolean, arrayCopyString, arrayEqualBoolean, arrayEqualString } from "$lib/utilities/utils";
 	import type { ColorIndex } from "$lib/store/Colors.svelte";
+	import { keyboardState } from "$lib/store/KeyboardState.svelte";
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function clearAll() {
@@ -101,6 +102,7 @@
 			currentLesson = new LessonDB(idbLessons.sourceLessons[idbLessonIndex]);
 			colorIndex = idbSettings.colorIndex;
 			font = idbSettings.font;
+			keyboardState.update(idbSettings.keyboard, idbSettings.layout, idbSettings.showFingerColors);
 			idbLoading = false;
 		})
 		.catch((error) => {
@@ -142,6 +144,7 @@
 		customWords?: string[]
 	) {
 		if (settingsDB.isDirty) {
+			console.log("Settings changed", settingsDB);
 			idbStore.setValue("idbSettings", settingsDB);
 			colorIndex = settingsDB.colorIndex;
 			font = settingsDB.font;
@@ -229,7 +232,7 @@
 			{font}
 			bind:this={typist}
 		></Typist>
-		<Keyboard bind:idbSettings {colorIndex} {font}></Keyboard>
+		<Keyboard {colorIndex} {font}></Keyboard>
 	{/if}
 	<div class="flex items-center justify-center gap-8 p-4">
 		<a

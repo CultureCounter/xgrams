@@ -12,6 +12,7 @@
 	import type { ServerStore } from "$lib/store/ServerStore.svelte";
 	import { deepClone } from "$lib/utilities/utils";
 	import type { ColorIndex } from "$lib/store/Colors.svelte";
+	import { keyboardState } from "$lib/store/KeyboardState.svelte";
 
 	type Props = {
 		// Define the expected type for the prop
@@ -219,6 +220,9 @@
 		// console.log('classLine:' + JSON.stringify(classLine, null, '\t'));
 		classLine = aClassLine;
 		// console.log('classLine:' + JSON.stringify(classLine, null, '\t'));
+		// Update shared typing state for keyboard highlighting
+		keyboardState.nextChar = expectedLine[typedLine.length] ?? "";
+		keyboardState.typedLength = typedLine.length;
 	}
 
 	function onKeyDown(event: KeyboardEvent) {
@@ -423,7 +427,7 @@
 		</h2>
 		<h3 class="mt-0 flex place-content-center gap-x-3">
 			<span>WPM: {rawWPM} / {idbSettings.minimumWPM}</span>
-			<span>Accuracy: {accuracy}% / {idbSettings.minimumAccuracy}</span>
+			<span>Accuracy: {accuracy}% / {idbSettings.minimumAccuracy}%</span>
 			<span>Average WPM: {averageWPM(linesIndex)}</span>
 		</h3>
 	</div>

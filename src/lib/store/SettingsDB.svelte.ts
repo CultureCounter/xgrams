@@ -20,6 +20,7 @@ export class SettingsDB {
 	colorIndex: ColorIndex = ColorIndex.fuchsia;
 	keyboard: KeyboardIndex = KeyboardIndex.matrix;
 	layout: LayoutIndex = LayoutIndex.colemakDH;
+	showFingerColors: boolean = false;
 
 	constructor(init?: Partial<SettingsDB>) {
 		if (init) {
@@ -31,6 +32,7 @@ export class SettingsDB {
 			if (init.colorIndex !== undefined) this.colorIndex = init.colorIndex;
 			if (init.keyboard !== undefined) this.keyboard = init.keyboard;
 			if (init.layout !== undefined) this.layout = init.layout;
+			if (init.showFingerColors !== undefined) this.showFingerColors = init.showFingerColors;
 		}
 	}
 
@@ -56,5 +58,6 @@ export class SettingsDB {
 		settings.colorIndex = this.colorIndex;
 		settings.keyboard = this.keyboard;
 		settings.layout = this.layout;
+		settings.showFingerColors = this.showFingerColors;
 	}
 }

@@ -1,25 +1,51 @@
 <script lang="ts">
-	import { ColorIndex } from "$lib/store/Colors.svelte";
-	import { GlowColors, KeyColors } from "$lib/store/Colors.svelte";
+	import { ColorIndex, getNextFingerColor } from "$lib/store/Colors.svelte";
+	import { GlowColors, KeyColors, FingerColors } from "$lib/store/Colors.svelte";
+	import type { FingerIndex } from "$lib/store/keyboard";
 
 	type Props = {
 		letter: string;
 		colorIndex: ColorIndex;
 		font: string;
 		isLargeKey?: boolean;
+		fingerIndex?: FingerIndex;
+		showFingerColor?: boolean;
+		isHighlighted?: boolean;
 	};
-	let { letter, colorIndex, font, isLargeKey = false }: Props = $props();
+	let {
+		letter = $bindable<string>(),
+		colorIndex = $bindable<ColorIndex>(),
+		font = $bindable<string>(),
+		isLargeKey = $bindable<boolean>(),
+		fingerIndex = $bindable<FingerIndex>(),
+		showFingerColor = $bindable<boolean>(),
+		isHighlighted = $bindable<boolean>(),
+	}: Props = $props();
 
 	let glowCSS = $derived(
 		"absolute -inset-1 "
 			+ GlowColors[colorIndex]
 			+ " rounded-lg blur opacity-20 group-hover:opacity-100 transition duration-700 group-hover:duration-200 "
 	);
+
+	// Determine key background color: finger color or default
+	let keyBgColor = $derived(
+		showFingerColor && fingerIndex !== undefined ? FingerColors[fingerIndex] : KeyColors[colorIndex]
+	);
+
+	// Add highlight ring if this is the next key to type
+	// let highlightCSS = $derived(isHighlighted ? " ring-4 ring-red-800 dark:ring-red-200 animate-pulse" : "");
+	let highlightCSS = $derived(isHighlighted ? getNextFingerColor(fingerIndex) : "");
+
 	let keyCSS = $derived(
-		KeyColors[colorIndex] + " rounded-md text-black dark:text-white w-[min(8vw,4vh,40px)] h-[min(8vw,4vh,40px)] "
+		keyBgColor
+			+ highlightCSS
+			+ " rounded-md text-black dark:text-white w-[min(8vw,4vh,40px)] h-[min(8vw,4vh,40px)] "
 	);
 	let keyLargeCSS = $derived(
-		KeyColors[colorIndex] + " rounded-md text-black dark:text-white w-[min(12vw,6vh,60px)] h-[min(8vw,4vh,40px)] "
+		keyBgColor
+			+ highlightCSS
+			+ " rounded-md text-black dark:text-white w-[min(12vw,6vh,60px)] h-[min(8vw,4vh,40px)] "
 	);
 </script>
 
