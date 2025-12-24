@@ -375,54 +375,79 @@
 							/>
 						</article>
 					</div>
-					<div class={cardClass}>
-						<header class="card-header">
-							<span class="xs:hidden"><MusicIcon class="size-6" /></span>
-							<span class="hidden xs:inline">Sounds</span>
-						</header>
-						<article class={articleClassV}>
-							<Counter
-								name="Volume"
-								minCounter={0}
-								maxCounter={100}
-								stepCounter={5}
-								count={volume}
-								onChange={setNewVolume}
-								{colorIndex}
-							></Counter>
-							{#each SoundNames as name, i (name)}
-								<Switch
-									checked={sounds[i]}
-									onCheckedChange={(e) => {
-										soundsChanged(e.checked, i);
+					<div class="space-y-2">
+						<div class={cardClass}>
+							<header class="card-header">
+								<span class="xs:hidden"><MusicIcon class="size-6" /></span>
+								<span class="hidden xs:inline">Sounds</span>
+							</header>
+							<article class={articleClassV}>
+								<Counter
+									name="Volume"
+									minCounter={0}
+									maxCounter={100}
+									stepCounter={5}
+									count={volume}
+									onChange={setNewVolume}
+									{colorIndex}
+								></Counter>
+								{#each SoundNames as name, i (name)}
+									<Switch
+										checked={sounds[i]}
+										onCheckedChange={(e) => {
+											soundsChanged(e.checked, i);
+										}}
+									>
+										<Switch.Control
+											class="preset-filled-secondary-50-950 data-[state=checked]:preset-filled-secondary-500"
+										>
+											<Switch.Thumb>
+												<Switch.Context>
+													{#if i == (SoundIndex.rightletter as number)}
+														<PawPrintIcon class="size-3" />
+													{:else if i == (SoundIndex.wrongletter as number)}
+														<BugIcon class="size-3" />
+													{:else if i == (SoundIndex.passedGoals as number)}
+														<RabbitIcon class="size-3" />
+													{:else if i == (SoundIndex.failedGoals as number)}
+														<TurtleIcon class="size-3" />
+													{:else if i == (SoundIndex.lessonsDone as number)}
+														<PartyPopperIcon class="size-3" />
+													{/if}
+												</Switch.Context>
+											</Switch.Thumb>
+										</Switch.Control>
+										<Switch.HiddenInput />
+										<Switch.Label class="pl-2"
+											><span class="hidden sm:inline inert">{name}</span></Switch.Label
+										>
+									</Switch>
+								{/each}
+							</article>
+						</div>
+						<div class={cardClass}>
+							<header class="card-header">
+								<span class="xs:hidden" style="font-size: 2em">🎨</span>
+								<span class="hidden xs:inline">Colors</span>
+							</header>
+							<article>
+								<select
+									class="select"
+									id="color-select"
+									name="Color Selection"
+									bind:value={selectedColor}
+									onchange={() => {
+										setColor();
 									}}
 								>
-									<Switch.Control
-										class="preset-filled-secondary-50-950 data-[state=checked]:preset-filled-secondary-500"
-									>
-										<Switch.Thumb>
-											<Switch.Context>
-												{#if i == (SoundIndex.rightletter as number)}
-													<PawPrintIcon class="size-3" />
-												{:else if i == (SoundIndex.wrongletter as number)}
-													<BugIcon class="size-3" />
-												{:else if i == (SoundIndex.passedGoals as number)}
-													<RabbitIcon class="size-3" />
-												{:else if i == (SoundIndex.failedGoals as number)}
-													<TurtleIcon class="size-3" />
-												{:else if i == (SoundIndex.lessonsDone as number)}
-													<PartyPopperIcon class="size-3" />
-												{/if}
-											</Switch.Context>
-										</Switch.Thumb>
-									</Switch.Control>
-									<Switch.HiddenInput />
-									<Switch.Label class="pl-2"
-										><span class="hidden sm:inline inert">{name}</span></Switch.Label
-									>
-								</Switch>
-							{/each}
-						</article>
+									{#each ColorNames as name, i (name)}
+										<option value={i}>
+											{name}
+										</option>
+									{/each}
+								</select>
+							</article>
+						</div>
 					</div>
 				</article>
 				<article class="flex flex-col gap-2">
@@ -456,24 +481,6 @@
 									}}>Keyboard</button
 								>
 							</div>
-							<label class={dropdownLabelClass} for="color-select">
-								<span>Color</span>
-								<select
-									class="select"
-									id="color-select"
-									name="Color Selection"
-									bind:value={selectedColor}
-									onchange={() => {
-										setColor();
-									}}
-								>
-									{#each ColorNames as name, i (name)}
-										<option value={i}>
-											{name}
-										</option>
-									{/each}
-								</select>
-							</label>
 						</article>
 					</div>
 				</article>
