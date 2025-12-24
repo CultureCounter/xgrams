@@ -12,7 +12,7 @@
 	import { LessonsDB } from "$lib/store/LessonsDB.svelte";
 	import { SettingsDB, SoundIndex, SoundNames } from "$lib/store/SettingsDB.svelte";
 	import { SourceAllIndex, SourceIndex, SourceNames } from "$lib/store/SourceDB.svelte";
-	import { Dialog, Portal, SegmentedControl, Switch } from "@skeletonlabs/skeleton-svelte";
+	import { Dialog, Portal, SegmentedControl, Switch, Tabs } from "@skeletonlabs/skeleton-svelte";
 	import { setVolume } from "./PlaySounds.svelte";
 
 	import Fonts from "./Fonts.svelte";
@@ -32,7 +32,6 @@
 
 	import CheckIcon from "@lucide/svelte/icons/check";
 	import FunnelIcon from "@lucide/svelte/icons/funnel";
-	import InfoIcon from "@lucide/svelte/icons/info";
 	import Dice2Icon from "@lucide/svelte/icons/dice-2";
 	import Dice3Icon from "@lucide/svelte/icons/dice-3";
 	import Dice4Icon from "@lucide/svelte/icons/dice-4";
@@ -196,21 +195,19 @@
 			+ BorderColors[colorIndex]
 			+ " "
 			+ BGColors[colorIndex]
-			+ " rounded-lg"
+			+ " rounded-lg flex-1"
 	);
-	const clickButtonClass = $derived(
-		"btn backdrop-blur-xl space-y-4 border-2 "
-			+ BorderColors[colorIndex]
-			+ " "
-			+ BGColors[colorIndex]
-			+ " rounded-lg"
-	);
+	// const clickButtonClass = $derived(
+	// 	"btn backdrop-blur-xl space-y-4 border-2 "
+	// 		+ BorderColors[colorIndex]
+	// 		+ " "
+	// 		+ BGColors[colorIndex]
+	// 		+ " rounded-lg"
+	// );
 	const iconButtonClass =
 		"focus:ring-opacity-50 rounded-full text-white hover:bg-blue-600 focus:ring-2 focus:ring-blue-900 focus:outline-none";
 	const articleClassV = "flex flex-col justify-between space-y-2";
 	const articleClassH = "flex flex-row justify-between space-x-2";
-
-	const dropdownLabelClass = "label w-full max-w-48";
 </script>
 
 <Dialog restoreFocus={true} onOpenChange={saveSettings}>
@@ -450,82 +447,51 @@
 						</div>
 					</div>
 				</article>
-				<article class="flex flex-col gap-2">
-					<div class={cardClass}>
-						<article class={articleClassH}>
-							<div>
-								<button
-									type="button"
-									class={clickButtonClass}
-									onclick={() => {
-										conditionalDisplay = "fonts";
-									}}>Fonts</button
-								>
-							</div>
-							<div>
-								<button
-									class={iconButtonClass}
-									onclick={() => {
-										conditionalDisplay = "fontInfo";
-									}}
-								>
-									<InfoIcon class={HourStrokeColors[colorIndex]} size={24} />
-								</button>
-							</div>
-							<div>
-								<button
-									type="button"
-									class={clickButtonClass}
-									onclick={() => {
-										conditionalDisplay = "keyboard";
-									}}>Keyboard</button
-								>
-							</div>
-						</article>
-					</div>
-				</article>
-				<article class="flex flex-col justify-between gap-2">
-					{#if conditionalDisplay === "code"}
-						<div class={cardClass}>
-							<header class="card-header">Code</header>
+				<article class={cardClass}>
+					<Tabs
+						value={conditionalDisplay}
+						onValueChange={(details) => (conditionalDisplay = details.value as ConditionalDisplay)}
+					>
+						<Tabs.List>
+							<Tabs.Trigger class="flex-1" value="code">Code</Tabs.Trigger>
+							<Tabs.Trigger class="flex-1" value="custom">Custom</Tabs.Trigger>
+							<Tabs.Trigger class="flex-1" value="filter">Filter</Tabs.Trigger>
+							<Tabs.Trigger class="flex-1" value="fonts">Fonts</Tabs.Trigger>
+							<Tabs.Trigger class="flex-1" value="fontInfo">Font Info</Tabs.Trigger>
+							<Tabs.Trigger class="flex-1" value="keyboard">Keyboard</Tabs.Trigger>
+							<Tabs.Indicator />
+						</Tabs.List>
+						<Tabs.Content value="code">
 							<article class={articleClassH}>
 								<OptionsCode {idbCodeChoices} {codeChanged}></OptionsCode>
 							</article>
-						</div>
-					{:else if conditionalDisplay === "custom"}
-						<div class={cardClass}>
-							<header class="card-header">Custom</header>
+						</Tabs.Content>
+						<Tabs.Content value="custom">
 							<article class={articleClassH}>
 								<OptionsCustom {customString} {customChanged} {colorIndex}></OptionsCustom>
 							</article>
-						</div>
-					{:else if conditionalDisplay === "filter"}
-						<div class={cardClass}>
-							<header class="card-header">Filter</header>
+						</Tabs.Content>
+						<Tabs.Content value="filter">
 							<article class={articleClassH}>
 								<OptionsFilter {filterString} {filterChanged} {colorIndex}></OptionsFilter>
 							</article>
-						</div>
-					{:else if conditionalDisplay === "fonts"}
-						<div class={cardClass}>
-							<header class="card-header">Font</header>
-							<Fonts bind:font bind:idbSettings />
-						</div>
-					{:else if conditionalDisplay === "fontInfo"}
-						<div class={cardClass}>
-							<header class="card-header">Font Download Links</header>
-							<article class={articleClassH}>
+						</Tabs.Content>
+						<Tabs.Content value="fonts">
+							<article class={articleClassV}>
+								<Fonts bind:font bind:idbSettings />
+							</article>
+						</Tabs.Content>
+						<Tabs.Content value="fontInfo">
+							<article class={articleClassV}>
 								<FontInfo />
 							</article>
-						</div>
-					{:else if conditionalDisplay === "keyboard"}
-						<div class={cardClass}>
-							<header class="card-header">Keyboard</header>
+						</Tabs.Content>
+						<Tabs.Content value="keyboard">
 							<article class={articleClassH}>
 								<OptionsKeyboard {idbSettings}></OptionsKeyboard>
 							</article>
-						</div>
-					{/if}
+						</Tabs.Content>
+					</Tabs>
 				</article>
 			</Dialog.Content>
 		</Dialog.Positioner>

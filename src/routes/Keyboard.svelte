@@ -15,6 +15,7 @@
 	};
 	let { colorIndex, font }: Props = $props();
 
+	// svelte-ignore non_reactive_update
 	let isLargeKey = true;
 	let keyCaps = $derived(getKeyCaps(keyboardState.keyboard, keyboardState.layout));
 
@@ -26,43 +27,43 @@
 		if (!keyboardState.nextChar) return false;
 		return letter.toUpperCase() === keyboardState.nextChar.toUpperCase();
 	}
+
+	let theKeyboard = $derived(keyboards[keyboardState.keyboard]);
 </script>
 
 <div class="relative flex flex-col justify-center overflow-hidden p-5">
 	<div class="mx-auto">
-		<svelte:boundary>
-			{#each keyCaps as row, rowIndex (row)}
-				<div class="row flex {keyboards[keyboardState.keyboard].justify}">
-					{#if keyboards[keyboardState.keyboard].leftKeys[rowIndex] != ""}
-						<KeyCap
-							bind:letter={keyboards[keyboardState.keyboard].leftKeys[rowIndex]}
-							bind:colorIndex
-							bind:font
-							bind:isLargeKey
-							bind:showFingerColor={keyboardState.showFingerColors}
-						/>
-					{/if}
-					{#each row as letter, colIndex (letter + colIndex)}
-						<KeyCap
-							{letter}
-							bind:colorIndex
-							bind:font
-							fingerIndex={currentFingerAssignments[rowIndex][colIndex]}
-							bind:showFingerColor={keyboardState.showFingerColors}
-							isHighlighted={isHighlighted(letter)}
-						/>
-					{/each}
-					{#if keyboards[keyboardState.keyboard].rightKeys[rowIndex] != ""}
-						<KeyCap
-							letter={keyboards[keyboardState.keyboard].rightKeys[rowIndex]}
-							{colorIndex}
-							{font}
-							{isLargeKey}
-							showFingerColor={keyboardState.showFingerColors}
-						/>
-					{/if}
-				</div>
-			{/each}
-		</svelte:boundary>
+		{#each keyCaps as row, rowIndex (row)}
+			<div class="row flex {keyboards[keyboardState.keyboard].justify}">
+				{#if keyboards[keyboardState.keyboard].leftKeys[rowIndex] != ""}
+					<KeyCap
+						letter={theKeyboard.leftKeys[rowIndex]}
+						bind:colorIndex
+						bind:font
+						bind:isLargeKey
+						bind:showFingerColor={keyboardState.showFingerColors}
+					/>
+				{/if}
+				{#each row as letter, colIndex (letter + colIndex)}
+					<KeyCap
+						{letter}
+						bind:colorIndex
+						bind:font
+						fingerIndex={currentFingerAssignments[rowIndex][colIndex]}
+						bind:showFingerColor={keyboardState.showFingerColors}
+						isHighlighted={isHighlighted(letter)}
+					/>
+				{/each}
+				{#if keyboards[keyboardState.keyboard].rightKeys[rowIndex] != ""}
+					<KeyCap
+						letter={theKeyboard.rightKeys[rowIndex]}
+						{colorIndex}
+						{font}
+						{isLargeKey}
+						showFingerColor={keyboardState.showFingerColors}
+					/>
+				{/if}
+			</div>
+		{/each}
 	</div>
 </div>

@@ -35,7 +35,7 @@ export class ServerStore<T extends object> {
 			.then((keys) => {
 				const hasAllKeys = this.#keys.every((k) => keys.includes(k as string));
 				if (!hasAllKeys) {
-					console.log(`ServerStore[${this.#name}] hasAllKeys:`, hasAllKeys, keys, this.#keys);
+					// console.log(`ServerStore[${this.#name}] hasAllKeys:`, hasAllKeys, keys, this.#keys);
 					this.#loadState.setState(LoadIndex.loadingServer);
 					this.#fetchFromServer();
 					return;

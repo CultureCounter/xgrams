@@ -144,7 +144,6 @@
 		customWords?: string[]
 	) {
 		if (settingsDB.isDirty) {
-			console.log("Settings changed", settingsDB);
 			idbStore.setValue("idbSettings", settingsDB);
 			colorIndex = settingsDB.colorIndex;
 			font = settingsDB.font;
