@@ -219,7 +219,7 @@ export const layouts = [
  * @returns string[]
  */
 export function getKeyCaps(keyboardIndex: KeyboardIndex, layoutIndex: LayoutIndex): string[] {
-	console.log("getKeyCaps keyboardIndex:", keyboardIndex, "layoutIndex:", layoutIndex);
+	// console.log("getKeyCaps keyboardIndex:", keyboardIndex, "layoutIndex:", layoutIndex);
 	if (keyboardIndex === undefined || layoutIndex === undefined) {
 		return [];
 	}
