@@ -16,6 +16,7 @@ I searched for Mavis Beacon but she has left the building! RIP Mavis! I slowly d
 
 - [`Ben Vallack`](https://www.youtube.com/watch?v=sI-a64EVPPU) For general The Joy of Typing inspiration.
 - [`Cyanophage`](https://cyanophage.github.io/) Fantastic layout research on a lot of layouts.
+- [`Keyboard Design`](https://keyboard-design.com/) Good comparison of keyboard layouts.
 - [`Keyboard Builder's Digest`](https://kbd.news/) One does not simply buy a keyboard.
 - [`Hamaji Neo`](https://www.youtube.com/watch?v=7jtGYw22OBw) Your keyboard needs an upgrade, or something.
 - [`Mechcables`](https://mechcables.com/products/samurai-aviator-cable) You kind of have to right?

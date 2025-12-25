@@ -5,7 +5,7 @@
  -->
 <script lang="ts">
 	import KeyCap from "./KeyCap.svelte";
-	import { keyboards, getKeyCaps, fingerAssignments, FingerIndex } from "$lib/store/keyboard";
+	import { fingerAssignments, FingerIndex, getKeyboard, getKeyCaps } from "$lib/store/keyboard";
 	import type { ColorIndex } from "$lib/store/Colors.svelte";
 	import { keyboardState } from "$lib/store/KeyboardState.svelte";
 
@@ -18,7 +18,6 @@
 	// svelte-ignore non_reactive_update
 	let isLargeKey = true;
 	let keyCaps = $derived(getKeyCaps(keyboardState.keyboard, keyboardState.layout));
-
 	/** Get finger assignments for current keyboard type */
 	let currentFingerAssignments: FingerIndex[][] = $derived(fingerAssignments[keyboardState.keyboard]);
 
@@ -28,14 +27,14 @@
 		return letter.toUpperCase() === keyboardState.nextChar.toUpperCase();
 	}
 
-	let theKeyboard = $derived(keyboards[keyboardState.keyboard]);
+	let theKeyboard = $derived(getKeyboard(keyboardState.keyboard, keyboardState.layout));
 </script>
 
 <div class="relative flex flex-col justify-center overflow-hidden p-5">
 	<div class="mx-auto">
 		{#each keyCaps as row, rowIndex (row)}
-			<div class="row flex {keyboards[keyboardState.keyboard].justify}">
-				{#if keyboards[keyboardState.keyboard].leftKeys[rowIndex] != ""}
+			<div class="row flex {theKeyboard?.justify}">
+				{#if theKeyboard?.leftKeys[rowIndex] != ""}
 					<KeyCap
 						letter={theKeyboard.leftKeys[rowIndex]}
 						bind:colorIndex
@@ -54,7 +53,7 @@
 						isHighlighted={isHighlighted(letter)}
 					/>
 				{/each}
-				{#if keyboards[keyboardState.keyboard].rightKeys[rowIndex] != ""}
+				{#if theKeyboard.rightKeys[rowIndex] != ""}
 					<KeyCap
 						letter={theKeyboard.rightKeys[rowIndex]}
 						{colorIndex}

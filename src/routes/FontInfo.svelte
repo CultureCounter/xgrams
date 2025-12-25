@@ -1,9 +1,11 @@
 <script lang="ts">
 	import iconGoogleFonts from "$lib/images/google-fonts-logo.svg";
 	import iconFontsource from "$lib/images/fontsource-logo.svg";
+
+	const linksClass = "flex flex-row flex-wrap justify-stretch space-x-4";
 </script>
 
-<div class="flex flex-row flex-wrap justify-stretch space-x-4">
+<div class={linksClass}>
 	<a
 		href="https://fonts.google.com/specimen/Source+Code+Pro"
 		target="_blank"
