@@ -30,15 +30,21 @@
 	import TurtleIcon from "@lucide/svelte/icons/turtle";
 	import PartyPopperIcon from "@lucide/svelte/icons/party-popper";
 
+	import ALargeSmallIcon from "@lucide/svelte/icons/a-large-small";
+	import BookOpenTextIcon from "@lucide/svelte/icons/book-open-text";
 	import CheckIcon from "@lucide/svelte/icons/check";
-	import FunnelIcon from "@lucide/svelte/icons/funnel";
 	import Dice2Icon from "@lucide/svelte/icons/dice-2";
 	import Dice3Icon from "@lucide/svelte/icons/dice-3";
 	import Dice4Icon from "@lucide/svelte/icons/dice-4";
 	import Dice5Icon from "@lucide/svelte/icons/dice-5";
 	import Dice6Icon from "@lucide/svelte/icons/dice-6";
+	import ExternalLinkIcon from "@lucide/svelte/icons/external-link";
+	import FunnelIcon from "@lucide/svelte/icons/funnel";
+	import InfinityIcon from "@lucide/svelte/icons/infinity";
+	import KeyboardIcon from "@lucide/svelte/icons/keyboard";
 	import PandaIcon from "@lucide/svelte/icons/panda";
-	import BookOpenTextIcon from "@lucide/svelte/icons/book-open-text";
+	import ShellIcon from "@lucide/svelte/icons/shell";
+	import WandSparklesIcon from "@lucide/svelte/icons/wand-sparkles";
 
 	type Props = {
 		// Define the expected type for the prop
@@ -188,10 +194,10 @@
 	const animModal =
 		"transition transition-discrete opacity-0 -translate-x-full starting:data-[state=open]:opacity-0 starting:data-[state=open]:-translate-x-full data-[state=open]:opacity-100 data-[state=open]:translate-x-0";
 
-	let contentClass = "card space-y-4 backdrop-blur-lg shadow-xl";
+	let contentClass = "card xs:space-y-4 backdrop-blur-lg shadow-xl";
 	//   3xs:bg-lime-600 2xs:text-yellow-100 xs:bg-digital-blue-200 sm:bg-digital-blue-300 md:bg-digital-blue-400 lg:bg-digital-blue-500 xl:bg-digital-blue-600 2xl:bg-amber-700 3xl:bg-lime-800
 	let cardClass = $derived(
-		"card backdrop-blur-xl p-2 space-x-1 space-y-2 border-2 "
+		"card backdrop-blur-xl xs:p-2 space-x-1 space-y-2 border-2 "
 			+ BorderColors[colorIndex]
 			+ " "
 			+ BGColors[colorIndex]
@@ -206,8 +212,8 @@
 	// );
 	const iconButtonClass =
 		"focus:ring-opacity-50 rounded-full text-white hover:bg-blue-600 focus:ring-2 focus:ring-blue-900 focus:outline-none";
-	const articleClassV = "flex flex-col justify-between space-y-2";
-	const articleClassH = "flex flex-row justify-between space-x-2";
+	const articleClassV = "flex flex-col justify-between xs:space-y-2";
+	const articleClassH = "flex flex-row justify-between xs:space-x-2";
 </script>
 
 <Dialog restoreFocus={true} onOpenChange={saveSettings}>
@@ -224,7 +230,10 @@
 				</header>
 				<article class={articleClassH}>
 					<div class={cardClass}>
-						<header class="card-header">Source</header>
+						<header class="card-header">
+							<span class="md:hidden"><WandSparklesIcon class="size-6" /></span>
+							<span class="hidden md:inline">Source</span>
+						</header>
 						<article class={articleClassV}>
 							<SegmentedControl
 								value={sourceValue}
@@ -259,7 +268,7 @@
 															conditionalDisplay = "custom";
 															setSource(name);
 														}}
-														>🛠️
+														>📜
 													</button>
 												</SegmentedControl.ItemText>
 												<SegmentedControl.ItemHiddenInput />
@@ -293,7 +302,10 @@
 						</article>
 					</div>
 					<div class={cardClass}>
-						<header class="card-header">Scope</header>
+						<header class="card-header">
+							<span class="md:hidden"><InfinityIcon class="size-6" /></span>
+							<span class="hidden md:inline">Scope</span>
+						</header>
 						<article class={articleClassV}>
 							<SegmentedControl
 								value={scopeValue}
@@ -317,7 +329,7 @@
 					</div>
 					<div class={cardClass}>
 						<header class="card-header">
-							<span class="md:hidden">Gen</span>
+							<span class="md:hidden"><ShellIcon class="size-6" /></span>
 							<span class="hidden md:inline">Generate</span>
 						</header>
 						<article class={articleClassV}>
@@ -350,81 +362,35 @@
 							</div>
 						</article>
 					</div>
-					<div class={cardClass}>
-						<header class="card-header">Goals</header>
-						<article class={articleClassV}>
-							<Counter
-								name="Minimum&nbsp;WPM"
-								minCounter={0}
-								maxCounter={400}
-								stepCounter={10}
-								onChange={setMinimumWPM}
-								bind:count={minimumWPM}
-								{colorIndex}
-							/>
-							<Counter
-								name="Minimum&nbsp;Accuracy"
-								minCounter={0}
-								maxCounter={100}
-								onChange={setMinimumAccuracy}
-								bind:count={minimumAccuracy}
-								{colorIndex}
-							/>
-						</article>
-					</div>
-					<div class="space-y-2">
+					<div class="space-y-2 flex flex-col flex-stretch">
 						<div class={cardClass}>
 							<header class="card-header">
-								<span class="xs:hidden"><MusicIcon class="size-6" /></span>
-								<span class="hidden xs:inline">Sounds</span>
+								<span class="xs:hidden"><RabbitIcon class="size-6" /></span>
+								<span class="hidden xs:inline">Goals</span>
 							</header>
 							<article class={articleClassV}>
 								<Counter
-									name="Volume"
+									name="Minimum&nbsp;WPM"
+									minCounter={0}
+									maxCounter={400}
+									stepCounter={10}
+									onChange={setMinimumWPM}
+									bind:count={minimumWPM}
+									{colorIndex}
+								/>
+								<Counter
+									name="Minimum&nbsp;Accuracy"
 									minCounter={0}
 									maxCounter={100}
-									stepCounter={5}
-									count={volume}
-									onChange={setNewVolume}
+									onChange={setMinimumAccuracy}
+									bind:count={minimumAccuracy}
 									{colorIndex}
-								></Counter>
-								{#each SoundNames as name, i (name)}
-									<Switch
-										checked={sounds[i]}
-										onCheckedChange={(e) => {
-											soundsChanged(e.checked, i);
-										}}
-									>
-										<Switch.Control
-											class="preset-filled-secondary-50-950 data-[state=checked]:preset-filled-secondary-500"
-										>
-											<Switch.Thumb>
-												<Switch.Context>
-													{#if i == (SoundIndex.rightletter as number)}
-														<PawPrintIcon class="size-3" />
-													{:else if i == (SoundIndex.wrongletter as number)}
-														<BugIcon class="size-3" />
-													{:else if i == (SoundIndex.passedGoals as number)}
-														<RabbitIcon class="size-3" />
-													{:else if i == (SoundIndex.failedGoals as number)}
-														<TurtleIcon class="size-3" />
-													{:else if i == (SoundIndex.lessonsDone as number)}
-														<PartyPopperIcon class="size-3" />
-													{/if}
-												</Switch.Context>
-											</Switch.Thumb>
-										</Switch.Control>
-										<Switch.HiddenInput />
-										<Switch.Label class="pl-2"
-											><span class="hidden sm:inline inert">{name}</span></Switch.Label
-										>
-									</Switch>
-								{/each}
+								/>
 							</article>
 						</div>
 						<div class={cardClass}>
 							<header class="card-header">
-								<span class="xs:hidden" style="font-size: 2em">🎨</span>
+								<span class="xs:hidden" style="font-size: 1.5em">🎨</span>
 								<span class="hidden xs:inline">Colors</span>
 							</header>
 							<article>
@@ -446,6 +412,55 @@
 							</article>
 						</div>
 					</div>
+					<div class={cardClass}>
+						<header class="card-header">
+							<span class="xs:hidden"><MusicIcon class="size-6" /></span>
+							<span class="hidden xs:inline">Sounds</span>
+						</header>
+						<article class={articleClassV}>
+							<Counter
+								name="Volume"
+								minCounter={0}
+								maxCounter={100}
+								stepCounter={5}
+								count={volume}
+								onChange={setNewVolume}
+								{colorIndex}
+							></Counter>
+							{#each SoundNames as name, i (name)}
+								<Switch
+									checked={sounds[i]}
+									onCheckedChange={(e) => {
+										soundsChanged(e.checked, i);
+									}}
+								>
+									<Switch.Control
+										class="preset-filled-secondary-50-950 data-[state=checked]:preset-filled-secondary-500"
+									>
+										<Switch.Thumb>
+											<Switch.Context>
+												{#if i == (SoundIndex.rightletter as number)}
+													<PawPrintIcon class="size-3" />
+												{:else if i == (SoundIndex.wrongletter as number)}
+													<BugIcon class="size-3" />
+												{:else if i == (SoundIndex.passedGoals as number)}
+													<RabbitIcon class="size-3" />
+												{:else if i == (SoundIndex.failedGoals as number)}
+													<TurtleIcon class="size-3" />
+												{:else if i == (SoundIndex.lessonsDone as number)}
+													<PartyPopperIcon class="size-3" />
+												{/if}
+											</Switch.Context>
+										</Switch.Thumb>
+									</Switch.Control>
+									<Switch.HiddenInput />
+									<Switch.Label class="pl-2"
+										><span class="hidden sm:inline inert">{name}</span></Switch.Label
+									>
+								</Switch>
+							{/each}
+						</article>
+					</div>
 				</article>
 				<article class={cardClass}>
 					<Tabs
@@ -453,12 +468,33 @@
 						onValueChange={(details) => (conditionalDisplay = details.value as ConditionalDisplay)}
 					>
 						<Tabs.List>
-							<Tabs.Trigger class="flex-1" value="code">Code</Tabs.Trigger>
-							<Tabs.Trigger class="flex-1" value="custom">Custom</Tabs.Trigger>
-							<Tabs.Trigger class="flex-1" value="filter">Filter</Tabs.Trigger>
-							<Tabs.Trigger class="flex-1" value="fonts">Fonts</Tabs.Trigger>
-							<Tabs.Trigger class="flex-1" value="fontInfo">Font Info</Tabs.Trigger>
-							<Tabs.Trigger class="flex-1" value="keyboard">Keyboard</Tabs.Trigger>
+							<Tabs.Trigger class="flex-1" value="code"
+								><span class="xs:hidden">🤖</span>
+								<span class="hidden xs:inline">Code</span></Tabs.Trigger
+							>
+							<Tabs.Trigger class="flex-1" value="custom"
+								><span class="xs:hidden">📜</span>
+								<span class="hidden xs:inline">Custom</span></Tabs.Trigger
+							>
+							<Tabs.Trigger class="flex-1" value="filter"
+								><span class="xs:hidden"
+									><FunnelIcon class={getHourStrokeFill(colorIndex)} size={24} /></span
+								>
+								<span class="hidden xs:inline">Filter</span></Tabs.Trigger
+							>
+							<Tabs.Trigger class="flex-1" value="fonts"
+								><span class="xs:hidden"><ALargeSmallIcon size={24} /></span>
+								<span class="hidden xs:inline">Fonts</span></Tabs.Trigger
+							>
+							<Tabs.Trigger class="flex-1" value="fontInfo"
+								><span class="xs:hidden"><ExternalLinkIcon size={24} /></span>
+								<span class="hidden xs:inline">Font Info</span></Tabs.Trigger
+							>
+							<Tabs.Trigger class="flex-1" value="keyboard"
+								><span class="xs:hidden"><KeyboardIcon size={24} /></span><span class="hidden xs:inline"
+									>Keyboard</span
+								></Tabs.Trigger
+							>
 							<Tabs.Indicator />
 						</Tabs.List>
 						<Tabs.Content value="code">

@@ -29,6 +29,7 @@
 	class="textarea"
 	id="custom-text"
 	name={OtherNames.custom}
+	placeholder="Type or paste custom words to practice with here."
 	rows="10"
 	value={customString}
 	bind:this={myTextArea}

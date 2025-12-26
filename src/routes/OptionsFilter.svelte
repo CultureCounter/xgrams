@@ -24,16 +24,19 @@
 	);
 </script>
 
-<article>
-	All letters on same line required.<br />
-	At least one line must match:<br />
-	<strong
-		>exa<br />
-		mple</strong
-	><br />
-	Matches: <strong>exam empl mple mpel plem ...</strong>
-</article>
-<textarea class="textarea" id="filter-text" name="Filter Text" rows="10" value={textAreaValue} bind:this={myTextArea}
+<textarea
+	class="textarea"
+	id="filter-text"
+	name="Filter Text"
+	placeholder="All letters on the same line are required.
+	Letter order does not matter.
+	At least one line must match:
+		exa
+		mple
+	Matches: exam axe empl mple mpel plem ..."
+	rows="10"
+	value={textAreaValue}
+	bind:this={myTextArea}
 ></textarea>
 <button
 	onclick={() => {

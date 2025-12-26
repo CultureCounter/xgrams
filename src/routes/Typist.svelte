@@ -391,19 +391,13 @@
 		isMouseInside = true;
 	}
 
-	// function handleClick() {
-	// 	isMouseInside = true;
-	// }
-	// 	onclick={handleClick}
-	// 	onkeyup={handleClick}
-
 	initializeLesson();
 </script>
 
 <div class="mx-2">
 	<div
 		role="textbox"
-		class={isMouseInside ? "textFocus textZone" : "textBlur textZone"}
+		class={isMouseInside ? " textFocus textZone" : " textBlur textZone"}
 		onfocus={handleFocus}
 		onblur={handleBlur}
 		onmouseover={handleMouseOver}

@@ -120,7 +120,6 @@
 			<p class="label">Gallium</p>
 		</div>
 	</a>
-
 	<a
 		href="https://github.com/rdavison/graphite-layout/blob/main/README.md"
 		target="_blank"
@@ -131,6 +130,18 @@
 		<div class={linkClass}>
 			<img width="20" height="20" src={githubDark} alt="GitHub" />
 			<p class="label">Graphite</p>
+		</div>
+	</a>
+	<a
+		href="https://github.com/kaievns/halmak"
+		target="_blank"
+		rel="noreferrer"
+		aria-label="Halmak Layout"
+		id="github-link"
+	>
+		<div class={linkClass}>
+			<img width="20" height="20" src={githubDark} alt="GitHub" />
+			<p class="label">Halmak</p>
 		</div>
 	</a>
 	<a

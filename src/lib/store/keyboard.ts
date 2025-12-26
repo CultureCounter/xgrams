@@ -122,7 +122,6 @@ export class KeyMap {
 // https://cyanophage.github.io/
 export enum LayoutIndex {
 	colemakDH = 0,
-	carpalx,
 	dvorak,
 	enthium,
 	gallium,
@@ -140,7 +139,6 @@ export enum LayoutIndex {
 }
 export const LayoutNames = [
 	"Colemak-DH",
-	"Carpalx",
 	"Dvorak",
 	"Enthium",
 	"Gallium",
@@ -368,6 +366,60 @@ graphiteMap.set(
 		],
 		["", keyTab, keyCapslock, keyShift],
 		[keyBackspace, "", keyEnter, keyShift],
+		"justify-center"
+	)
+);
+
+// https://github.com/kaievns/halmak
+const halmakMap = new Map<KeyboardIndex, KeyMap>();
+keyboards.set(LayoutIndex.halmak, halmakMap);
+halmakMap.set(
+	KeyboardIndex.matrix,
+	new KeyMap(
+		LayoutIndex.halmak,
+		KeyboardIndex.matrix,
+		[
+			["`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "["],
+			["=", "w", "l", "r", "b", "z", "q", "g", "u", "d", "j", "-"],
+			[keyTab, "s", "h", "n", "t", ",", ".", "a", "e", "o", "i", "/"],
+			["\\", "f", "m", "v", "c", "/", ";", "p", "x", "k", "y", "]"],
+			[keyBackspace, keyDelete, keyEscape, keyMagic, keyReturn, keySpace],
+		],
+		["", "", "", "", ""],
+		["", "", "", "", ""],
+		"justify-center",
+		hasThumbRow
+	)
+);
+halmakMap.set(
+	KeyboardIndex.ansi,
+	new KeyMap(
+		LayoutIndex.halmak,
+		KeyboardIndex.ansi,
+		[
+			["`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "="],
+			["w", "l", "r", "b", "z", "q", "g", "u", "d", "j", "[", "]", "\\"],
+			["s", "h", "n", "t", ",", ".", "a", "e", "o", "i", "/"],
+			["f", "m", "v", "c", "/", ";", "p", "x", "k", "y"],
+		],
+		["", keyTab, keyCapslock, keyShift],
+		[keyBackspace, "", keyEnter, keyShift],
+		"justify-center"
+	)
+);
+halmakMap.set(
+	KeyboardIndex.iso,
+	new KeyMap(
+		LayoutIndex.halmak,
+		KeyboardIndex.iso,
+		[
+			["`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "="],
+			["w", "l", "r", "b", "z", "q", "g", "u", "d", "j", "[", "]"],
+			["s", "h", "n", "t", ",", ".", "a", "e", "o", "i", "'", "#"],
+			["f", "m", "v", "c", "/", ";", "p", "x", "k", "y", "/"],
+		],
+		["", keyTab, keyCapslock, keyShift],
+		[keyBackspace, keyEnter, keyEnter, keyShift],
 		"justify-center"
 	)
 );
