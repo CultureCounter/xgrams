@@ -132,7 +132,6 @@ export enum LayoutIndex {
 	qwerty,
 	sturdy,
 	vibranium,
-	workman,
 }
 export const LayoutNames = [
 	"Colemak-DH",
@@ -146,7 +145,6 @@ export const LayoutNames = [
 	"Qwerty",
 	"Sturdy",
 	"Vibranium",
-	"Workman",
 ];
 
 export enum KeyboardIndex {

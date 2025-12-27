@@ -114,10 +114,9 @@
 		settingsState.volume = newVolume / 100;
 	}
 
-	let selectedColor: ColorIndex = $state(idbSettings?.colorIndex ?? ColorIndex.fuchsia);
-	function setColor(): void {
-		settingsState.colorIndex = selectedColor;
-		idbSettings.colorIndex = selectedColor;
+	function setColor(colorIndex: ColorIndex): void {
+		settingsState.colorIndex = colorIndex;
+		idbSettings.colorIndex = colorIndex;
 		idbSettings.isDirty = true;
 	}
 
@@ -357,55 +356,30 @@
 							</div>
 						</article>
 					</div>
-					<div class="space-y-2 flex flex-col flex-stretch">
-						<div class={cardClass}>
-							<header class="card-header">
-								<span class="xs:hidden"><RabbitIcon class="size-6" /></span>
-								<span class="hidden xs:inline">Goals</span>
-							</header>
-							<article class={articleClassV}>
-								<Counter
-									name="Minimum&nbsp;WPM"
-									minCounter={0}
-									maxCounter={400}
-									stepCounter={10}
-									onChange={setMinimumWPM}
-									bind:count={minimumWPM}
-									colorIndex={settingsState.colorIndex}
-								/>
-								<Counter
-									name="Minimum&nbsp;Accuracy"
-									minCounter={0}
-									maxCounter={100}
-									onChange={setMinimumAccuracy}
-									bind:count={minimumAccuracy}
-									colorIndex={settingsState.colorIndex}
-								/>
-							</article>
-						</div>
-						<div class={cardClass}>
-							<header class="card-header">
-								<span class="xs:hidden" style="font-size: 1.5em">🎨</span>
-								<span class="hidden xs:inline">Colors</span>
-							</header>
-							<article>
-								<select
-									class="select"
-									id="color-select"
-									name="Color Selection"
-									bind:value={selectedColor}
-									onchange={() => {
-										setColor();
-									}}
-								>
-									{#each ColorNames as name, i (name)}
-										<option value={i}>
-											{name}
-										</option>
-									{/each}
-								</select>
-							</article>
-						</div>
+					<div class={cardClass}>
+						<header class="card-header">
+							<span class="xs:hidden"><RabbitIcon class="size-6" /></span>
+							<span class="hidden xs:inline">Goals</span>
+						</header>
+						<article class={articleClassV}>
+							<Counter
+								name="Minimum&nbsp;WPM"
+								minCounter={0}
+								maxCounter={400}
+								stepCounter={10}
+								onChange={setMinimumWPM}
+								bind:count={minimumWPM}
+								colorIndex={settingsState.colorIndex}
+							/>
+							<Counter
+								name="Minimum&nbsp;Accuracy"
+								minCounter={0}
+								maxCounter={100}
+								onChange={setMinimumAccuracy}
+								bind:count={minimumAccuracy}
+								colorIndex={settingsState.colorIndex}
+							/>
+						</article>
 					</div>
 					<div class={cardClass}>
 						<header class="card-header">
@@ -490,6 +464,10 @@
 									>Keyboard</span
 								></Tabs.Trigger
 							>
+							<Tabs.Trigger class="flex-1" value="colors"
+								><span class="xs:hidden">🎨</span><span class="hidden xs:inline">Colors</span
+								></Tabs.Trigger
+							>
 							<Tabs.Indicator />
 						</Tabs.List>
 						<Tabs.Content value="code">
@@ -522,6 +500,25 @@
 						<Tabs.Content value="keyboard">
 							<article class={articleClassH}>
 								<OptionsKeyboard {idbSettings}></OptionsKeyboard>
+							</article>
+						</Tabs.Content>
+						<Tabs.Content value="colors">
+							<article class="grid xs:gap-1 sm:gap-2 grid-cols-5 md:grid-cols-6 lg:grid-cols-7">
+								{#each ColorNames as name, i (name)}
+									<button
+										class={"btn backdrop-blur-xl border-2 "
+											+ BorderColors[i]
+											+ " "
+											+ BGColors[i]
+											+ " rounded-lg"}
+										type="button"
+										aria-label={name}
+										value={i}
+										onclick={() => {
+											setColor(i as ColorIndex);
+										}}><span class="hidden xs:inline">{name}</span></button
+									>
+								{/each}
 							</article>
 						</Tabs.Content>
 					</Tabs>
