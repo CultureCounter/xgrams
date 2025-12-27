@@ -3,9 +3,12 @@
  * Updated by Typist.svelte and Settings.svelte, consumed by Keyboard.svelte
  */
 
+import { ColorIndex } from "./Colors.svelte";
 import { KeyboardIndex, LayoutIndex } from "./keyboard";
+import type { SettingsDB } from "./SettingsDB.svelte";
 
 export class SettingsState {
+	#colorIndex = $state(ColorIndex.lime);
 	#font = $state("font-sourceCodePro ");
 	#keyboard = $state(KeyboardIndex.matrix);
 	#layout = $state(LayoutIndex.colemakDH);
@@ -14,12 +17,21 @@ export class SettingsState {
 	#typedLength = $state(0);
 	#volume = $state(0.5);
 
-	update(keyboard: KeyboardIndex, layout: LayoutIndex, showFingerColors: boolean) {
-		this.#keyboard = keyboard;
-		this.#layout = layout;
-		this.#showFingerColors = showFingerColors;
+	update(settingsDB: SettingsDB) {
+		this.#colorIndex = settingsDB.colorIndex;
+		this.#font = settingsDB.font;
+		this.#keyboard = settingsDB.keyboard;
+		this.#layout = settingsDB.layout;
+		this.#showFingerColors = settingsDB.showFingerColors;
+		this.#volume = settingsDB.volume;
 	}
 
+	get colorIndex() {
+		return this.#colorIndex;
+	}
+	set colorIndex(value: ColorIndex) {
+		this.#colorIndex = value;
+	}
 	get font() {
 		return this.#font;
 	}

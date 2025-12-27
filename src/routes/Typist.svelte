@@ -11,7 +11,6 @@
 	import { LessonDB } from "$lib/store/LessonDB.svelte";
 	import type { ServerStore } from "$lib/store/ServerStore.svelte";
 	import { deepClone } from "$lib/utilities/utils";
-	import type { ColorIndex } from "$lib/store/Colors.svelte";
 	import { settingsState } from "$lib/store/SettingsState.svelte";
 
 	type Props = {
@@ -24,8 +23,6 @@
 		idbCodes: ServerStore<CodeXG>;
 		idbCodeChoices: boolean[];
 		idbCustomWords: string[];
-		colorIndex: ColorIndex;
-		font: string;
 	};
 	let {
 		idbLessonIndex = $bindable<SourceAllIndex>(),
@@ -36,8 +33,6 @@
 		idbCodes = $bindable<ServerStore<CodeXG>>(),
 		idbCodeChoices = $bindable<boolean[]>(),
 		idbCustomWords = $bindable<string[]>(),
-		colorIndex = $bindable<ColorIndex>(),
-		font = $bindable<string>(),
 	}: Props = $props();
 	let codesSource: string[] = [];
 
@@ -392,6 +387,7 @@
 	}
 
 	initializeLesson();
+	let colorIndex = $derived(settingsState.colorIndex);
 </script>
 
 <div class="mx-2">
@@ -405,7 +401,7 @@
 		tabindex="0"
 		aria-label="Typing area"
 	>
-		<div class="p-2 {font}">
+		<div class="p-2 {settingsState.font}">
 			{#each classLine as cp, i (cp.chars + i)}
 				{#if cp.typing}
 					<span class={cp.class + " " + ClassSpan[ColorChars.typingChar]}>{cp.chars}</span>

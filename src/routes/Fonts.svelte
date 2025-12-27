@@ -1,12 +1,11 @@
 <script lang="ts">
 	import { SettingsDB } from "$lib/store/SettingsDB.svelte";
+	import { settingsState } from "$lib/store/SettingsState.svelte";
 	import { findStrings, replaceStrings } from "$lib/utilities/utils";
 
 	let {
-		font = $bindable(),
 		idbSettings = $bindable(),
 	}: {
-		font: string;
 		idbSettings: SettingsDB;
 	} = $props();
 
@@ -122,32 +121,32 @@
 		"tracking-widest ",
 	];
 
-	let selectedFontFamily: string = $state(findStrings(font ?? "", FontFamilyCSS));
+	let selectedFontFamily: string = $state(findStrings(settingsState.font ?? "", FontFamilyCSS));
 	function setFontFamily(): void {
-		font = replaceStrings(font, FontFamilyCSS, selectedFontFamily);
-		idbSettings.font = font;
+		settingsState.font = replaceStrings(settingsState.font, FontFamilyCSS, selectedFontFamily);
+		idbSettings.font = settingsState.font;
 		idbSettings.isDirty = true;
 	}
 
-	let selectedFontSize: string = $state(findStrings(font ?? "", FontSizeCSS));
+	let selectedFontSize: string = $state(findStrings(settingsState.font ?? "", FontSizeCSS));
 	function setFontSize(): void {
-		font = replaceStrings(font, FontSizeCSS, selectedFontSize);
-		idbSettings.font = font;
+		settingsState.font = replaceStrings(settingsState.font, FontSizeCSS, selectedFontSize);
+		idbSettings.font = settingsState.font;
 		idbSettings.isDirty = true;
 	}
 
-	let selectedFontWeight: string = $state(findStrings(font ?? "", FontWeightCSS));
+	let selectedFontWeight: string = $state(findStrings(settingsState.font ?? "", FontWeightCSS));
 	function setFontWeight(): void {
-		font = replaceStrings(font, FontWeightCSS, selectedFontWeight);
-		idbSettings.font = font;
+		settingsState.font = replaceStrings(settingsState.font, FontWeightCSS, selectedFontWeight);
+		idbSettings.font = settingsState.font;
 		idbSettings.isDirty = true;
 	}
 
 	let fontSpacingNames = ["tighter", "tight", "normal", "wide", "wider", "widest"];
-	let selectedFontSpacing: string = $state(findStrings(font ?? "", FontSpacingCSS));
+	let selectedFontSpacing: string = $state(findStrings(settingsState.font ?? "", FontSpacingCSS));
 	function setFontSpacing(): void {
-		font = replaceStrings(font, FontSpacingCSS, selectedFontSpacing);
-		idbSettings.font = font;
+		settingsState.font = replaceStrings(settingsState.font, FontSpacingCSS, selectedFontSpacing);
+		idbSettings.font = settingsState.font;
 		idbSettings.isDirty = true;
 	}
 
@@ -264,10 +263,10 @@
 </article>
 <header class="card-header">Font Legibility Test</header>
 <article class={articleClassV}>
-	<span class="bg-transparent {font} align-middle"
+	<span class="bg-transparent {settingsState.font} align-middle"
 		>il1IL1 dbdqpq DBDQPQ ij., fgjty rnmrn RNMRN o0O ABCDEFGHIJKLMNOPQRSTUVWXYZ</span
 	>
-	<span class="bg-transparent {font} align-middle"
+	<span class="bg-transparent {settingsState.font} align-middle"
 		>Sphinx of black quartz, judge my vow! 1234567890 abcdefghijklmnopqrstuvwxyz</span
 	>
 </article>

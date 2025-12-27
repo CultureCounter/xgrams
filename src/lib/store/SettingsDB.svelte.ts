@@ -12,27 +12,27 @@ export const SoundNames = ["Right Letter", "Wrong Letter", "Passed Goals", "Fail
 
 // These do not cause changes to typing lessons
 export class SettingsDB {
-	minimumWPM: number = 40;
-	minimumAccuracy: number = 100;
-	sounds: boolean[] = [true, true, true, true, true];
-	volume: number = 0.5;
-	font: string = "font-sourceCodePro ";
 	colorIndex: ColorIndex = ColorIndex.fuchsia;
+	font: string = "font-sourceCodePro ";
 	keyboard: KeyboardIndex = KeyboardIndex.matrix;
 	layout: LayoutIndex = LayoutIndex.colemakDH;
+	minimumAccuracy: number = 100;
+	minimumWPM: number = 40;
 	showFingerColors: boolean = false;
+	sounds: boolean[] = [true, true, true, true, true];
+	volume: number = 0.5;
 
 	constructor(init?: Partial<SettingsDB>) {
 		if (init) {
-			if (init.minimumWPM !== undefined) this.minimumWPM = init.minimumWPM;
-			if (init.minimumAccuracy !== undefined) this.minimumAccuracy = init.minimumAccuracy;
-			if (init.sounds !== undefined) this.sounds = init.sounds;
-			if (init.volume !== undefined) this.volume = init.volume;
-			if (init.font !== undefined) this.font = init.font;
 			if (init.colorIndex !== undefined) this.colorIndex = init.colorIndex;
+			if (init.font !== undefined) this.font = init.font;
 			if (init.keyboard !== undefined) this.keyboard = init.keyboard;
 			if (init.layout !== undefined) this.layout = init.layout;
+			if (init.minimumAccuracy !== undefined) this.minimumAccuracy = init.minimumAccuracy;
+			if (init.minimumWPM !== undefined) this.minimumWPM = init.minimumWPM;
 			if (init.showFingerColors !== undefined) this.showFingerColors = init.showFingerColors;
+			if (init.sounds !== undefined) this.sounds = init.sounds;
+			if (init.volume !== undefined) this.volume = init.volume;
 		}
 	}
 

@@ -70,8 +70,6 @@
 			codeChoices?: boolean[],
 			customWords?: string[]
 		) => void;
-		colorIndex: ColorIndex;
-		font: string;
 	};
 	let {
 		idbLessonIndex = $bindable<SourceAllIndex>(),
@@ -82,8 +80,6 @@
 		idbCodeChoices,
 		onLessonChanged,
 		onSettingsChanged,
-		colorIndex = $bindable<ColorIndex>(),
-		font = $bindable<string>(),
 	}: Props = $props();
 
 	// Avoid Aria whining using conditional display not popups
@@ -120,7 +116,7 @@
 
 	let selectedColor: ColorIndex = $state(idbSettings?.colorIndex ?? ColorIndex.fuchsia);
 	function setColor(): void {
-		colorIndex = selectedColor;
+		settingsState.colorIndex = selectedColor;
 		idbSettings.colorIndex = selectedColor;
 		idbSettings.isDirty = true;
 	}
@@ -197,9 +193,9 @@
 	//   3xs:bg-lime-600 2xs:text-yellow-100 xs:bg-digital-blue-200 sm:bg-digital-blue-300 md:bg-digital-blue-400 lg:bg-digital-blue-500 xl:bg-digital-blue-600 2xl:bg-amber-700 3xl:bg-lime-800
 	let cardClass = $derived(
 		"card backdrop-blur-xl xs:p-2 space-x-1 space-y-2 border-2 "
-			+ BorderColors[colorIndex]
+			+ BorderColors[settingsState.colorIndex]
 			+ " "
-			+ BGColors[colorIndex]
+			+ BGColors[settingsState.colorIndex]
 			+ " rounded-lg flex-1"
 	);
 	// const clickButtonClass = $derived(
@@ -338,7 +334,7 @@
 								stepCounter={1}
 								count={combination}
 								onChange={setCombination}
-								{colorIndex}
+								colorIndex={settingsState.colorIndex}
 							/>
 							<Counter
 								name="Repetition"
@@ -346,7 +342,7 @@
 								minCounter={1}
 								count={repetition}
 								onChange={setRepetition}
-								{colorIndex}
+								colorIndex={settingsState.colorIndex}
 							/>
 							<div>
 								<span class="hidden xs:inline">Filter</span>
@@ -356,7 +352,7 @@
 										conditionalDisplay = "filter";
 									}}
 								>
-									<FunnelIcon class={getHourStrokeFill(colorIndex)} size={18} />
+									<FunnelIcon class={getHourStrokeFill(settingsState.colorIndex)} size={18} />
 								</button>
 							</div>
 						</article>
@@ -375,7 +371,7 @@
 									stepCounter={10}
 									onChange={setMinimumWPM}
 									bind:count={minimumWPM}
-									{colorIndex}
+									colorIndex={settingsState.colorIndex}
 								/>
 								<Counter
 									name="Minimum&nbsp;Accuracy"
@@ -383,7 +379,7 @@
 									maxCounter={100}
 									onChange={setMinimumAccuracy}
 									bind:count={minimumAccuracy}
-									{colorIndex}
+									colorIndex={settingsState.colorIndex}
 								/>
 							</article>
 						</div>
@@ -424,7 +420,7 @@
 								stepCounter={5}
 								count={volume}
 								onChange={setNewVolume}
-								{colorIndex}
+								colorIndex={settingsState.colorIndex}
 							></Counter>
 							{#each SoundNames as name, i (name)}
 								<Switch
@@ -477,7 +473,7 @@
 							>
 							<Tabs.Trigger class="flex-1" value="filter"
 								><span class="xs:hidden"
-									><FunnelIcon class={getHourStrokeFill(colorIndex)} size={24} /></span
+									><FunnelIcon class={getHourStrokeFill(settingsState.colorIndex)} size={24} /></span
 								>
 								<span class="hidden xs:inline">Filter</span></Tabs.Trigger
 							>
@@ -503,17 +499,19 @@
 						</Tabs.Content>
 						<Tabs.Content value="custom">
 							<article class={articleClassH}>
-								<OptionsCustom {customString} {customChanged} {colorIndex}></OptionsCustom>
+								<OptionsCustom {customString} {customChanged} colorIndex={settingsState.colorIndex}
+								></OptionsCustom>
 							</article>
 						</Tabs.Content>
 						<Tabs.Content value="filter">
 							<article class={articleClassH}>
-								<OptionsFilter {filterString} {filterChanged} {colorIndex}></OptionsFilter>
+								<OptionsFilter {filterString} {filterChanged} colorIndex={settingsState.colorIndex}
+								></OptionsFilter>
 							</article>
 						</Tabs.Content>
 						<Tabs.Content value="fonts">
 							<article class={articleClassV}>
-								<Fonts bind:font bind:idbSettings />
+								<Fonts bind:idbSettings />
 							</article>
 						</Tabs.Content>
 						<Tabs.Content value="fontInfo">

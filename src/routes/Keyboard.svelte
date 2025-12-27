@@ -6,16 +6,8 @@
 <script lang="ts">
 	import KeyCap from "./KeyCap.svelte";
 	import { fingerAssignments, FingerIndex, getKeyboard, getKeyCaps } from "$lib/store/keyboard";
-	import type { ColorIndex } from "$lib/store/Colors.svelte";
 	import { settingsState } from "$lib/store/SettingsState.svelte";
 
-	type Props = {
-		colorIndex: ColorIndex;
-		font: string;
-	};
-	let { colorIndex, font }: Props = $props();
-
-	// svelte-ignore non_reactive_update
 	let isLargeKey = true;
 	let keyCaps = $derived(getKeyCaps(settingsState.keyboard, settingsState.layout));
 	/** Get finger assignments for current keyboard type */
@@ -37,27 +29,21 @@
 				{#if theKeyboard?.leftKeys[rowIndex] != ""}
 					<KeyCap
 						letter={theKeyboard.leftKeys[rowIndex]}
-						bind:colorIndex
-						bind:font
-						bind:isLargeKey
-						bind:showFingerColor={settingsState.showFingerColors}
+						{isLargeKey}
+						showFingerColor={settingsState.showFingerColors}
 					/>
 				{/if}
 				{#each row as letter, colIndex (letter + colIndex)}
 					<KeyCap
 						{letter}
-						bind:colorIndex
-						bind:font
 						fingerIndex={currentFingerAssignments[rowIndex][colIndex]}
-						bind:showFingerColor={settingsState.showFingerColors}
+						showFingerColor={settingsState.showFingerColors}
 						isHighlighted={isHighlighted(letter)}
 					/>
 				{/each}
 				{#if theKeyboard.rightKeys[rowIndex] != ""}
 					<KeyCap
 						letter={theKeyboard.rightKeys[rowIndex]}
-						{colorIndex}
-						{font}
 						{isLargeKey}
 						showFingerColor={settingsState.showFingerColors}
 					/>

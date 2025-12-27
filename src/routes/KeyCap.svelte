@@ -1,12 +1,11 @@
 <script lang="ts">
-	import { ColorIndex, getNextFingerColor } from "$lib/store/Colors.svelte";
+	import { getNextFingerColor } from "$lib/store/Colors.svelte";
 	import { GlowColors, KeyColors, FingerColors } from "$lib/store/Colors.svelte";
 	import type { FingerIndex } from "$lib/store/keyboard";
+	import { settingsState } from "$lib/store/SettingsState.svelte";
 
 	type Props = {
 		letter: string;
-		colorIndex: ColorIndex;
-		font: string;
 		isLargeKey?: boolean;
 		fingerIndex?: FingerIndex;
 		showFingerColor?: boolean;
@@ -14,8 +13,6 @@
 	};
 	let {
 		letter = $bindable<string>(),
-		colorIndex = $bindable<ColorIndex>(),
-		font = $bindable<string>(),
 		isLargeKey = $bindable<boolean>(),
 		fingerIndex = $bindable<FingerIndex>(),
 		showFingerColor = $bindable<boolean>(),
@@ -24,13 +21,13 @@
 
 	let glowCSS = $derived(
 		"absolute -inset-1 "
-			+ GlowColors[colorIndex]
+			+ GlowColors[settingsState.colorIndex]
 			+ " rounded-lg blur opacity-20 group-hover:opacity-100 transition duration-700 group-hover:duration-200 "
 	);
 
 	// Determine key background color: finger color or default
 	let keyBgColor = $derived(
-		showFingerColor && fingerIndex !== undefined ? FingerColors[fingerIndex] : KeyColors[colorIndex]
+		showFingerColor && fingerIndex !== undefined ? FingerColors[fingerIndex] : KeyColors[settingsState.colorIndex]
 	);
 
 	// Add highlight ring if this is the next key to type
@@ -67,7 +64,7 @@
 					disabled={true}
 					tabindex="-1"
 				>
-					<span class={font}>{letter}</span>
+					<span class={settingsState.font}>{letter}</span>
 				</button>
 			</div>
 		</div>
@@ -88,7 +85,7 @@
 					disabled={true}
 					tabindex="-1"
 				>
-					<span class={font}>{letter}</span>
+					<span class={settingsState.font}>{letter}</span>
 				</button>
 			</div>
 		</div>

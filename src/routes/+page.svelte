@@ -20,7 +20,6 @@
 	import { CodeKeys } from "$lib/store/code";
 	import { SourceKeys } from "$lib/store/SourceDB.svelte";
 	import { arrayCopyBoolean, arrayCopyString, arrayEqualBoolean, arrayEqualString } from "$lib/utilities/utils";
-	import type { ColorIndex } from "$lib/store/Colors.svelte";
 	import { settingsState } from "$lib/store/SettingsState.svelte";
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -30,7 +29,6 @@
 		LoadState.clearDatabase = true;
 	}
 
-	// TODO: https://svelte.dev/tutorial/svelte/svelte-head
 	// TODO: minimal defaults for server data
 
 	const IDBKeys = ["idbLessons", "idbSettings", "idbCustomWords", "idbCodeChoices", "idbLessonIndex"];
@@ -70,8 +68,6 @@
 
 	// svelte-ignore non_reactive_update
 	let currentLesson = null as unknown as LessonDB;
-	let colorIndex = $state<ColorIndex>(0);
-	let font = $state<string>(" ");
 
 	let idbStore = new IDBStore();
 	let idbLoading = $state(true);
@@ -96,13 +92,14 @@
 				idbStore.setValue("idbLessons", idbLessons);
 			}
 			idbSettings = new SettingsDB(values[1] as SettingsDB);
+			if (currentVersion < 4) {
+				if (idbSettings.volume > 1) idbSettings.volume = 0.5;
+			}
 			arrayCopyString(values[2] as string[], idbCustomWords);
 			arrayCopyBoolean(values[3] as boolean[], idbCodeChoices);
 			idbLessonIndex = (values[4] as SourceAllIndex) || SourceAllIndex.bigrams;
 			currentLesson = new LessonDB(idbLessons.sourceLessons[idbLessonIndex]);
-			colorIndex = idbSettings.colorIndex;
-			font = idbSettings.font;
-			settingsState.update(idbSettings.keyboard, idbSettings.layout, idbSettings.showFingerColors);
+			settingsState.update(idbSettings);
 			idbLoading = false;
 		})
 		.catch((error) => {
@@ -146,8 +143,6 @@
 		let needsUpdate = false;
 		if (settingsDB.isDirty) {
 			idbStore.setValue("idbSettings", settingsDB);
-			colorIndex = settingsDB.colorIndex;
-			font = settingsDB.font;
 			idbSettings.isDirty = false;
 			settingsDB.isDirty = false;
 			// No update needed
@@ -220,8 +215,6 @@
 					{idbCustomWords}
 					{onLessonChanged}
 					{onSettingsChanged}
-					bind:colorIndex
-					bind:font
 				></Settings>
 			</div>
 		</div>
@@ -234,11 +227,9 @@
 			bind:idbCodes
 			bind:idbCodeChoices
 			bind:idbCustomWords
-			{colorIndex}
-			{font}
 			bind:this={typist}
 		></Typist>
-		<Keyboard {colorIndex} {font}></Keyboard>
+		<Keyboard></Keyboard>
 	{/if}
 	<div class="flex items-center justify-center gap-8 p-4">
 		<a
