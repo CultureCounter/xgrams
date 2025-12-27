@@ -278,7 +278,7 @@ describe("IDBStore", () => {
 				settings.colorIndex = ColorIndex.blue;
 				settings.keyboard = KeyboardIndex.matrix;
 				settings.layout = LayoutIndex.colemakDH;
-				settings.volume = 75;
+				settings.volume = 0.75;
 
 				const keys = ["idbSettings"];
 				await store.setValue(keys[0], settings);
@@ -291,7 +291,7 @@ describe("IDBStore", () => {
 				expect(retrieved.colorIndex).toBe(ColorIndex.blue);
 				expect(retrieved.keyboard).toBe(KeyboardIndex.matrix);
 				expect(retrieved.layout).toBe(LayoutIndex.colemakDH);
-				expect(retrieved.volume).toBe(75);
+				expect(retrieved.volume).toBe(0.75);
 			});
 
 			it("should handle default SettingsDB when nothing is stored", async () => {
@@ -304,7 +304,7 @@ describe("IDBStore", () => {
 				expect(retrieved.minimumWPM).toBe(40);
 				expect(retrieved.minimumAccuracy).toBe(100);
 				expect(retrieved.colorIndex).toBe(ColorIndex.fuchsia);
-				expect(retrieved.volume).toBe(100);
+				expect(retrieved.volume).toBe(0.5);
 			});
 		});
 	});
@@ -315,7 +315,7 @@ describe("IDBStore", () => {
 			const codeWords = [true, false, true, false, true, false, true, false, true];
 			const lessons = new LessonsDB();
 			const settings = new SettingsDB();
-			settings.volume = 80;
+			settings.volume = 0.8;
 
 			// Store all values
 			await setMany([
@@ -332,7 +332,7 @@ describe("IDBStore", () => {
 
 			expect(values[0]).toEqual(customWords);
 			expect(values[1]).toEqual(codeWords);
-			expect((values[3] as SettingsDB).volume).toBe(80);
+			expect((values[3] as SettingsDB).volume).toBe(0.8);
 		});
 
 		it("should handle mixed defaults and existing values for all four types", async () => {
@@ -360,7 +360,7 @@ describe("IDBStore", () => {
 
 			// Default values
 			expect(values[1]).toEqual([false, false, false, false, false, false, false, false, false]);
-			expect((values[3] as SettingsDB).volume).toBe(100);
+			expect((values[3] as SettingsDB).volume).toBe(0.5);
 		});
 
 		it("should update multiple values and verify persistence", async () => {

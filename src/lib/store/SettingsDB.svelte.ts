@@ -15,7 +15,7 @@ export class SettingsDB {
 	minimumWPM: number = 40;
 	minimumAccuracy: number = 100;
 	sounds: boolean[] = [true, true, true, true, true];
-	volume: number = 100;
+	volume: number = 0.5;
 	font: string = "font-sourceCodePro ";
 	colorIndex: ColorIndex = ColorIndex.fuchsia;
 	keyboard: KeyboardIndex = KeyboardIndex.matrix;

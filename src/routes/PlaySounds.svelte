@@ -1,4 +1,6 @@
 <script module lang="ts">
+	import { settingsState } from "$lib/store/SettingsState.svelte";
+
 	let rightLetterSound: HTMLAudioElement = null as unknown as HTMLAudioElement;
 	let wrongLetterSound: HTMLAudioElement = null as unknown as HTMLAudioElement;
 	let failedGoalsSound: HTMLAudioElement = null as unknown as HTMLAudioElement;
@@ -47,26 +49,9 @@
 		theSound.play();
 		currentPlayingSound = theSound;
 	}
-	export function setVolume(volume: number): void {
-		// console.log("Volume changed to ", volume);
-		if (rightLetterSound === null) {
-			return;
-		}
-		// console.log("setVolume theSounds.length ", theSounds.length);
-		if (theSounds.length === 0) {
-			theSounds = [rightLetterSound, wrongLetterSound, failedGoalsSound, passedGoalsSound, lessonsDoneSound];
-		}
-		let soundVolume = volume / 100;
-		// console.log("Setting sound volume to ", soundVolume);
-		rightLetterSound.volume = soundVolume;
-		wrongLetterSound.volume = soundVolume;
-		failedGoalsSound.volume = soundVolume;
-		passedGoalsSound.volume = soundVolume;
-		lessonsDoneSound.volume = soundVolume;
-	}
 </script>
 
-<audio src="/click.mp3" bind:this={rightLetterSound}></audio>
+<audio src="/click.mp3" bind:volume={settingsState.volume} bind:this={rightLetterSound}></audio>
 <audio src="/clack.mp3" bind:this={wrongLetterSound}></audio>
 <audio src="/failed.mp3" bind:this={failedGoalsSound}></audio>
 <audio src="/ding.wav" bind:this={passedGoalsSound}></audio>

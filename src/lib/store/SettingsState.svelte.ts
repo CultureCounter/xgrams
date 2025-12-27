@@ -5,12 +5,14 @@
 
 import { KeyboardIndex, LayoutIndex } from "./keyboard";
 
-export class KeyboardState {
+export class SettingsState {
+	#font = $state("font-sourceCodePro ");
 	#keyboard = $state(KeyboardIndex.matrix);
 	#layout = $state(LayoutIndex.colemakDH);
 	#nextChar = $state("");
 	#showFingerColors = $state(true);
 	#typedLength = $state(0);
+	#volume = $state(0.5);
 
 	update(keyboard: KeyboardIndex, layout: LayoutIndex, showFingerColors: boolean) {
 		this.#keyboard = keyboard;
@@ -18,6 +20,12 @@ export class KeyboardState {
 		this.#showFingerColors = showFingerColors;
 	}
 
+	get font() {
+		return this.#font;
+	}
+	set font(value: string) {
+		this.#font = value;
+	}
 	get keyboard() {
 		return this.#keyboard;
 	}
@@ -48,6 +56,12 @@ export class KeyboardState {
 	set typedLength(value: number) {
 		this.#typedLength = value;
 	}
+	get volume() {
+		return this.#volume;
+	}
+	set volume(value: number) {
+		this.#volume = value;
+	}
 }
 
-export const keyboardState = new KeyboardState();
+export const settingsState = new SettingsState();

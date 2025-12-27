@@ -12,7 +12,7 @@
 	import type { ServerStore } from "$lib/store/ServerStore.svelte";
 	import { deepClone } from "$lib/utilities/utils";
 	import type { ColorIndex } from "$lib/store/Colors.svelte";
-	import { keyboardState } from "$lib/store/KeyboardState.svelte";
+	import { settingsState } from "$lib/store/SettingsState.svelte";
 
 	type Props = {
 		// Define the expected type for the prop
@@ -221,8 +221,8 @@
 		classLine = aClassLine;
 		// console.log('classLine:' + JSON.stringify(classLine, null, '\t'));
 		// Update shared typing state for keyboard highlighting
-		keyboardState.nextChar = expectedLine[typedLine.length] ?? "";
-		keyboardState.typedLength = typedLine.length;
+		settingsState.nextChar = expectedLine[typedLine.length] ?? "";
+		settingsState.typedLength = typedLine.length;
 	}
 
 	function onKeyDown(event: KeyboardEvent) {

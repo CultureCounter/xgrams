@@ -21,7 +21,7 @@
 	import { SourceKeys } from "$lib/store/SourceDB.svelte";
 	import { arrayCopyBoolean, arrayCopyString, arrayEqualBoolean, arrayEqualString } from "$lib/utilities/utils";
 	import type { ColorIndex } from "$lib/store/Colors.svelte";
-	import { keyboardState } from "$lib/store/KeyboardState.svelte";
+	import { settingsState } from "$lib/store/SettingsState.svelte";
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function clearAll() {
@@ -102,7 +102,7 @@
 			currentLesson = new LessonDB(idbLessons.sourceLessons[idbLessonIndex]);
 			colorIndex = idbSettings.colorIndex;
 			font = idbSettings.font;
-			keyboardState.update(idbSettings.keyboard, idbSettings.layout, idbSettings.showFingerColors);
+			settingsState.update(idbSettings.keyboard, idbSettings.layout, idbSettings.showFingerColors);
 			idbLoading = false;
 		})
 		.catch((error) => {
@@ -143,12 +143,14 @@
 		codeChoices?: boolean[],
 		customWords?: string[]
 	) {
+		let needsUpdate = false;
 		if (settingsDB.isDirty) {
 			idbStore.setValue("idbSettings", settingsDB);
 			colorIndex = settingsDB.colorIndex;
 			font = settingsDB.font;
 			idbSettings.isDirty = false;
 			settingsDB.isDirty = false;
+			// No update needed
 		}
 		if (lessonsDB.isDirty) {
 			let target = lessonsDB.sourceLessons[idbLessonIndex];
@@ -156,20 +158,25 @@
 			idbStore.setValue("idbLessons", lessonsDB);
 			lessonsDB.isDirty = false;
 			currentLesson.isDirty = false;
+			needsUpdate = true;
 		}
 		if (codeChoices) {
 			if (!arrayEqualBoolean(codeChoices, idbCodeChoices)) {
 				arrayCopyBoolean(codeChoices, idbCodeChoices);
 				idbStore.setValue("idbCodeChoices", idbCodeChoices);
+				needsUpdate = true;
 			}
 		}
 		if (customWords) {
 			if (!arrayEqualString(customWords, idbCustomWords)) {
 				idbStore.setValue("idbCustomWords", customWords);
 				arrayCopyString(customWords, idbCustomWords);
+				needsUpdate = true;
 			}
 		}
-		typist?.initializeLesson();
+		if (needsUpdate) {
+			typist?.initializeLesson();
+		}
 	}
 </script>
 

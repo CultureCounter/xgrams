@@ -7,7 +7,7 @@
 	import KeyCap from "./KeyCap.svelte";
 	import { fingerAssignments, FingerIndex, getKeyboard, getKeyCaps } from "$lib/store/keyboard";
 	import type { ColorIndex } from "$lib/store/Colors.svelte";
-	import { keyboardState } from "$lib/store/KeyboardState.svelte";
+	import { settingsState } from "$lib/store/SettingsState.svelte";
 
 	type Props = {
 		colorIndex: ColorIndex;
@@ -17,17 +17,17 @@
 
 	// svelte-ignore non_reactive_update
 	let isLargeKey = true;
-	let keyCaps = $derived(getKeyCaps(keyboardState.keyboard, keyboardState.layout));
+	let keyCaps = $derived(getKeyCaps(settingsState.keyboard, settingsState.layout));
 	/** Get finger assignments for current keyboard type */
-	let currentFingerAssignments: FingerIndex[][] = $derived(fingerAssignments[keyboardState.keyboard]);
+	let currentFingerAssignments: FingerIndex[][] = $derived(fingerAssignments[settingsState.keyboard]);
 
 	/** Check if a letter should be highlighted (next key to type) */
 	function isHighlighted(letter: string): boolean {
-		if (!keyboardState.nextChar) return false;
-		return letter.toUpperCase() === keyboardState.nextChar.toUpperCase();
+		if (!settingsState.nextChar) return false;
+		return letter.toUpperCase() === settingsState.nextChar.toUpperCase();
 	}
 
-	let theKeyboard = $derived(getKeyboard(keyboardState.keyboard, keyboardState.layout));
+	let theKeyboard = $derived(getKeyboard(settingsState.keyboard, settingsState.layout));
 </script>
 
 <div class="relative flex flex-col justify-center overflow-hidden p-5">
@@ -40,7 +40,7 @@
 						bind:colorIndex
 						bind:font
 						bind:isLargeKey
-						bind:showFingerColor={keyboardState.showFingerColors}
+						bind:showFingerColor={settingsState.showFingerColors}
 					/>
 				{/if}
 				{#each row as letter, colIndex (letter + colIndex)}
@@ -49,7 +49,7 @@
 						bind:colorIndex
 						bind:font
 						fingerIndex={currentFingerAssignments[rowIndex][colIndex]}
-						bind:showFingerColor={keyboardState.showFingerColors}
+						bind:showFingerColor={settingsState.showFingerColors}
 						isHighlighted={isHighlighted(letter)}
 					/>
 				{/each}
@@ -59,7 +59,7 @@
 						{colorIndex}
 						{font}
 						{isLargeKey}
-						showFingerColor={keyboardState.showFingerColors}
+						showFingerColor={settingsState.showFingerColors}
 					/>
 				{/if}
 			</div>

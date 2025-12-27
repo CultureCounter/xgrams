@@ -2,7 +2,7 @@
 	import githubDark from "$lib/images/github-mark-white.svg";
 	import reddit from "$lib/images/reddit-icon-full-color.svg";
 	import { KeyboardIndex, KeyboardNames, keyboards, LayoutIndex, LayoutNames } from "$lib/store/keyboard";
-	import { keyboardState } from "$lib/store/KeyboardState.svelte";
+	import { settingsState } from "$lib/store/SettingsState.svelte";
 	import type { SettingsDB } from "$lib/store/SettingsDB.svelte";
 	import { Switch } from "@skeletonlabs/skeleton-svelte";
 
@@ -12,32 +12,32 @@
 	let { idbSettings = $bindable<SettingsDB>() }: Props = $props();
 
 	function setKeyboard(): void {
-		// console.log("setKeyboard", idbSettings.keyboard, "->", keyboardState.keyboard);
-		idbSettings.keyboard = keyboardState.keyboard;
+		// console.log("setKeyboard", idbSettings.keyboard, "->", settingsState.keyboard);
+		idbSettings.keyboard = settingsState.keyboard;
 		idbSettings.isDirty = true;
 	}
 
 	function setLayout(): void {
-		// console.log("setLayout", idbSettings.layout, "->", keyboardState.layout);
-		idbSettings.layout = keyboardState.layout;
+		// console.log("setLayout", idbSettings.layout, "->", settingsState.layout);
+		idbSettings.layout = settingsState.layout;
 		idbSettings.isDirty = true;
 
 		// adjust keyboard type if needed
-		let newLayout = keyboards.get(keyboardState.layout);
+		let newLayout = keyboards.get(settingsState.layout);
 		if (newLayout === undefined) {
 			console.assert(newLayout !== undefined, "Layout not found");
 			newLayout = keyboards.get(LayoutIndex.colemakDH);
 		}
-		if (newLayout?.get(keyboardState.keyboard) === undefined) {
-			keyboardState.keyboard = newLayout?.keys().next().value as KeyboardIndex;
-			console.assert(newLayout?.get(keyboardState.keyboard) !== undefined, "Keyboard not found");
+		if (newLayout?.get(settingsState.keyboard) === undefined) {
+			settingsState.keyboard = newLayout?.keys().next().value as KeyboardIndex;
+			console.assert(newLayout?.get(settingsState.keyboard) !== undefined, "Keyboard not found");
 		}
 	}
 
 	// eslint-disable-next-line svelte/no-unused-svelte-ignore
 	// svelte-ignore state_referenced_locally
 	const onCheckedChange = (checked: boolean) => {
-		keyboardState.showFingerColors = checked;
+		settingsState.showFingerColors = checked;
 		idbSettings.showFingerColors = checked;
 		idbSettings.isDirty = true;
 	};
@@ -53,7 +53,7 @@
 		class="select"
 		id="select-keyboard"
 		name="Keyboard Selection"
-		bind:value={keyboardState.keyboard}
+		bind:value={settingsState.keyboard}
 		onchange={() => {
 			setKeyboard();
 		}}
@@ -71,7 +71,7 @@
 		class="select"
 		id="select-keyboard-layout"
 		name="Keyboard Layout Selection"
-		bind:value={keyboardState.layout}
+		bind:value={settingsState.layout}
 		onchange={() => {
 			setLayout();
 		}}
@@ -84,7 +84,7 @@
 	</select>
 </label>
 <Switch
-	checked={keyboardState.showFingerColors}
+	checked={settingsState.showFingerColors}
 	onCheckedChange={(e) => {
 		onCheckedChange(e.checked);
 	}}

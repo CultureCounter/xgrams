@@ -13,7 +13,6 @@
 	import { SettingsDB, SoundIndex, SoundNames } from "$lib/store/SettingsDB.svelte";
 	import { SourceAllIndex, SourceIndex, SourceNames } from "$lib/store/SourceDB.svelte";
 	import { Dialog, Portal, SegmentedControl, Switch, Tabs } from "@skeletonlabs/skeleton-svelte";
-	import { setVolume } from "./PlaySounds.svelte";
 
 	import Fonts from "./Fonts.svelte";
 	import FontInfo from "./FontInfo.svelte";
@@ -45,6 +44,7 @@
 	import PandaIcon from "@lucide/svelte/icons/panda";
 	import ShellIcon from "@lucide/svelte/icons/shell";
 	import WandSparklesIcon from "@lucide/svelte/icons/wand-sparkles";
+	import { settingsState } from "$lib/store/SettingsState.svelte";
 
 	type Props = {
 		// Define the expected type for the prop
@@ -111,12 +111,11 @@
 		idbSettings.isDirty = true;
 	}
 
-	let volume = $state(idbSettings.volume);
+	let volume = $derived(settingsState.volume * 100);
 	function setNewVolume(newVolume: number): void {
-		// volume = newVolume;
-		setVolume(newVolume);
 		idbSettings.volume = newVolume;
 		idbSettings.isDirty = true;
+		settingsState.volume = newVolume / 100;
 	}
 
 	let selectedColor: ColorIndex = $state(idbSettings?.colorIndex ?? ColorIndex.fuchsia);
