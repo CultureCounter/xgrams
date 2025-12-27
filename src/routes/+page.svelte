@@ -31,7 +31,7 @@
 	}
 
 	// TODO: https://svelte.dev/tutorial/svelte/svelte-head
-	// TODO: minimal defaults
+	// TODO: minimal defaults for server data
 
 	const IDBKeys = ["idbLessons", "idbSettings", "idbCustomWords", "idbCodeChoices", "idbLessonIndex"];
 	const AllKeys = [...IDBKeys, ...CodeKeys, ...SourceKeys];

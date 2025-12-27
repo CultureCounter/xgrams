@@ -127,14 +127,11 @@ export enum LayoutIndex {
 	gallium,
 	graphite,
 	halmak,
-	norman,
 	nordrassil,
+	prometheum,
 	qwerty,
 	sturdy,
-	vibraniumB,
-	vibraniumF,
-	vibraniumP,
-	vibraniumV,
+	vibranium,
 	workman,
 }
 export const LayoutNames = [
@@ -144,14 +141,11 @@ export const LayoutNames = [
 	"Gallium",
 	"Graphite",
 	"Halmak",
-	"Norman",
 	"Nordrassil",
+	"Prometheum",
 	"Qwerty",
 	"Sturdy",
-	"Vibranium-B",
-	"Vibranium-F",
-	"Vibranium-P",
-	"Vibranium-V",
+	"Vibranium",
 	"Workman",
 ];
 
@@ -447,6 +441,29 @@ nordrassilMap.set(
 	)
 );
 
+// https://www.reddit.com/r/KeyboardLayouts/comments/1g66ivi/hands_down_promethium_snth_meets_hd_silverengram/
+// https://cyanophage.github.io/index.html#hd-promethium
+const prometheumMap = new Map<KeyboardIndex, KeyMap>();
+keyboards.set(LayoutIndex.prometheum, prometheumMap);
+prometheumMap.set(
+	KeyboardIndex.matrix,
+	new KeyMap(
+		LayoutIndex.prometheum,
+		KeyboardIndex.matrix,
+		[
+			["`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-"],
+			["[", "f", "p", "d", "l", "x", ";", "u", "o", "y", "b", "z"],
+			[keyTab, "s", "n", "t", "h", "k", ",", "a", "e", "i", "c", "q"],
+			["\\", "v", "w", "g", "m", "j", "-", ".", "'", "=", "/", "]"],
+			[keyBackspace, keyAltLeft, keyControl, keyCommand, keyReturn, keySpace],
+		],
+		["", "", "", "", ""],
+		["", "", "", "", ""],
+		"justify-center",
+		hasThumbRow
+	)
+);
+
 const qwertyMap = new Map<KeyboardIndex, KeyMap>();
 keyboards.set(LayoutIndex.qwerty, qwertyMap);
 qwertyMap.set(
@@ -551,6 +568,30 @@ sturdyMap.set(
 		["", keyTab, keyCapslock, keyShift],
 		[keyBackspace, keyEnter, keyEnter, keyShift],
 		"justify-center"
+	)
+);
+
+// https://cyanophage.github.io/index.html#hd-vibranium
+// What a mess, is there even an actual layout or just a bunch of vaguely similar layouts?
+// Picking the cyanophage layout as it has real testing.
+const vibraniumMap = new Map<KeyboardIndex, KeyMap>();
+keyboards.set(LayoutIndex.vibranium, vibraniumMap);
+vibraniumMap.set(
+	KeyboardIndex.matrix,
+	new KeyMap(
+		LayoutIndex.vibranium,
+		KeyboardIndex.matrix,
+		[
+			["`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-"],
+			["=", "x", "w", "m", "g", "q", "z", ".", "'", "j", "b", "["],
+			[keyTab, "s", "c", "n", "t", "k", ",", "a", "e", "i", "h", "-"],
+			["\\", "v", "p", "l", "d", "/", "-", "u", "o", "y", "f", "]"],
+			["r", keyCommand, keyArcane, keyArcane, keyBackspace, keySpace],
+		],
+		["", "", "", "", ""],
+		["", "", "", "", ""],
+		"justify-center",
+		hasThumbRow
 	)
 );
 

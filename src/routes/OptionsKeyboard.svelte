@@ -1,6 +1,7 @@
 <script lang="ts">
 	import githubDark from "$lib/images/github-mark-white.svg";
-	import { KeyboardNames, LayoutNames } from "$lib/store/keyboard";
+	import reddit from "$lib/images/reddit-icon-full-color.svg";
+	import { KeyboardIndex, KeyboardNames, keyboards, LayoutIndex, LayoutNames } from "$lib/store/keyboard";
 	import { keyboardState } from "$lib/store/KeyboardState.svelte";
 	import type { SettingsDB } from "$lib/store/SettingsDB.svelte";
 	import { Switch } from "@skeletonlabs/skeleton-svelte";
@@ -20,6 +21,17 @@
 		// console.log("setLayout", idbSettings.layout, "->", keyboardState.layout);
 		idbSettings.layout = keyboardState.layout;
 		idbSettings.isDirty = true;
+
+		// adjust keyboard type if needed
+		let newLayout = keyboards.get(keyboardState.layout);
+		if (newLayout === undefined) {
+			console.assert(newLayout !== undefined, "Layout not found");
+			newLayout = keyboards.get(LayoutIndex.colemakDH);
+		}
+		if (newLayout?.get(keyboardState.keyboard) === undefined) {
+			keyboardState.keyboard = newLayout?.keys().next().value as KeyboardIndex;
+			console.assert(newLayout?.get(keyboardState.keyboard) !== undefined, "Keyboard not found");
+		}
 	}
 
 	// eslint-disable-next-line svelte/no-unused-svelte-ignore
@@ -157,6 +169,18 @@
 		</div>
 	</a>
 	<a
+		href="https://www.reddit.com/r/KeyboardLayouts/comments/1g66ivi/hands_down_promethium_snth_meets_hd_silverengram/"
+		target="_blank"
+		rel="noreferrer"
+		aria-label="Prometheum Layout"
+		id="reddit-link"
+	>
+		<div class={linkClass}>
+			<img width="20" height="20" src={reddit} alt="Reddit" />
+			<p class="label">Prometheum</p>
+		</div>
+	</a>
+	<a
 		href="https://oxey.dev/sturdy/index.html"
 		target="_blank"
 		rel="noreferrer"
@@ -166,6 +190,18 @@
 		<div class={linkClass}>
 			<img width="20" height="20" src={githubDark} alt="GitHub" />
 			<p class="label">Sturdy</p>
+		</div>
+	</a>
+	<a
+		href="https://cyanophage.github.io/index.html#hd-vibranium"
+		target="_blank"
+		rel="noreferrer"
+		aria-label="Vibranium Layout"
+		id="github-link"
+	>
+		<div class={linkClass}>
+			<img width="20" height="20" src={githubDark} alt="GitHub" />
+			<p class="label">Vibranium</p>
 		</div>
 	</a>
 </div>
