@@ -8,6 +8,7 @@
 // TODO: assignments for angle mod? Or is that another keyboard type with variant finger assignments?
 // TODO: direct pasting of custom keymaps from other sources
 // TODO: Maybe add variant layouts in the same manner as keyboard types?
+// TODO: Fix keyboard width for ansi and iso layouts.
 
 export class KeyMap {
 	layout: LayoutIndex;
@@ -179,24 +180,24 @@ export const fingerAssignments: Record<KeyboardIndex, FingerIndex[][]> = {
 	[KeyboardIndex.matrix]: [
 		// Row 0-3: 12 keys split 6+6, Row 4: thumb keys
 		//1 2  3  4  5  6  7  8  9  10 11 12
-		[0, 1, 2, 3, 3, 3, 6, 6, 6, 7, 8, 9], // numbers
-		[0, 1, 2, 3, 3, 3, 6, 6, 6, 7, 8, 9], // top
-		[0, 1, 2, 3, 3, 3, 6, 6, 6, 7, 8, 9], // home
-		[0, 1, 2, 3, 3, 3, 6, 6, 6, 7, 8, 9], // bottom
+		[0, 0, 1, 2, 3, 3, 6, 6, 7, 8, 9, 9], // numbers
+		[0, 0, 1, 2, 3, 3, 6, 6, 7, 8, 9, 9], // top
+		[0, 0, 1, 2, 3, 3, 6, 6, 7, 8, 9, 9], // home
+		[0, 0, 1, 2, 3, 3, 6, 6, 7, 8, 9, 9], // bottom
 		[4, 4, 4, 5, 5, 5], // thumb (left 4, right 5)
 	],
 	[KeyboardIndex.ansi]: [
 		//1 2  3  4  5  6  7  8  9  10 11 12 13
-		[0, 0, 1, 2, 3, 3, 3, 6, 6, 6, 7, 8, 9], // numbers
-		[0, 1, 2, 3, 3, 3, 6, 6, 6, 7, 8, 9, 9], // top
+		[0, 0, 1, 2, 3, 3, 6, 6, 7, 8, 9, 9, 9], // numbers
+		[0, 1, 2, 3, 3, 6, 6, 7, 8, 9, 9, 9, 9], // top
 		[0, 1, 2, 3, 3, 6, 6, 7, 8, 9, 9], // home
 		[0, 1, 2, 3, 3, 6, 6, 7, 8, 9], // bottom
 	],
 	[KeyboardIndex.iso]: [
 		//1 2  3  4  5  6  7  8  9  10 11 12 13
-		[0, 0, 1, 2, 3, 3, 3, 6, 6, 6, 7, 8, 9], // numbers
-		[0, 1, 2, 3, 3, 3, 6, 6, 6, 7, 8, 9], // top
-		[0, 1, 2, 3, 3, 3, 6, 6, 6, 7, 8, 9], // home
+		[0, 0, 1, 2, 3, 3, 6, 6, 7, 8, 9, 9, 9], // numbers
+		[0, 1, 2, 3, 3, 6, 6, 7, 8, 9, 9, 9], // top
+		[0, 1, 2, 3, 3, 6, 6, 7, 8, 9, 9, 9], // home
 		[0, 0, 1, 2, 3, 3, 6, 6, 7, 8, 9], // bottom
 	],
 };

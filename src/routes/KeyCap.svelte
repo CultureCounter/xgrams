@@ -7,6 +7,7 @@
 	type Props = {
 		letter: string;
 		isLargeKey?: boolean;
+		size?: number;
 		fingerIndex?: FingerIndex;
 		showFingerColor?: boolean;
 		isHighlighted?: boolean;
@@ -14,6 +15,7 @@
 	let {
 		letter = $bindable<string>(),
 		isLargeKey = $bindable<boolean>(),
+		size = $bindable<number>(),
 		fingerIndex = $bindable<FingerIndex>(),
 		showFingerColor = $bindable<boolean>(),
 		isHighlighted = $bindable<boolean>(),
@@ -34,18 +36,18 @@
 	// let highlightCSS = $derived(isHighlighted ? " ring-4 ring-red-800 dark:ring-red-200 animate-pulse" : "");
 	let highlightCSS = $derived(isHighlighted ? getNextFingerColor(fingerIndex) : "");
 
-	let keyCSS = $derived(
-		keyBgColor
-			+ " "
-			+ highlightCSS
-			+ " rounded-md text-black dark:text-white w-[min(8vw,4vh,40px)] h-[min(8vw,4vh,40px)] "
+	let keyBaseCSS = $derived(
+		keyBgColor + " " + highlightCSS + " rounded-md text-black dark:text-white h-[min(8vw,4vh,40px)]"
 	);
-	let keyLargeCSS = $derived(
-		keyBgColor
-			+ " "
-			+ highlightCSS
-			+ " rounded-md text-black dark:text-white w-[min(12vw,6vh,60px)] h-[min(8vw,4vh,40px)] "
-	);
+	let keyCSS = $derived(keyBaseCSS + " w-[min(8vw,4vh,40px)]");
+	let largeWidths: string[] = [
+		" w-[min(12vw,6vh,60px)]",
+		" w-[min(14vw,7vh,70px)]",
+		" w-[min(16vw,8vh,80px)]",
+		" w-[min(20vw,10vh,100px)]",
+		" w-[min(26vw,13vh,130px)]",
+	];
+	let keyLargeCSS = $derived(!isLargeKey ? "" : keyBaseCSS + largeWidths[size]);
 </script>
 
 {#if isLargeKey}

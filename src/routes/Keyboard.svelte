@@ -5,7 +5,7 @@
  -->
 <script lang="ts">
 	import KeyCap from "./KeyCap.svelte";
-	import { fingerAssignments, FingerIndex, getKeyboard, getKeyCaps } from "$lib/store/keyboard";
+	import { fingerAssignments, FingerIndex, getKeyboard, getKeyCaps, KeyboardIndex } from "$lib/store/keyboard";
 	import { settingsState } from "$lib/store/SettingsState.svelte";
 
 	let isLargeKey = true;
@@ -19,6 +19,13 @@
 		return letter.toUpperCase() === settingsState.nextChar.toUpperCase();
 	}
 
+	const ansiSizesLeft: number[] = [0, 0, 1, 3];
+	const ansiSizesRight: number[] = [0, 0, 2, 3];
+	const isoSizesLeft: number[] = [0, 0, 2, 0];
+	const isoSizesRight: number[] = [3, 2, 0, 4];
+	const sizesLeft = $derived(settingsState.keyboard === KeyboardIndex.ansi ? ansiSizesLeft : isoSizesLeft);
+	const sizesRight = $derived(settingsState.keyboard === KeyboardIndex.ansi ? ansiSizesRight : isoSizesRight);
+
 	let theKeyboard = $derived(getKeyboard(settingsState.keyboard, settingsState.layout));
 </script>
 
@@ -30,6 +37,7 @@
 					<KeyCap
 						letter={theKeyboard.leftKeys[rowIndex]}
 						{isLargeKey}
+						size={sizesLeft[rowIndex]}
 						showFingerColor={settingsState.showFingerColors}
 					/>
 				{/if}
@@ -45,6 +53,7 @@
 					<KeyCap
 						letter={theKeyboard.rightKeys[rowIndex]}
 						{isLargeKey}
+						size={sizesRight[rowIndex]}
 						showFingerColor={settingsState.showFingerColors}
 					/>
 				{/if}

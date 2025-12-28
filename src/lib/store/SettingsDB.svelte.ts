@@ -18,7 +18,7 @@ export class SettingsDB {
 	layout: LayoutIndex = LayoutIndex.colemakDH;
 	minimumAccuracy: number = 100;
 	minimumWPM: number = 40;
-	showFingerColors: boolean = false;
+	showFingerColors: boolean = true;
 	sounds: boolean[] = [true, true, true, true, true];
 	volume: number = 0.5;
 
