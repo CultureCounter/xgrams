@@ -46,6 +46,8 @@
 		}
 		stopPlayingSound();
 		let theSound = theSounds[sound];
+		console.assert(theSound, "PlaySound: No sound for", sound);
+		if (!theSound) return;
 		theSound.play();
 		currentPlayingSound = theSound;
 	}

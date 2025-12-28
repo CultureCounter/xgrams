@@ -35,25 +35,25 @@
 			<div class="row flex {theKeyboard?.justify}">
 				{#if theKeyboard?.leftKeys[rowIndex] != ""}
 					<KeyCap
-						letter={theKeyboard.leftKeys[rowIndex]}
+						letter={theKeyboard.leftKeys[rowIndex]!}
 						{isLargeKey}
-						size={sizesLeft[rowIndex]}
+						size={sizesLeft[rowIndex]!}
 						showFingerColor={settingsState.showFingerColors}
 					/>
 				{/if}
 				{#each row as letter, colIndex (letter + colIndex)}
 					<KeyCap
 						{letter}
-						fingerIndex={currentFingerAssignments[rowIndex][colIndex]}
+						fingerIndex={currentFingerAssignments[rowIndex]![colIndex]!}
 						showFingerColor={settingsState.showFingerColors}
 						isHighlighted={isHighlighted(letter)}
 					/>
 				{/each}
 				{#if theKeyboard.rightKeys[rowIndex] != ""}
 					<KeyCap
-						letter={theKeyboard.rightKeys[rowIndex]}
+						letter={theKeyboard.rightKeys[rowIndex]!}
 						{isLargeKey}
-						size={sizesRight[rowIndex]}
+						size={sizesRight[rowIndex]!}
 						showFingerColor={settingsState.showFingerColors}
 					/>
 				{/if}

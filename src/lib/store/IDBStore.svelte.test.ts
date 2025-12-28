@@ -192,7 +192,7 @@ describe("IDBStore", () => {
 				const customWords = ["hello", "world", "test", "example"];
 				const keys = ["customWords"];
 
-				await store.setValue(keys[0], customWords);
+				await store.setValue(keys[0]!, customWords);
 
 				const values = await store.getValues(keys, [[]]);
 				expect(values[0]).toEqual(customWords);
@@ -212,7 +212,7 @@ describe("IDBStore", () => {
 				const codeWords = [true, false, true, false, true, false, true, false, true];
 				const keys = ["idbCodeWords"];
 
-				await store.setValue(keys[0], codeWords);
+				await store.setValue(keys[0]!, codeWords);
 
 				const values = await store.getValues(keys, [[]]);
 				expect(values[0]).toEqual(codeWords);
@@ -223,7 +223,7 @@ describe("IDBStore", () => {
 				const codeWords = [false, false, false, false, false, false, false, false, false];
 				const keys = ["idbCodeWords"];
 
-				await store.setValue(keys[0], codeWords);
+				await store.setValue(keys[0]!, codeWords);
 
 				const values = await store.getValues(keys, [[]]);
 				expect(values[0]).toEqual(codeWords);
@@ -247,16 +247,16 @@ describe("IDBStore", () => {
 				});
 
 				const keys = ["idbLessons"];
-				await store.setValue(keys[0], lessons);
+				await store.setValue(keys[0]!, lessons);
 
 				const values = await store.getValues(keys, [new LessonsDB()]);
 				const retrieved = values[0] as LessonsDB;
 
-				expect(retrieved.sourceLessons[lessonIndex].scope).toBe(15);
-				expect(retrieved.sourceLessons[lessonIndex].combination).toBe(25);
-				expect(retrieved.sourceLessons[lessonIndex].repetition).toBe(35);
-				expect(retrieved.sourceLessons[lessonIndex].filter).toBe("test filter");
-				expect(retrieved.sourceLessons[lessonIndex].WPMs).toEqual([50, 60, 70]);
+				expect(retrieved.sourceLessons[lessonIndex]!.scope).toBe(15);
+				expect(retrieved.sourceLessons[lessonIndex]!.combination).toBe(25);
+				expect(retrieved.sourceLessons[lessonIndex]!.repetition).toBe(35);
+				expect(retrieved.sourceLessons[lessonIndex]!.filter).toBe("test filter");
+				expect(retrieved.sourceLessons[lessonIndex]!.WPMs).toEqual([50, 60, 70]);
 			});
 
 			it("should handle default LessonsDB when nothing is stored", async () => {
@@ -281,7 +281,7 @@ describe("IDBStore", () => {
 				settings.volume = 0.75;
 
 				const keys = ["idbSettings"];
-				await store.setValue(keys[0], settings);
+				await store.setValue(keys[0]!, settings);
 
 				const values = await store.getValues(keys, [new SettingsDB()]);
 				const retrieved = values[0] as SettingsDB;
@@ -408,7 +408,7 @@ describe("IDBStore", () => {
 			const largeArray = Array.from({ length: 1000 }, (_, i) => `word${i}`);
 			const keys = ["largeArray"];
 
-			await store.setValue(keys[0], largeArray);
+			await store.setValue(keys[0]!, largeArray);
 
 			const values = await store.getValues(keys, [[]]);
 			expect((values[0] as string[]).length).toBe(1000);
@@ -430,7 +430,7 @@ describe("IDBStore", () => {
 			};
 
 			const keys = ["nested"];
-			await store.setValue(keys[0], nested);
+			await store.setValue(keys[0]!, nested);
 
 			const values = await store.getValues(keys, [{}]);
 			expect(

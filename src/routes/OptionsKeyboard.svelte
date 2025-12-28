@@ -15,6 +15,22 @@
 		// console.log("setKeyboard", idbSettings.keyboard, "->", settingsState.keyboard);
 		idbSettings.keyboard = settingsState.keyboard;
 		idbSettings.isDirty = true;
+
+		let newLayout = keyboards.get(settingsState.layout);
+		if (newLayout === undefined) {
+			console.assert(newLayout !== undefined, "Layout not found");
+			newLayout = keyboards.get(LayoutIndex.colemakDH);
+		}
+		if (newLayout?.get(settingsState.keyboard) === undefined) {
+			// Find a layout that has this keyboard
+			for (let layout of keyboards.keys()) {
+				if (keyboards.get(layout)?.has(settingsState.keyboard)) {
+					settingsState.layout = layout;
+					break;
+				}
+			}
+			console.assert(newLayout?.get(settingsState.keyboard) !== undefined, "Keyboard not found");
+		}
 	}
 
 	function setLayout(): void {

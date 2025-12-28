@@ -52,7 +52,7 @@
 	let confettii = $state(
 		Array.from({ length: confettiiMaxCount }, (_, index) => {
 			return new Confetti(
-				emojii[index % emojii.length],
+				emojii[index % emojii.length]!,
 				Math.random() * 100,
 				-20 - Math.random() * 100,
 				0.1 + Math.random(),
@@ -70,8 +70,10 @@
 		// console.log('preCelebration');
 		for (let i = 0; i < confettiMax; i++) {
 			var confetti = confettii[i];
+			console.assert(confetti, "Celebration: No confetti for", i);
+			if (!confetti) continue;
 			confetti.d = "emoj" + i;
-			confetti.emoji = emojii[i % emojii.length];
+			confetti.emoji = emojii[i % emojii.length]!;
 		}
 	}
 	if (browser) {
@@ -107,6 +109,8 @@
 			if (previousTimeStamp !== timestamp) {
 				for (let i = 0; i < confettiMax; i++) {
 					var emoji = confettii[i];
+					console.assert(emoji, "Celebration: No emoji for", i);
+					if (!emoji) continue;
 					emoji.y += 0.4 * emoji.r;
 					if (emoji.y > 120) {
 						emoji.x = Math.random() * 100;
@@ -139,7 +143,7 @@
 		let done = true;
 		for (let i = 0; i < confettiMax; i++) {
 			var emoji = confettii[i];
-			if (emoji.opacity > 0) {
+			if (emoji && emoji.opacity > 0) {
 				emoji.opacity = 0;
 				done = false;
 			}

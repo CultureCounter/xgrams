@@ -76,8 +76,8 @@ export class ServerStore<T extends object> {
 
 	#updateValueFromIDB(vals: T[keyof T][]) {
 		for (let i = 0; i < this.#props.length; i++) {
-			const prop = this.#props[i];
-			const val = vals[i];
+			const prop = this.#props[i]!;
+			const val = vals[i]!;
 			this.#value[prop] = val;
 		}
 		this.#loadState.setState(LoadIndex.loaded);
@@ -113,8 +113,8 @@ export class ServerStore<T extends object> {
 			// Save to IDB
 			const entries: [IDBValidKey, unknown][] = [];
 			for (let i = 0; i < this.#props.length; i++) {
-				const prop = this.#props[i];
-				const key = this.#keys[i];
+				const prop = this.#props[i]!;
+				const key = this.#keys[i]!;
 				entries.push([key, data[prop]]);
 			}
 
@@ -175,7 +175,7 @@ export class ServerStore<T extends object> {
 							if (target === root) {
 								const index = this.#props.indexOf(property as keyof T);
 								if (index !== -1) {
-									const key = this.#keys[index];
+									const key = this.#keys[index]!;
 									setMany([[key, value]]).catch((e) => {
 										console.error(`ServerStore[${this.#name}] setMany failed:`, e);
 									});
@@ -196,8 +196,8 @@ export class ServerStore<T extends object> {
 							// Alternative: Just save everything.
 							const entries: [IDBValidKey, unknown][] = [];
 							for (let i = 0; i < this.#props.length; i++) {
-								const prop = this.#props[i];
-								const key = this.#keys[i];
+								const prop = this.#props[i]!;
+								const key = this.#keys[i]!;
 								entries.push([key, this.#value[prop]]);
 							}
 							setMany(entries).catch((e) => {
@@ -225,8 +225,8 @@ export class ServerStore<T extends object> {
 		if (typeof window !== "undefined") {
 			const entries: [IDBValidKey, unknown][] = [];
 			for (let i = 0; i < this.#props.length; i++) {
-				const prop = this.#props[i];
-				const key = this.#keys[i];
+				const prop = this.#props[i]!;
+				const key = this.#keys[i]!;
 				entries.push([key, value[prop]]);
 			}
 			setMany(entries).catch((e) => {

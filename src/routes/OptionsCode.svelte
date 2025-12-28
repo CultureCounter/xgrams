@@ -8,13 +8,11 @@
 	};
 	let { idbCodeChoices, codeChanged }: Props = $props();
 
-	// eslint-disable-next-line
 	// svelte-ignore state_referenced_locally
 	const codeChanges = $state<boolean[]>(idbCodeChoices);
-	const onCheckedChange = (event: { checked: boolean; i: number }) => {
-		var checked = !event.checked;
-		codeChanges[event.i] = checked;
-		codeChanged(checked, event.i);
+	const onCheckedChange = (checked: boolean, i: number) => {
+		codeChanges[i] = checked;
+		codeChanged(checked, i);
 	};
 </script>
 
@@ -23,8 +21,8 @@
 		class="flex flex-col"
 		{name}
 		checked={codeChanges[i]}
-		onchange={() => {
-			onCheckedChange({ checked: codeChanges[i], i });
+		onCheckedChange={(e) => {
+			onCheckedChange(e.checked, i);
 		}}
 	>
 		<Switch.Control class="preset-filled-secondary-50-950 data-[state=checked]:preset-filled-secondary-500">

@@ -39,14 +39,14 @@
 	function shuffle(array: string[]): void {
 		for (let i = array.length - 1; i > 0; i--) {
 			let j = Math.floor(Math.random() * (i + 1));
-			[array[i], array[j]] = [array[j], array[i]];
+			[array[i]!, array[j]!] = [array[j]!, array[i]!];
 		}
 	}
 
 	function padToMultiple(array: string[], multiple: number) {
 		while (array.length % multiple > 0) {
 			let j = Math.floor(Math.random() * (array.length - 1));
-			array.push(array[j]);
+			array.push(array[j]!);
 		}
 	}
 
@@ -87,7 +87,7 @@
 		let source: string[];
 		if (index == SourceAllIndex.code) source = codesSource;
 		else if (index == SourceAllIndex.custom) source = idbCustomWords;
-		else source = idbSources.current[SourceKeys[index]];
+		else source = idbSources.current[SourceKeys[index]!]!;
 
 		// let s: string = SourceNames[index];
 		// console.log("Generating lines with source length:", s, source?.length);
@@ -181,7 +181,7 @@
 		let currentColor = ColorChars.untoldChar;
 		let currentIsTyping = false;
 		let currentClass: ClassLine = {
-			class: ClassSpan[ColorChars.typingChar],
+			class: ClassSpan[ColorChars.typingChar]!,
 			chars: "",
 			typing: false,
 		};
@@ -189,7 +189,7 @@
 		let typingIndex = typedLine.length;
 		let length = colorLine.length;
 		for (let i = 0; i < length; i++) {
-			let c = colorLine[i];
+			let c = colorLine[i]!;
 			if (i > typingIndex) {
 				c = ColorChars.normalChar;
 			}
@@ -198,7 +198,7 @@
 				// Subsequent movie span
 				currentColor = c;
 				currentIsTyping = isTyping;
-				currentClass = { class: ClassSpan[currentColor], chars: "", typing: isTyping };
+				currentClass = { class: ClassSpan[currentColor]!, chars: "", typing: isTyping };
 				aClassLine.push(currentClass);
 			}
 			let t = expectedLine[i];
@@ -343,7 +343,7 @@
 		let nextLineExists = lines.length > linesIndex + 1;
 		if (nextLineExists) {
 			linesIndex += 1;
-			expectedLine = lines[linesIndex];
+			expectedLine = lines[linesIndex]!;
 			// unleashWorker();
 			initializeLine();
 		} else {

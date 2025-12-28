@@ -121,8 +121,8 @@
 		// Save dirty settings
 		onSettingsChanged(settingsDB, idbLessonIndex, currentLesson, lessonsDB, codeChoices, customWords);
 
-		if (currentLesson !== idbLessons.sourceLessons[newLessonIndex]) {
-			transferTo(idbLessons.sourceLessons[newLessonIndex], currentLesson);
+		if (currentLesson !== idbLessons.sourceLessons[newLessonIndex]!) {
+			transferTo(idbLessons.sourceLessons[newLessonIndex]!, currentLesson);
 			idbLessonIndex = newLessonIndex;
 			idbStore.setValue("idbLessonIndex", idbLessonIndex);
 			typist?.initializeLesson();
@@ -148,7 +148,7 @@
 			// No update needed
 		}
 		if (lessonsDB.isDirty) {
-			let target = lessonsDB.sourceLessons[idbLessonIndex];
+			let target = lessonsDB.sourceLessons[idbLessonIndex]!;
 			transferTo(currentLesson, target);
 			idbStore.setValue("idbLessons", lessonsDB);
 			lessonsDB.isDirty = false;

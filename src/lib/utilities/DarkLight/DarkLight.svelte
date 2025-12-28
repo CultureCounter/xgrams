@@ -27,6 +27,7 @@
 	 */
 	function toggleBackUserDarkLight(): TrinaryValue {
 		userDarkLight = Math.abs((userDarkLight + 2) % 3);
+		userDarkLightStore.setValue(userDarkLight);
 		return userDarkLight;
 	}
 

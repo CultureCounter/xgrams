@@ -78,14 +78,14 @@ export class IDBStore {
 				vals.forEach((val, index) => {
 					if (val === undefined) {
 						values.push(defaultValues[index]);
-						this.#values.set(keys[index], defaultValues[index]);
-						setValues.push([keys[index], defaultValues[index]]);
+						this.#values.set(keys[index]!, defaultValues[index]);
+						setValues.push([keys[index]!, defaultValues[index]]);
 					} else {
 						values.push(val);
-						this.#values.set(keys[index], val);
-						setValues.push([keys[index], val]);
+						this.#values.set(keys[index]!, val);
+						setValues.push([keys[index]!, val]);
 					}
-					this.#loadStates.get(keys[index])?.setState(LoadIndex.loaded);
+					this.#loadStates.get(keys[index]!)?.setState(LoadIndex.loaded);
 				});
 				if (setValues.length > 0) {
 					setMany(setValues).catch((e) => {

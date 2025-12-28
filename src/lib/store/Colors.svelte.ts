@@ -327,16 +327,16 @@ export const BorderColors: string[] = [
 // Finger colors for 10-finger touch typing (indexed by FingerIndex from keyboard.ts)
 // Symmetric colors: same finger on each hand gets the same color
 export const FingerColors = [
-	"bg-red-200 dark:bg-red-800", // leftPinky (0)
-	"bg-orange-200 dark:bg-orange-800", // leftRing (1)
-	"bg-yellow-200 dark:bg-yellow-800", // leftMiddle (2)
-	"bg-fuchsia-200 dark:bg-fuchsia-800", // leftIndex (3)
-	"bg-violet-200 dark:bg-violet-800", // leftThumb (4)
-	"bg-sky-200 dark:bg-sky-800", // rightThumb (5)
-	"bg-blue-200 dark:bg-blue-800", // rightIndex (6)
-	"bg-yellow-200 dark:bg-yellow-800", // rightMiddle (7)
-	"bg-orange-200 dark:bg-orange-800", // rightRing (8)
-	"bg-red-200 dark:bg-red-800", // rightPinky (9)
+	"bg-red-300 dark:bg-red-800", // leftPinky (0)
+	"bg-orange-300 dark:bg-orange-800", // leftRing (1)
+	"bg-yellow-300 dark:bg-yellow-800", // leftMiddle (2)
+	"bg-fuchsia-300 dark:bg-fuchsia-800", // leftIndex (3)
+	"bg-violet-300 dark:bg-violet-800", // leftThumb (4)
+	"bg-sky-300 dark:bg-sky-800", // rightThumb (5)
+	"bg-blue-300 dark:bg-blue-800", // rightIndex (6)
+	"bg-yellow-300 dark:bg-yellow-800", // rightMiddle (7)
+	"bg-orange-300 dark:bg-orange-800", // rightRing (8)
+	"bg-red-300 dark:bg-red-800", // rightPinky (9)
 ];
 
 // Highlight ring for next key to type

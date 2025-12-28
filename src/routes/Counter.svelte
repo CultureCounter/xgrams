@@ -40,7 +40,7 @@
 		onChange?.(count);
 	}
 	function onValueChange(values: { value: number[] }) {
-		count = values.value[0];
+		count = values.value[0] || count;
 		onChange?.(count);
 	}
 

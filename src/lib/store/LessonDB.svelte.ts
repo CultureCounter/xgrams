@@ -13,7 +13,7 @@ export const ScopeIndex = {
 };
 
 export class LessonDB {
-	scope: number = ScopeValues[ScopeIndex.top50];
+	scope: number = ScopeValues[ScopeIndex.top50]!;
 	combination: number = 2;
 	repetition: number = 20;
 	filter: string = "";

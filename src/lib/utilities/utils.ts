@@ -14,7 +14,7 @@ export const arrayCopyBoolean = (a1: boolean[], a2: boolean[]) => {
 		a2.length = a1.length;
 	}
 	for (let i = 0; i < a1.length; i++) {
-		a2[i] = a1[i];
+		a2[i] = a1[i]!;
 	}
 };
 
@@ -34,7 +34,7 @@ export const arrayCopyString = (a1: string[], a2: string[]) => {
 		a2.length = a1.length;
 	}
 	for (let i = 0; i < a1.length; i++) {
-		a2[i] = a1[i];
+		a2[i] = a1[i]!;
 	}
 };
 

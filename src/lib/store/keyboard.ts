@@ -37,22 +37,22 @@ export class KeyMap {
 		if (this.keyboard === KeyboardIndex.ansi) {
 			console.assert(keyCaps.length === 4, LayoutNames[this.layout], "KeyCaps rows must be 4 for ANSI keyboard");
 			console.assert(
-				keyCaps[0].length === 13,
+				keyCaps[0]!.length === 13,
 				LayoutNames[this.layout],
 				"KeyCaps[0] needs 13 keys for ANSI keyboard"
 			);
 			console.assert(
-				keyCaps[1].length === 13,
+				keyCaps[1]!.length === 13,
 				LayoutNames[this.layout],
 				"KeyCaps[1] needs 13 keys for ANSI keyboard"
 			);
 			console.assert(
-				keyCaps[2].length === 11,
+				keyCaps[2]!.length === 11,
 				LayoutNames[this.layout],
 				"KeyCaps[2] needs 11 keys for ANSI keyboard"
 			);
 			console.assert(
-				keyCaps[3].length === 10,
+				keyCaps[3]!.length === 10,
 				LayoutNames[this.layout],
 				"KeyCaps[3] needs 10 keys for ANSI keyboard"
 			);
@@ -60,22 +60,22 @@ export class KeyMap {
 		if (this.keyboard === KeyboardIndex.iso) {
 			console.assert(keyCaps.length === 4, LayoutNames[this.layout], "KeyCaps rows must be 4 for ISO keyboard");
 			console.assert(
-				keyCaps[0].length === 13,
+				keyCaps[0]!.length === 13,
 				LayoutNames[this.layout],
 				"KeyCaps[0] needs 13 keys for ISO keyboard"
 			);
 			console.assert(
-				keyCaps[1].length === 12,
+				keyCaps[1]!.length === 12,
 				LayoutNames[this.layout],
 				"KeyCaps[1] needs 12 keys for ISO keyboard"
 			);
 			console.assert(
-				keyCaps[2].length === 12,
+				keyCaps[2]!.length === 12,
 				LayoutNames[this.layout],
 				"KeyCaps[2] needs 12 keys for ISO keyboard"
 			);
 			console.assert(
-				keyCaps[3].length === 11,
+				keyCaps[3]!.length === 11,
 				LayoutNames[this.layout],
 				"KeyCaps[3] needs 11 keys for ISO keyboard"
 			);
@@ -87,27 +87,27 @@ export class KeyMap {
 				"KeyCaps rows must be 5 for Matrix keyboard"
 			);
 			console.assert(
-				keyCaps[0].length === 12,
+				keyCaps[0]!.length === 12,
 				LayoutNames[this.layout],
 				"KeyCaps[0] needs 12 keys for Matrix keyboard"
 			);
 			console.assert(
-				keyCaps[1].length === 12,
+				keyCaps[1]!.length === 12,
 				LayoutNames[this.layout],
 				"KeyCaps[1] needs 12 keys for Matrix keyboard"
 			);
 			console.assert(
-				keyCaps[2].length === 12,
+				keyCaps[2]!.length === 12,
 				LayoutNames[this.layout],
 				"KeyCaps[2] needs 12 keys for Matrix keyboard"
 			);
 			console.assert(
-				keyCaps[3].length === 12,
+				keyCaps[3]!.length === 12,
 				LayoutNames[this.layout],
 				"KeyCaps[3] needs 12 keys for Matrix keyboard"
 			);
 			console.assert(
-				keyCaps[4].length === 6,
+				keyCaps[4]!.length === 6,
 				LayoutNames[this.layout],
 				"KeyCaps[4] needs 6 keys for Matrix keyboard"
 			);

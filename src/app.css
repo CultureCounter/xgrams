@@ -32,14 +32,13 @@
 	--font-sourceCodePro: "Source Code Pro", monospace;
 	--font-ubuntuMono: "Ubuntu Mono", monospace;
 
-
 	--breakpoint-3xs: 16rem;
 	--breakpoint-2xs: 24rem;
 	--breakpoint-xs: 32rem;
 	--breakpoint-3xl: 120rem;
 
-	--color-digital-blue-50: oklch(95.13% 0.023 256.10);
-	--color-digital-blue-100: oklch(90.17% 0.048 259.10);
+	--color-digital-blue-50: oklch(95.13% 0.023 256.11);
+	--color-digital-blue-100: oklch(90.17% 0.048 259.11);
 	--color-digital-blue-200: oklch(80.72% 0.097 258.14);
 	--color-digital-blue-300: oklch(71.49% 0.149 258.39);
 	--color-digital-blue-400: oklch(63.31% 0.198 258.73);
@@ -48,7 +47,5 @@
 	--color-digital-blue-700: oklch(39.11% 0.161 260.13);
 	--color-digital-blue-800: oklch(29.89% 0.116 259.04);
 	--color-digital-blue-900: oklch(19.67% 0.068 256.39);
-	--color-digital-blue-950: oklch(16.49% 0.052 253.90);
+	--color-digital-blue-950: oklch(16.49% 0.052 253.91);
 }
-
-/*  */

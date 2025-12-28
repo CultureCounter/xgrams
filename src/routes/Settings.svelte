@@ -120,7 +120,7 @@
 		idbSettings.isDirty = true;
 	}
 
-	let sourceValue = $state<string>(SourceNames[idbLessonIndex]);
+	let sourceValue = $state<string>(SourceNames[idbLessonIndex]!);
 	function setSource(newSource: string | null): void {
 		if (newSource === null) {
 			return;
@@ -134,12 +134,12 @@
 		combination = currentLesson.combination;
 		repetition = currentLesson.repetition;
 		filterString = currentLesson.filter;
-		sourceValue = SourceNames[idbLessonIndex];
+		sourceValue = SourceNames[idbLessonIndex]!;
 	}
 
 	let scopeValue = $state<string>(currentLesson.scope.toString());
 	function setScope(newScope: string | null): void {
-		let scope = newScope ? Number(newScope) : ScopeValues[ScopeIndex.top50];
+		let scope = newScope ? Number(newScope) : ScopeValues[ScopeIndex.top50]!;
 		currentLesson.scope = scope;
 		scopeValue = scope.toString();
 		idbLessons.isDirty = true;
@@ -309,7 +309,7 @@
 								<SegmentedControl.Control>
 									<SegmentedControl.Indicator />
 									{#each ScopeNames as name, i (name)}
-										<SegmentedControl.Item value={ScopeValues[i].toString()}>
+										<SegmentedControl.Item value={ScopeValues[i]!.toString()}>
 											<SegmentedControl.ItemText>
 												<span class="md:hidden">{name}</span>
 												<span class="hidden md:inline">Top&nbsp;{name}</span>
