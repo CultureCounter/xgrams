@@ -188,10 +188,10 @@
 	const animModal =
 		"transition transition-discrete opacity-0 -translate-x-full starting:data-[state=open]:opacity-0 starting:data-[state=open]:-translate-x-full data-[state=open]:opacity-100 data-[state=open]:translate-x-0";
 
-	let contentClass = "card xs:space-y-4 backdrop-blur-lg shadow-xl";
+	let contentClass = "card xs:space-y-4 backdrop-blur-sm backdrop-brightness-50 backdrop-saturate-400 shadow-xl";
 	//   3xs:bg-lime-600 2xs:text-yellow-100 xs:bg-digital-blue-200 sm:bg-digital-blue-300 md:bg-digital-blue-400 lg:bg-digital-blue-500 xl:bg-digital-blue-600 2xl:bg-amber-700 3xl:bg-lime-800
 	let cardClass = $derived(
-		"card backdrop-blur-xl xs:p-2 space-x-1 space-y-2 border-2 "
+		"card xs:p-2 space-x-1 space-y-2 border-2 "
 			+ BorderColors[settingsState.colorIndex]
 			+ " "
 			+ BGColors[settingsState.colorIndex]
@@ -225,8 +225,8 @@
 				<article class={articleClassH}>
 					<div class={cardClass}>
 						<header class="card-header">
-							<span class="md:hidden"><WandSparklesIcon class="size-6" /></span>
-							<span class="hidden md:inline">Source</span>
+							<span class="xs:hidden"><WandSparklesIcon class="size-6" /></span>
+							<span class="hidden xs:inline">Source</span>
 						</header>
 						<article class={articleClassV}>
 							<SegmentedControl
@@ -238,7 +238,12 @@
 									<SegmentedControl.Indicator />
 									{#each SourceNames as name (name)}
 										{#if name == OtherNames.code}
-											<SegmentedControl.Item value={name}>
+											<SegmentedControl.Item
+												class="p-0"
+												value={name}
+												title={name}
+												aria-label={name}
+											>
 												<SegmentedControl.ItemText>
 													<span class="hidden md:inline">Code </span>
 													<button
@@ -253,7 +258,12 @@
 												<SegmentedControl.ItemHiddenInput />
 											</SegmentedControl.Item>
 										{:else if name == OtherNames.custom}
-											<SegmentedControl.Item value={name}>
+											<SegmentedControl.Item
+												class="p-0"
+												value={name}
+												title={name}
+												aria-label={name}
+											>
 												<SegmentedControl.ItemText>
 													<span class="hidden md:inline">Custom </span>
 													<button
@@ -268,7 +278,12 @@
 												<SegmentedControl.ItemHiddenInput />
 											</SegmentedControl.Item>
 										{:else}
-											<SegmentedControl.Item value={name}>
+											<SegmentedControl.Item
+												class="p-0"
+												value={name}
+												title={name}
+												aria-label={name}
+											>
 												<SegmentedControl.ItemText>
 													<span class="hidden md:inline">{name}</span>
 													{#if name == SourceNames[SourceIndex.bigrams]}
@@ -297,8 +312,8 @@
 					</div>
 					<div class={cardClass}>
 						<header class="card-header">
-							<span class="md:hidden"><InfinityIcon class="size-6" /></span>
-							<span class="hidden md:inline">Scope</span>
+							<span class="xs:hidden"><InfinityIcon class="size-6" /></span>
+							<span class="hidden xs:inline">Scope</span>
 						</header>
 						<article class={articleClassV}>
 							<SegmentedControl
@@ -309,7 +324,12 @@
 								<SegmentedControl.Control>
 									<SegmentedControl.Indicator />
 									{#each ScopeNames as name, i (name)}
-										<SegmentedControl.Item value={ScopeValues[i]!.toString()}>
+										<SegmentedControl.Item
+											class="p-0"
+											value={ScopeValues[i]!.toString()}
+											title="Top {name}"
+											aria-label="Top {name}"
+										>
 											<SegmentedControl.ItemText>
 												<span class="md:hidden">{name}</span>
 												<span class="hidden md:inline">Top&nbsp;{name}</span>
@@ -323,8 +343,8 @@
 					</div>
 					<div class={cardClass}>
 						<header class="card-header">
-							<span class="md:hidden"><ShellIcon class="size-6" /></span>
-							<span class="hidden md:inline">Generate</span>
+							<span class="xs:hidden"><ShellIcon class="size-6" /></span>
+							<span class="hidden xs:inline">Generate</span>
 						</header>
 						<article class={articleClassV}>
 							<Counter
@@ -423,7 +443,7 @@
 										</Switch.Thumb>
 									</Switch.Control>
 									<Switch.HiddenInput />
-									<Switch.Label class="pl-2"
+									<Switch.Label class="sm:pl-2"
 										><span class="hidden sm:inline inert">{name}</span></Switch.Label
 									>
 								</Switch>
@@ -438,34 +458,34 @@
 					>
 						<Tabs.List>
 							<Tabs.Trigger class="flex-1" value="code"
-								><span class="xs:hidden">🤖</span>
-								<span class="hidden xs:inline">Code</span></Tabs.Trigger
+								><span class="sm:hidden">🤖</span>
+								<span class="hidden sm:inline">Code</span></Tabs.Trigger
 							>
 							<Tabs.Trigger class="flex-1" value="custom"
-								><span class="xs:hidden">📜</span>
-								<span class="hidden xs:inline">Custom</span></Tabs.Trigger
+								><span class="sm:hidden">📜</span>
+								<span class="hidden sm:inline">Custom</span></Tabs.Trigger
 							>
 							<Tabs.Trigger class="flex-1" value="filter"
-								><span class="xs:hidden"
+								><span class="sm:hidden"
 									><FunnelIcon class={getHourStrokeFill(settingsState.colorIndex)} size={24} /></span
 								>
-								<span class="hidden xs:inline">Filter</span></Tabs.Trigger
+								<span class="hidden sm:inline">Filter</span></Tabs.Trigger
 							>
 							<Tabs.Trigger class="flex-1" value="fonts"
-								><span class="xs:hidden"><ALargeSmallIcon size={24} /></span>
-								<span class="hidden xs:inline">Fonts</span></Tabs.Trigger
+								><span class="sm:hidden"><ALargeSmallIcon size={24} /></span>
+								<span class="hidden sm:inline">Fonts</span></Tabs.Trigger
 							>
 							<Tabs.Trigger class="flex-1" value="fontInfo"
-								><span class="xs:hidden"><ExternalLinkIcon size={24} /></span>
-								<span class="hidden xs:inline">Font Info</span></Tabs.Trigger
+								><span class="sm:hidden"><ExternalLinkIcon size={24} /></span>
+								<span class="hidden sm:inline">Font Info</span></Tabs.Trigger
 							>
 							<Tabs.Trigger class="flex-1" value="keyboard"
-								><span class="xs:hidden"><KeyboardIcon size={24} /></span><span class="hidden xs:inline"
+								><span class="sm:hidden"><KeyboardIcon size={24} /></span><span class="hidden sm:inline"
 									>Keyboard</span
 								></Tabs.Trigger
 							>
 							<Tabs.Trigger class="flex-1" value="colors"
-								><span class="xs:hidden">🎨</span><span class="hidden xs:inline">Colors</span
+								><span class="sm:hidden">🎨</span><span class="hidden sm:inline">Colors</span
 								></Tabs.Trigger
 							>
 							<Tabs.Indicator />

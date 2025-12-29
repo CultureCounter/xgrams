@@ -1,14 +1,14 @@
 <script lang="ts">
 	import Darklight from "$lib/utilities/DarkLight/DarkLight.svelte";
+	import Settings from "./Settings.svelte";
+	import Keyboard from "./Keyboard.svelte";
+	import Lesson from "./Lesson.svelte";
 
 	import iconTailwind from "$lib/images/tailwindcss.svg";
 	import githubDark from "$lib/images/github-mark-white.svg";
 	import iconSvelte from "$lib/images/svelte-logo.svg";
 	import iconX from "$lib/images/x.svg";
 
-	import Settings from "./Settings.svelte";
-	import Typist from "./Typist.svelte";
-	import Keyboard from "./Keyboard.svelte";
 	import { IDBStore } from "$lib/store/IDBStore.svelte";
 	import { currentVersion, LessonsDB } from "$lib/store/LessonsDB.svelte";
 	import { LessonDB, transferTo } from "$lib/store/LessonDB.svelte";
@@ -108,7 +108,7 @@
 		});
 
 	// svelte-ignore non_reactive_update
-	let typist: Typist;
+	let lesson: Lesson;
 
 	function onLessonChanged(
 		settingsDB: SettingsDB,
@@ -125,12 +125,12 @@
 			transferTo(idbLessons.sourceLessons[newLessonIndex]!, currentLesson);
 			idbLessonIndex = newLessonIndex;
 			idbStore.setValue("idbLessonIndex", idbLessonIndex);
-			typist?.initializeLesson();
+			lesson?.initializeLesson();
 		}
 	}
 
 	/**
-	 * Update typist and stores if settings have changed
+	 * Update lesson and stores if settings have changed
 	 */
 	function onSettingsChanged(
 		settingsDB: SettingsDB,
@@ -170,7 +170,7 @@
 			}
 		}
 		if (needsUpdate) {
-			typist?.initializeLesson();
+			lesson?.initializeLesson();
 		}
 	}
 </script>
@@ -218,7 +218,7 @@
 				></Settings>
 			</div>
 		</div>
-		<Typist
+		<Lesson
 			bind:idbLessonIndex
 			bind:idbLessons
 			bind:currentLesson
@@ -227,8 +227,8 @@
 			bind:idbCodes
 			bind:idbCodeChoices
 			bind:idbCustomWords
-			bind:this={typist}
-		></Typist>
+			bind:this={lesson}
+		></Lesson>
 		<Keyboard></Keyboard>
 	{/if}
 	<div class="flex items-center justify-center gap-8 p-4">

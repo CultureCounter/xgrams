@@ -11,6 +11,7 @@ export enum CodeIndex {
 }
 
 export const CodeNames: string[] = ["C++", "C#", "Go", "Java", "Javascript", "Python", "Rust", "Swift", "Typescript"];
+export const CodeNamesShort: string[] = ["C++", "C#", "Go", "Jva", "JS", "Py", "Rst", "Swf", "TS"];
 
 export const CodeKeys: string[] = ["cpp", "cs", "go", "java", "js", "python", "rust", "swift", "ts"];
 

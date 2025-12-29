@@ -63,54 +63,56 @@
 	const linkClass = "flex items-center space-x-1";
 </script>
 
-<label class={dropdownLabelClass} for="select-keyboard">
-	<span>Keyboard</span>
-	<select
-		class="select"
-		id="select-keyboard"
-		name="Keyboard Selection"
-		bind:value={settingsState.keyboard}
-		onchange={() => {
-			setKeyboard();
+<div class="flex flex-col justify-stretch gap-4">
+	<label class={dropdownLabelClass} for="select-keyboard">
+		<span>Keyboard</span>
+		<select
+			class="select"
+			id="select-keyboard"
+			name="Keyboard Selection"
+			bind:value={settingsState.keyboard}
+			onchange={() => {
+				setKeyboard();
+			}}
+		>
+			{#each KeyboardNames as name, i (name)}
+				<option value={i}>
+					{name}
+				</option>
+			{/each}
+		</select>
+	</label>
+	<label class={dropdownLabelClass} for="select-keyboard-layout">
+		<span>Layout</span>
+		<select
+			class="select"
+			id="select-keyboard-layout"
+			name="Keyboard Layout Selection"
+			bind:value={settingsState.layout}
+			onchange={() => {
+				setLayout();
+			}}
+		>
+			{#each LayoutNames as name, i (name)}
+				<option value={i}>
+					{name}
+				</option>
+			{/each}
+		</select>
+	</label>
+	<Switch
+		checked={settingsState.showFingerColors}
+		onCheckedChange={(e) => {
+			onCheckedChange(e.checked);
 		}}
 	>
-		{#each KeyboardNames as name, i (name)}
-			<option value={i}>
-				{name}
-			</option>
-		{/each}
-	</select>
-</label>
-<label class={dropdownLabelClass} for="select-keyboard-layout">
-	<span>Layout</span>
-	<select
-		class="select"
-		id="select-keyboard-layout"
-		name="Keyboard Layout Selection"
-		bind:value={settingsState.layout}
-		onchange={() => {
-			setLayout();
-		}}
-	>
-		{#each LayoutNames as name, i (name)}
-			<option value={i}>
-				{name}
-			</option>
-		{/each}
-	</select>
-</label>
-<Switch
-	checked={settingsState.showFingerColors}
-	onCheckedChange={(e) => {
-		onCheckedChange(e.checked);
-	}}
->
-	<Switch.Control class="preset-filled-secondary-50-950 data-[state=checked]:preset-filled-secondary-500">
-		<Switch.Thumb />
-	</Switch.Control>
-	<Switch.HiddenInput />
-	<Switch.Label class="pl-2">Finger Colors</Switch.Label>
-</Switch>
+		<Switch.Control class="preset-filled-secondary-50-950 data-[state=checked]:preset-filled-secondary-500">
+			<Switch.Thumb />
+		</Switch.Control>
+		<Switch.HiddenInput />
+		<Switch.Label class="pl-2">Finger Colors</Switch.Label>
+	</Switch>
+</div>
 <div class={linksClass}>
 	<a
 		href="https://colemakmods.github.io/mod-dh/"

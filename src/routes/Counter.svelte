@@ -55,7 +55,7 @@
 	<header class="card-header text-center">
 		<p class="hidden md:inline">{name}</p>
 	</header>
-	<div class="grid grid-rows-1 justify-between sm:grid-cols-3">
+	<div class="grid grid-rows-1 justify-between xs:grid-cols-3">
 		<button onmouseup={onMouseUp} aria-label="Decrease the counter by one">
 			<MinusIcon class="size-4" />
 		</button>

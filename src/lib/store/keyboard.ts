@@ -5,10 +5,12 @@
 // There are finger assignments for each keyboard type.
 // Had to migrate from array of strings to array of array of character strings to get reactivity.
 // Settings will have to coalesce the keyboard types for each layout.
+
 // TODO: assignments for angle mod? Or is that another keyboard type with variant finger assignments?
+// NOT DOING: Maybe add variant layouts in the same manner as keyboard types?
+// Oh wow no. Saw the list on MonkeyType. Zero appetite for that in noncommercial software.
+
 // TODO: direct pasting of custom keymaps from other sources
-// TODO: Maybe add variant layouts in the same manner as keyboard types?
-// TODO: Fix keyboard width for ansi and iso layouts.
 
 export class KeyMap {
 	layout: LayoutIndex;
