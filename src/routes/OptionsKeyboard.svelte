@@ -1,5 +1,5 @@
 <script lang="ts">
-	import githubDark from "$lib/images/github-mark-white.svg";
+	import github from "$lib/images/github-mark-white.svg";
 	import reddit from "$lib/images/reddit-icon-full-color.svg";
 	import { KeyboardIndex, KeyboardNames, keyboards, LayoutIndex, LayoutNames } from "$lib/store/keyboard";
 	import { settingsState } from "$lib/store/SettingsState.svelte";
@@ -122,7 +122,7 @@
 		id="github-link"
 	>
 		<div class={linkClass}>
-			<img width="20" height="20" src={githubDark} alt="GitHub" />
+			<img width="20" height="20" src={github} alt="GitHub" />
 			<p class="label">ColemakDH</p>
 		</div>
 	</a>
@@ -134,7 +134,7 @@
 		id="github-link"
 	>
 		<div class={linkClass}>
-			<img width="20" height="20" src={githubDark} alt="GitHub" />
+			<img width="20" height="20" src={github} alt="GitHub" />
 			<p class="label">Enthium</p>
 		</div>
 	</a>
@@ -146,7 +146,7 @@
 		id="github-link"
 	>
 		<div class={linkClass}>
-			<img width="20" height="20" src={githubDark} alt="GitHub" />
+			<img width="20" height="20" src={github} alt="GitHub" />
 			<p class="label">Gallium</p>
 		</div>
 	</a>
@@ -158,7 +158,7 @@
 		id="github-link"
 	>
 		<div class={linkClass}>
-			<img width="20" height="20" src={githubDark} alt="GitHub" />
+			<img width="20" height="20" src={github} alt="GitHub" />
 			<p class="label">Graphite</p>
 		</div>
 	</a>
@@ -170,7 +170,7 @@
 		id="github-link"
 	>
 		<div class={linkClass}>
-			<img width="20" height="20" src={githubDark} alt="GitHub" />
+			<img width="20" height="20" src={github} alt="GitHub" />
 			<p class="label">Halmak</p>
 		</div>
 	</a>
@@ -182,7 +182,7 @@
 		id="github-link"
 	>
 		<div class={linkClass}>
-			<img width="20" height="20" src={githubDark} alt="GitHub" />
+			<img width="20" height="20" src={github} alt="GitHub" />
 			<p class="label">Nordrassil</p>
 		</div>
 	</a>
@@ -206,7 +206,7 @@
 		id="github-link"
 	>
 		<div class={linkClass}>
-			<img width="20" height="20" src={githubDark} alt="GitHub" />
+			<img width="20" height="20" src={github} alt="GitHub" />
 			<p class="label">Sturdy</p>
 		</div>
 	</a>
@@ -218,7 +218,7 @@
 		id="github-link"
 	>
 		<div class={linkClass}>
-			<img width="20" height="20" src={githubDark} alt="GitHub" />
+			<img width="20" height="20" src={github} alt="GitHub" />
 			<p class="label">Vibranium</p>
 		</div>
 	</a>

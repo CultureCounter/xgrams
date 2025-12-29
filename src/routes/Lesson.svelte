@@ -1,12 +1,12 @@
 <script lang="ts">
+	import { CodeIndex, CodeXG } from "$lib/store/code";
 	import { LessonsDB } from "$lib/store/LessonsDB.svelte";
+	import { LessonDB } from "$lib/store/LessonDB.svelte";
 	import { SettingsDB } from "$lib/store/SettingsDB.svelte";
 	import { SourceAllIndex, SourceKeys, SourceXG } from "$lib/store/SourceDB.svelte";
-	import { CodeIndex, CodeXG } from "$lib/store/code";
+	import type { ServerStore } from "$lib/store/ServerStore.svelte";
 	// import Celebration, { startCelebration, unleashWorker } from './Celebration.svelte';
 	import { resetStopWatch } from "../lib/utilities/StopWatch/stopwatch";
-	import { LessonDB } from "$lib/store/LessonDB.svelte";
-	import type { ServerStore } from "$lib/store/ServerStore.svelte";
 	import { deepClone, padToMultiple, shuffle } from "$lib/utilities/utils";
 	import Typist from "./Typist.svelte";
 
@@ -44,7 +44,9 @@
 		lines = generateLines();
 		expectedLine = lines[0] || "";
 		linesIndex = 0;
-		typist?.initializeLine();
+		if (typist && typist.initializeLine) {
+			typist.initializeLine();
+		}
 		resetStopWatch();
 	}
 

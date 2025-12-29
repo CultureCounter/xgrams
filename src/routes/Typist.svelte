@@ -131,7 +131,6 @@
 		// normalChar -> betterChar / failedChar
 		// failedChar -> remedyChar
 		// typingChar floats virtually at the insertion point
-		// TODO separate into a component
 		// TODO: create a true lesson that persists between sessions
 		// TODO: make deliberate line length -> lesson length
 		// TODO: autofocus on bad characters scheme with auto filter and calculated character practice order from layout.
