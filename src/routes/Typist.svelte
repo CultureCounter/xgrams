@@ -1,167 +1,36 @@
 <script lang="ts">
-	import { LessonsDB } from "$lib/store/LessonsDB.svelte";
 	import { SettingsDB, SoundIndex } from "$lib/store/SettingsDB.svelte";
-	import { SourceAllIndex, SourceKeys, SourceXG } from "$lib/store/SourceDB.svelte";
-	import { CodeIndex, CodeXG } from "$lib/store/code";
 	import Celebration, { startCelebration } from "./Celebration.svelte";
-	// import Celebration, { startCelebration, unleashWorker } from './Celebration.svelte';
+	// TODO: Celebration, { startCelebration, unleashWorker } from './Celebration.svelte';
 	import PlaySounds, { playSound, Sounds } from "./PlaySounds.svelte";
 	import StopWatch from "../lib/utilities/StopWatch/StopWatch.svelte";
-	import { lapTime, resetStopWatch, resetLap, startLap, endLap } from "../lib/utilities/StopWatch/stopwatch";
+	import { resetLap, startLap, endLap, lapTime } from "../lib/utilities/StopWatch/stopwatch";
 	import { LessonDB } from "$lib/store/LessonDB.svelte";
-	import type { ServerStore } from "$lib/store/ServerStore.svelte";
-	import { deepClone } from "$lib/utilities/utils";
 	import { settingsState } from "$lib/store/SettingsState.svelte";
 
 	type Props = {
-		// Define the expected type for the prop
-		idbLessonIndex: SourceAllIndex;
-		currentLesson: LessonDB;
-		idbLessons: LessonsDB;
+		lines: string[];
+		linesIndex: number;
+		expectedLine: string;
 		idbSettings: SettingsDB;
-		idbSources: ServerStore<SourceXG>;
-		idbCodes: ServerStore<CodeXG>;
-		idbCodeChoices: boolean[];
-		idbCustomWords: string[];
+		currentLesson: LessonDB;
+		initializeLesson: () => void;
 	};
 	let {
-		idbLessonIndex = $bindable<SourceAllIndex>(),
-		currentLesson = $bindable<LessonDB>(),
-		idbLessons = $bindable<LessonsDB>(),
+		lines = $bindable<string[]>(),
+		linesIndex = $bindable<number>(),
+		expectedLine = $bindable<string>(),
 		idbSettings = $bindable<SettingsDB>(),
-		idbSources = $bindable<ServerStore<SourceXG>>(),
-		idbCodes = $bindable<ServerStore<CodeXG>>(),
-		idbCodeChoices = $bindable<boolean[]>(),
-		idbCustomWords = $bindable<string[]>(),
+		currentLesson = $bindable<LessonDB>(),
+		initializeLesson = $bindable<() => void>(),
 	}: Props = $props();
-	let codesSource: string[] = [];
 
-	function shuffle(array: string[]): void {
-		for (let i = array.length - 1; i > 0; i--) {
-			let j = Math.floor(Math.random() * (i + 1));
-			[array[i]!, array[j]!] = [array[j]!, array[i]!];
-		}
-	}
-
-	function padToMultiple(array: string[], multiple: number) {
-		while (array.length % multiple > 0) {
-			let j = Math.floor(Math.random() * (array.length - 1));
-			array.push(array[j]!);
-		}
-	}
-
-	let expectedLine = "";
 	let typedLine = "";
 	let rightLetters = 0;
 	let wrongLetters = 0;
 	let rawWPM = $state(0);
 	let accuracy = $state(0);
 	let isMouseInside = $state(false);
-
-	let lines: string[] = $state([]);
-	let linesIndex = $state(0);
-	/**
-	 * Lessons are a series of `lines`
-	 */
-	export function initializeLesson() {
-		if (idbLessonIndex == SourceAllIndex.code) updateCodeWords(idbCodeChoices);
-		lines = generateLines();
-		expectedLine = lines[0] || "";
-		linesIndex = 0;
-		initializeLine();
-		resetStopWatch();
-	}
-
-	/**
-	 * @param combinations how many words, ngrams, etc. to combine
-	 * @param repetitions how many sets of the combinations to create
-	 * @param filter reduce the available combinations
-	 * @returns lines to type
-	 */
-	export function generateLines(): string[] {
-		let combinations = currentLesson.combination;
-		let repetitions = currentLesson.repetition;
-		let filter = currentLesson.filter;
-		let scope = currentLesson.scope;
-		let index = idbLessonIndex;
-		let source: string[];
-		if (index == SourceAllIndex.code) source = codesSource;
-		else if (index == SourceAllIndex.custom) source = idbCustomWords;
-		else source = idbSources.current[SourceKeys[index]!]!;
-
-		// let s: string = SourceNames[index];
-		// console.log("Generating lines with source length:", s, source?.length);
-		if (source == null) {
-			console.assert(source != null, "Generating lines with source == null:", index);
-			source = idbSources.current.bigrams.slice(0, scope);
-		}
-
-		// Use indexing to limit scope of Xgrams.
-		// Select the Top 50...16000 ngrams from source
-		if (scope) {
-			// console.log('Slicing source to scope:', source.length, '->', scope);
-			source = source.slice(0, scope);
-		}
-
-		if (filter.length > 0) {
-			// Filter: AND characters on the same line, OR different lines.
-			let orList = filter.split("\n");
-			source = source.filter(function (element: string) {
-				for (let andString of orList) {
-					let chosen = true;
-					for (let mandatoryChar of andString) {
-						if (!element.includes(mandatoryChar)) {
-							chosen = false;
-							break;
-						}
-					}
-					if (chosen) return true;
-				}
-				return false;
-			});
-		}
-
-		let ngrams = deepClone(source);
-		if (ngrams.length == 0) ngrams.push("NoWordsSelectedCheckFilter");
-		shuffle(ngrams);
-		padToMultiple(ngrams, combinations); // Ensure all subLines have requested combinations
-
-		let lines = [];
-		while (ngrams.length) {
-			let ngramsSublist = ngrams.slice(0, combinations);
-			let subLine = ngramsSublist.join(" ");
-			let _line = [];
-			for (let i = 0; i < repetitions; i++) {
-				_line.push(subLine);
-			}
-			lines.push(_line.join(" "));
-			// Remove the processed ngrams.
-			ngrams.splice(0, combinations);
-		}
-
-		shuffle(lines);
-		return lines;
-	}
-
-	/**
-	 * Update codesSource array based on idbCodeChoices
-	 * TODO: only update if idbCodeChoices has changed
-	 * @param idbCodeChoices boolean[] indicating which languages to include.
-	 */
-	function updateCodeWords(idbCodeChoices: boolean[]) {
-		codesSource.length = 0;
-		codesSource.push(
-			...(idbCodeChoices[CodeIndex.cpp] ? idbCodes.current.cpp : []),
-			...(idbCodeChoices[CodeIndex.cs] ? idbCodes.current.cs : []),
-			...(idbCodeChoices[CodeIndex.go] ? idbCodes.current.go : []),
-			...(idbCodeChoices[CodeIndex.java] ? idbCodes.current.java : []),
-			...(idbCodeChoices[CodeIndex.js] ? idbCodes.current.js : []),
-			...(idbCodeChoices[CodeIndex.python] ? idbCodes.current.python : []),
-			...(idbCodeChoices[CodeIndex.rust] ? idbCodes.current.rust : []),
-			...(idbCodeChoices[CodeIndex.swift] ? idbCodes.current.swift : []),
-			...(idbCodeChoices[CodeIndex.ts] ? idbCodes.current.ts : [])
-		);
-	}
 
 	const ColorChars = {
 		untoldChar: 0,
@@ -301,7 +170,7 @@
 		// Full line correctly entered
 		if (typedLine.trimEnd() === expectedLine) {
 			// console.log('typedLine === expectedLine');
-			// console.log('$lapTime seconds' + ($lapTime / 1000) * 60);
+			// console.log('$lapTime seconds', (lapTime / 1000) * 60);
 			rawWPM = Math.round(
 				((rightLetters + wrongLetters) / 5 / ($lapTime / 1000)) * 60 // 5 chars per word average
 			);
@@ -330,7 +199,7 @@
 		}
 	}
 
-	function initializeLine() {
+	export function initializeLine() {
 		// console.log('resetLap():' + $lapTime);
 		resetLap();
 		rightLetters = 0;
@@ -389,8 +258,8 @@
 		isMouseInside = true;
 	}
 
-	initializeLesson();
 	let colorIndex = $derived(settingsState.colorIndex);
+	initializeLesson();
 </script>
 
 <div class="mx-2">
@@ -419,8 +288,8 @@
 			</div>
 		</h2>
 		<h3 class="mt-0 flex place-content-center gap-x-3">
-			<span>WPM: {rawWPM} / {idbSettings.minimumWPM}</span>
-			<span>Accuracy: {accuracy}% / {idbSettings.minimumAccuracy}%</span>
+			<span>WPM: {rawWPM} / {settingsState.minimumWPM}</span>
+			<span>Accuracy: {accuracy}% / {settingsState.minimumAccuracy}%</span>
 			<span>Average WPM: {averageWPM(linesIndex)}</span>
 		</h3>
 	</div>

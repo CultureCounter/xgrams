@@ -12,6 +12,8 @@ export class SettingsState {
 	#font = $state("font-sourceCodePro ");
 	#keyboard = $state(KeyboardIndex.matrix);
 	#layout = $state(LayoutIndex.colemakDH);
+	#minimumWPM = $state(40);
+	#minimumAccuracy = $state(100);
 	#nextChar = $state("");
 	#showFingerColors = $state(true);
 	#typedLength = $state(0);
@@ -22,6 +24,8 @@ export class SettingsState {
 		this.#font = settingsDB.font;
 		this.#keyboard = settingsDB.keyboard;
 		this.#layout = settingsDB.layout;
+		this.#minimumWPM = settingsDB.minimumWPM;
+		this.#minimumAccuracy = settingsDB.minimumAccuracy;
 		this.#showFingerColors = settingsDB.showFingerColors;
 		this.#volume = settingsDB.volume;
 	}
@@ -49,6 +53,18 @@ export class SettingsState {
 	}
 	set layout(value: LayoutIndex) {
 		this.#layout = value;
+	}
+	get minimumWPM() {
+		return this.#minimumWPM;
+	}
+	set minimumWPM(value: number) {
+		this.#minimumWPM = value;
+	}
+	get minimumAccuracy() {
+		return this.#minimumAccuracy;
+	}
+	set minimumAccuracy(value: number) {
+		this.#minimumAccuracy = value;
 	}
 	get nextChar() {
 		return this.#nextChar;

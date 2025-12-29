@@ -79,3 +79,17 @@ export const findStrings = (target: string, candidates: string[]): string => {
 export function deepClone(original: any): any {
 	return structuredClone(original);
 }
+
+export function shuffle(array: string[]): void {
+	for (let i = array.length - 1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1));
+		[array[i]!, array[j]!] = [array[j]!, array[i]!];
+	}
+}
+
+export function padToMultiple(array: string[], multiple: number) {
+	while (array.length % multiple > 0) {
+		const j = Math.floor(Math.random() * (array.length - 1));
+		array.push(array[j]!);
+	}
+}
