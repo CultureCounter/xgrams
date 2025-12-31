@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Celebration, { startCelebration } from "./Celebration.svelte";
 	// TODO: Celebration, { startCelebration, unleashWorker } from './Celebration.svelte';
+	import { LessonDB } from "$lib/store/LessonDB.svelte";
 	import PlaySounds, { playSound, Sounds } from "./PlaySounds.svelte";
 	import { SettingsDB, SoundIndex } from "$lib/store/SettingsDB.svelte";
 	import { settingsState } from "$lib/store/SettingsState.svelte";
@@ -277,14 +278,16 @@
 		tabindex="0"
 		aria-label="Typing area"
 	>
-		<div class="p-2 {settingsState.font}">
-			{#each classLine as cp, i (cp.chars + i)}
-				{#if cp.typing}
-					<span class={cp.class + " " + ClassSpan[ColorChars.typingChar]}>{cp.chars}</span>
-				{:else}
-					<span class={cp.class}>{cp.chars}</span>
-				{/if}
-			{/each}
+		<div class="flex place-content-center">
+			<div class="p-2 {settingsState.font}">
+				{#each classLine as cp, i (cp.chars + i)}
+					{#if cp.typing}
+						<span class={cp.class + " " + ClassSpan[ColorChars.typingChar]}>{cp.chars}</span>
+					{:else}
+						<span class={cp.class}>{cp.chars}</span>
+					{/if}
+				{/each}
+			</div>
 		</div>
 		<h2 class="mt-6 flex place-content-center gap-x-3">
 			<div>
