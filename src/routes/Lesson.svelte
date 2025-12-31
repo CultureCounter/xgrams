@@ -11,6 +11,7 @@
 	import { deepClone, padToMultiple, shuffle } from "$lib/utilities/utils";
 	import Typist from "./Typist.svelte";
 	import { onMount } from "svelte";
+	import { settingsState } from "$lib/store/SettingsState.svelte";
 
 	type Props = {
 		// Define the expected type for the prop
@@ -47,13 +48,16 @@
 	export function initializeLesson() {
 		if (idbLessonIndex == SourceAllIndex.code) updateCodeWords(idbCodeChoices);
 
+		idbStats.setLessonKeys(settingsState.keyboard, settingsState.layout);
 		// Reset any perfected keys and get lesson focus letters
 		const lessonLetters = idbStats.getLessonLetters(idbSettings.minimumAccuracy, idbSettings.minimumWPM);
+		console.log("Lesson letters:", lessonLetters);
 
 		// Generate filter from focus letters if enabled
 		if (idbStats.autoFilter) {
 			const filterPattern = idbStats.generateFilterPattern(lessonLetters);
 			if (filterPattern) {
+				console.log("Filter pattern:", filterPattern);
 				currentLesson.filter = filterPattern;
 				idbLessons.isDirty = true;
 			}
@@ -82,7 +86,7 @@
 		else if (index == SourceAllIndex.custom) source = idbCustomWords;
 		else source = idbSources.current[SourceKeys[index]!]!;
 
-		// console.log("Generating lines with source length:", index, source?.length);
+		console.log("Generating lines with source length:", index, source?.length);
 		if (source == null) {
 			console.assert(source != null, "Generating lines with source == null:", index);
 			source = idbSources.current.bigrams.slice(0, scope);

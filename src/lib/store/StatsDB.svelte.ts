@@ -21,7 +21,9 @@ export class StatsDB {
 	constructor(init?: Partial<StatsDB>) {
 		if (init) {
 			if (init.autoFilter !== undefined) this.autoFilter = init.autoFilter;
-			if (init.stats !== undefined) this.stats = init.stats;
+			if (init.stats !== undefined) {
+				copyStringMap(init.stats, this.stats);
+			}
 			if (init.focusLetters !== undefined) this.focusLetters = init.focusLetters;
 			if (init.maxHistory !== undefined) this.maxHistory = init.maxHistory;
 			if (init.WPMs !== undefined) this.WPMs = init.WPMs;
@@ -73,7 +75,6 @@ export class StatsDB {
 
 		let stats = this.stats.get(char);
 		if (!stats) {
-			console.log("UNEXPECTED: recordKeystroke() ", char);
 			stats = new LetterStats();
 			this.stats.set(char, stats);
 		}
@@ -95,7 +96,7 @@ export class StatsDB {
 	 * @param layoutIndex
 	 * @returns string[]
 	 */
-	getLessonKeys(keyboardIndex: KeyboardIndex, layoutIndex: LayoutIndex): Map<string, LetterStats> {
+	setLessonKeys(keyboardIndex: KeyboardIndex, layoutIndex: LayoutIndex) {
 		const keyMap = getKeyboard(keyboardIndex, layoutIndex);
 
 		// home row, alternating from index to pinky

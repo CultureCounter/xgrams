@@ -218,9 +218,9 @@ const defaultColemakDHKeyMap = new KeyMap(
 	KeyboardIndex.matrix,
 	[
 		["`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", ";"],
-		["=", "Q", "W", "F", "P", "B", "J", "L", "U", "Y", ";", "-"],
-		[keyTab, "A", "R", "S", "T", "G", "M", "N", "E", "I", "O", "'"],
-		["[", "Z", "X", "C", "D", "V", "K", "H", ",", ".", "/", "\\"],
+		["=", "q", "w", "f", "p", "b", "j", "l", "u", "y", ";", "-"],
+		[keyTab, "a", "r", "s", "t", "g", "m", "n", "e", "i", "o", "'"],
+		["[", "z", "x", "c", "d", "v", "k", "h", ",", ".", "/", "\\"],
 		[keyBackspace, keyDelete, keyEscape, keyMagic, keyReturn, keySpace],
 	],
 	"justify-center"

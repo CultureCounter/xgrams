@@ -450,7 +450,7 @@
 							<Counter
 								name="Focus Letters"
 								minCounter={1}
-								maxCounter={10}
+								maxCounter={60}
 								stepCounter={1}
 								count={focusLetters}
 								onChange={setFocusLetters}
@@ -458,9 +458,9 @@
 							/>
 							<Counter
 								name="Max History"
-								minCounter={5}
-								maxCounter={240}
-								stepCounter={5}
+								minCounter={1}
+								maxCounter={20}
+								stepCounter={1}
 								count={maxHistory}
 								onChange={setMaxHistory}
 								colorIndex={settingsState.colorIndex}

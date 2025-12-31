@@ -7,6 +7,10 @@ import { ColorIndex } from "./Colors.svelte";
 import { KeyboardIndex, LayoutIndex } from "./keyboard";
 import type { SettingsDB } from "./SettingsDB.svelte";
 
+/**
+ * Shared settings state for keyboard layout and highlighting.
+ * Updated by Typist.svelte and Settings.svelte, consumed by Keyboard.svelte and Lesson.svelte
+ */
 export class SettingsState {
 	#colorIndex = $state(ColorIndex.lime);
 	#font = $state("font-sourceCodePro ");
