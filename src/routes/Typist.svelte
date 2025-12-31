@@ -1,18 +1,19 @@
 <script lang="ts">
-	import { SettingsDB, SoundIndex } from "$lib/store/SettingsDB.svelte";
 	import Celebration, { startCelebration } from "./Celebration.svelte";
 	// TODO: Celebration, { startCelebration, unleashWorker } from './Celebration.svelte';
 	import PlaySounds, { playSound, Sounds } from "./PlaySounds.svelte";
+	import { SettingsDB, SoundIndex } from "$lib/store/SettingsDB.svelte";
+	import { settingsState } from "$lib/store/SettingsState.svelte";
+	import type { StatsDB } from "$lib/store/StatsDB.svelte";
 	import StopWatch from "../lib/utilities/StopWatch/StopWatch.svelte";
 	import { resetLap, startLap, endLap, lapTime } from "../lib/utilities/StopWatch/stopwatch";
-	import { LessonDB } from "$lib/store/LessonDB.svelte";
-	import { settingsState } from "$lib/store/SettingsState.svelte";
 
 	type Props = {
 		lines: string[];
 		linesIndex: number;
 		expectedLine: string;
 		idbSettings: SettingsDB;
+		idbStats: StatsDB;
 		currentLesson: LessonDB;
 		initializeLesson: () => void;
 	};
@@ -21,6 +22,7 @@
 		linesIndex = $bindable<number>(),
 		expectedLine = $bindable<string>(),
 		idbSettings = $bindable<SettingsDB>(),
+		idbStats = $bindable<StatsDB>(),
 		currentLesson = $bindable<LessonDB>(),
 		initializeLesson = $bindable<() => void>(),
 	}: Props = $props();
@@ -83,7 +85,7 @@
 		}
 		// console.log('classLine:' + JSON.stringify(classLine, null, '\t'));
 		classLine = aClassLine;
-		// console.log('classLine:' + JSON.stringify(classLine, null, '\t'));
+		// console.log("classLine:", JSON.stringify(classLine, null, "\t"));
 		// Update shared typing state for keyboard highlighting
 		settingsState.nextChar = expectedLine[typedLine.length] ?? "";
 		settingsState.typedLength = typedLine.length;
@@ -161,9 +163,13 @@
 		if (expectedLine.startsWith(typedLine)) {
 			if (idbSettings.sounds[SoundIndex.rightletter]) playSound(Sounds.rightLetter);
 			rightLetters += 1;
+			// Record correct keystroke for accuracy tracking
+			idbStats.recordKeystroke(expectedLine[i]!, true, $lapTime);
 		} else if (expectedLine !== typedLine.trimEnd()) {
 			if (idbSettings.sounds[SoundIndex.wrongletter]) playSound(Sounds.wrongLetter);
 			wrongLetters += 1;
+			// Record incorrect keystroke for accuracy tracking
+			idbStats.recordKeystroke(expectedLine[i]!, false, $lapTime);
 		}
 
 		// Full line correctly entered
@@ -187,9 +193,9 @@
 			// Goals Achieved
 			let newRoundStarted = linesIndex == 0;
 			if (newRoundStarted) {
-				currentLesson.WPMs = [];
+				idbStats.WPMs = [];
 			}
-			currentLesson.WPMs.push(rawWPM);
+			idbStats.WPMs.push(rawWPM);
 
 			if (idbSettings.sounds[SoundIndex.passedGoals]) playSound(Sounds.passedGoals);
 			nextLine();
@@ -227,14 +233,14 @@
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function averageWPM(lineIndex: number): number {
-		if (currentLesson.WPMs?.length == 0) {
+		if (idbStats.WPMs?.length == 0) {
 			return 0;
 		}
 
-		let sum = currentLesson.WPMs?.reduce(function (a: number, b: number) {
+		let sum = idbStats.WPMs?.reduce(function (a: number, b: number) {
 			return a + b;
 		}, 0);
-		let average = sum / currentLesson.WPMs?.length;
+		let average = sum / idbStats.WPMs?.length;
 		return Math.round(average);
 	}
 
@@ -258,7 +264,6 @@
 	}
 
 	let colorIndex = $derived(settingsState.colorIndex);
-	initializeLesson();
 </script>
 
 <div class="mx-2">

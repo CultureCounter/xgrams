@@ -26,6 +26,7 @@
 			for (let layout of keyboards.keys()) {
 				if (keyboards.get(layout)?.has(settingsState.keyboard)) {
 					settingsState.layout = layout;
+					newLayout = keyboards.get(layout);
 					break;
 				}
 			}

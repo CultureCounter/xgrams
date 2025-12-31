@@ -17,7 +17,6 @@ export class LessonDB {
 	combination: number = 2;
 	repetition: number = 20;
 	filter: string = "";
-	WPMs: number[] = [];
 
 	constructor(init?: Partial<LessonDB>) {
 		if (init) {
@@ -25,7 +24,6 @@ export class LessonDB {
 			if (init.combination !== undefined) this.combination = init.combination;
 			if (init.repetition !== undefined) this.repetition = init.repetition;
 			if (init.filter !== undefined) this.filter = init.filter;
-			if (init.WPMs !== undefined) this.WPMs = init.WPMs;
 		}
 	}
 
@@ -60,18 +58,6 @@ export const transferTo = (lesson: LessonDB, lessonDB: LessonDB): boolean => {
 	}
 	if (lessonDB.filter !== lesson.filter) {
 		lessonDB.filter = lesson.filter;
-		didChange = true;
-	}
-
-	let wpmChanged = false;
-	lessonDB.WPMs.forEach((wpm, i) => {
-		if (lesson.WPMs[i] != wpm) wpmChanged = true;
-	});
-	if (wpmChanged) {
-		lessonDB.WPMs.length = 0;
-		lesson.WPMs.forEach((wpm) => {
-			lessonDB.WPMs.push(wpm);
-		});
 		didChange = true;
 	}
 

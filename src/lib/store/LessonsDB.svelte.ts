@@ -1,6 +1,6 @@
 import { LessonDB } from "./LessonDB.svelte.ts";
 
-export const currentVersion = 3; // increment for schema changes.
+export const currentVersion = 4; // increment for schema changes.
 
 export const OtherNames: { code: string; custom: string } = { code: "Code", custom: "Custom" };
 

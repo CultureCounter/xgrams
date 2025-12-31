@@ -19,100 +19,86 @@ export class KeyMap {
 	leftKeys: string[] = [];
 	rightKeys: string[] = [];
 	justify = "justify-center";
-	thumbRow: boolean = false; // Whether this layout has a dedicated thumb row
-	constructor(
-		layout: LayoutIndex,
-		keyboard: KeyboardIndex,
-		keyCaps: string[][],
-		leftKeys: string[],
-		rightKeys: string[],
-		justify: string,
-		thumbRow: boolean = false
-	) {
+	constructor(layout: LayoutIndex, keyboard: KeyboardIndex, keyCaps: string[][], justify: string) {
 		this.layout = layout;
 		this.keyboard = keyboard;
 		this.keyCaps = keyCaps;
-		this.leftKeys = leftKeys;
-		this.rightKeys = rightKeys;
 		this.justify = justify;
-		this.thumbRow = thumbRow;
-		if (this.keyboard === KeyboardIndex.ansi) {
-			console.assert(keyCaps.length === 4, LayoutNames[this.layout], "KeyCaps rows must be 4 for ANSI keyboard");
-			console.assert(
-				keyCaps[0]!.length === 13,
-				LayoutNames[this.layout],
-				"KeyCaps[0] needs 13 keys for ANSI keyboard"
-			);
-			console.assert(
-				keyCaps[1]!.length === 13,
-				LayoutNames[this.layout],
-				"KeyCaps[1] needs 13 keys for ANSI keyboard"
-			);
-			console.assert(
-				keyCaps[2]!.length === 11,
-				LayoutNames[this.layout],
-				"KeyCaps[2] needs 11 keys for ANSI keyboard"
-			);
-			console.assert(
-				keyCaps[3]!.length === 10,
-				LayoutNames[this.layout],
-				"KeyCaps[3] needs 10 keys for ANSI keyboard"
-			);
-		}
-		if (this.keyboard === KeyboardIndex.iso) {
-			console.assert(keyCaps.length === 4, LayoutNames[this.layout], "KeyCaps rows must be 4 for ISO keyboard");
-			console.assert(
-				keyCaps[0]!.length === 13,
-				LayoutNames[this.layout],
-				"KeyCaps[0] needs 13 keys for ISO keyboard"
-			);
-			console.assert(
-				keyCaps[1]!.length === 12,
-				LayoutNames[this.layout],
-				"KeyCaps[1] needs 12 keys for ISO keyboard"
-			);
-			console.assert(
-				keyCaps[2]!.length === 12,
-				LayoutNames[this.layout],
-				"KeyCaps[2] needs 12 keys for ISO keyboard"
-			);
-			console.assert(
-				keyCaps[3]!.length === 11,
-				LayoutNames[this.layout],
-				"KeyCaps[3] needs 11 keys for ISO keyboard"
-			);
-		}
-		if (this.keyboard === KeyboardIndex.matrix) {
-			console.assert(
-				keyCaps.length === 5,
-				LayoutNames[this.layout],
-				"KeyCaps rows must be 5 for Matrix keyboard"
-			);
-			console.assert(
-				keyCaps[0]!.length === 12,
-				LayoutNames[this.layout],
-				"KeyCaps[0] needs 12 keys for Matrix keyboard"
-			);
-			console.assert(
-				keyCaps[1]!.length === 12,
-				LayoutNames[this.layout],
-				"KeyCaps[1] needs 12 keys for Matrix keyboard"
-			);
-			console.assert(
-				keyCaps[2]!.length === 12,
-				LayoutNames[this.layout],
-				"KeyCaps[2] needs 12 keys for Matrix keyboard"
-			);
-			console.assert(
-				keyCaps[3]!.length === 12,
-				LayoutNames[this.layout],
-				"KeyCaps[3] needs 12 keys for Matrix keyboard"
-			);
-			console.assert(
-				keyCaps[4]!.length === 6,
-				LayoutNames[this.layout],
-				"KeyCaps[4] needs 6 keys for Matrix keyboard"
-			);
+		try {
+			console.assert(keyCaps.length === 5, LayoutNames[this.layout], "KeyCaps rows must be 5");
+			if (this.keyboard === KeyboardIndex.matrix) {
+				console.assert(
+					keyCaps[0]!.length === 12,
+					LayoutNames[this.layout],
+					"KeyCaps[0] needs 12 keys for Matrix keyboard"
+				);
+				console.assert(
+					keyCaps[1]!.length === 12,
+					LayoutNames[this.layout],
+					"KeyCaps[1] needs 12 keys for Matrix keyboard"
+				);
+				console.assert(
+					keyCaps[2]!.length === 12,
+					LayoutNames[this.layout],
+					"KeyCaps[2] needs 12 keys for Matrix keyboard"
+				);
+				console.assert(
+					keyCaps[3]!.length === 12,
+					LayoutNames[this.layout],
+					"KeyCaps[3] needs 12 keys for Matrix keyboard"
+				);
+				console.assert(
+					keyCaps[4]!.length === 6,
+					LayoutNames[this.layout],
+					"KeyCaps[4] needs 6 keys for Matrix keyboard"
+				);
+			}
+			if (this.keyboard === KeyboardIndex.ansi) {
+				console.assert(
+					keyCaps[0]!.length === 14,
+					LayoutNames[this.layout],
+					"KeyCaps[0] needs 14 keys for ANSI keyboard"
+				);
+				console.assert(
+					keyCaps[1]!.length === 14,
+					LayoutNames[this.layout],
+					"KeyCaps[1] needs 14 keys for ANSI keyboard"
+				);
+				console.assert(
+					keyCaps[2]!.length === 13,
+					LayoutNames[this.layout],
+					"KeyCaps[2] needs 13 keys for ANSI keyboard"
+				);
+				console.assert(
+					keyCaps[3]!.length === 12,
+					LayoutNames[this.layout],
+					"KeyCaps[3] needs 12 keys for ANSI keyboard"
+				);
+			}
+			if (this.keyboard === KeyboardIndex.iso) {
+				console.assert(
+					keyCaps[0]!.length === 14,
+					LayoutNames[this.layout],
+					"KeyCaps[0] needs 14 keys for ISO keyboard"
+				);
+				console.assert(
+					keyCaps[1]!.length === 14,
+					LayoutNames[this.layout],
+					"KeyCaps[1] needs 14 keys for ISO keyboard"
+				);
+				console.assert(
+					keyCaps[2]!.length === 14,
+					LayoutNames[this.layout],
+					"KeyCaps[2] needs 14 keys for ISO keyboard"
+				);
+				console.assert(
+					keyCaps[3]!.length === 13,
+					LayoutNames[this.layout],
+					"KeyCaps[3] needs 13 keys for ISO keyboard"
+				);
+			}
+		} catch (e) {
+			console.error(e);
 		}
 	}
 }
@@ -156,6 +142,7 @@ export enum KeyboardIndex {
 	iso,
 }
 export const KeyboardNames = ["Matrix", "ANSI", "ISO"];
+export const KeyboardKeys = ["matrix", "ansi", "iso"];
 
 // Finger assignments for touch typing
 export enum FingerIndex {
@@ -182,25 +169,27 @@ export const fingerAssignments: Record<KeyboardIndex, FingerIndex[][]> = {
 	[KeyboardIndex.matrix]: [
 		// Row 0-3: 12 keys split 6+6, Row 4: thumb keys
 		//1 2  3  4  5  6  7  8  9  10 11 12
-		[0, 0, 1, 2, 3, 3, 6, 6, 7, 8, 9, 9], // numbers
-		[0, 0, 1, 2, 3, 3, 6, 6, 7, 8, 9, 9], // top
-		[0, 0, 1, 2, 3, 3, 6, 6, 7, 8, 9, 9], // home
-		[0, 0, 1, 2, 3, 3, 6, 6, 7, 8, 9, 9], // bottom
+		[0, 0, 1, 2, 3, 3, 6, 6, 7, 8, 9, 9], // 12 numbers
+		[0, 0, 1, 2, 3, 3, 6, 6, 7, 8, 9, 9], // 12 top
+		[0, 0, 1, 2, 3, 3, 6, 6, 7, 8, 9, 9], // 12 home
+		[0, 0, 1, 2, 3, 3, 6, 6, 7, 8, 9, 9], // 12 bottom
 		[4, 4, 4, 5, 5, 5], // thumb (left 4, right 5)
 	],
 	[KeyboardIndex.ansi]: [
 		//1 2  3  4  5  6  7  8  9  10 11 12 13
-		[0, 0, 1, 2, 3, 3, 6, 6, 7, 8, 9, 9, 9], // numbers
-		[0, 1, 2, 3, 3, 6, 6, 7, 8, 9, 9, 9, 9], // top
-		[0, 1, 2, 3, 3, 6, 6, 7, 8, 9, 9], // home
-		[0, 1, 2, 3, 3, 6, 6, 7, 8, 9], // bottom
+		[0, 0, 1, 2, 3, 3, 6, 6, 7, 8, 9, 9, 9, 9], // 14 numbers
+		[0, 0, 1, 2, 3, 3, 6, 6, 7, 8, 9, 9, 9, 9], // 14 top
+		[0, 0, 1, 2, 3, 3, 6, 6, 7, 8, 9, 9, 9], // 13 home
+		[0, 0, 1, 2, 3, 3, 6, 6, 7, 8, 9, 9], // 12 bottom
+		[4, 4, 4, 5, 5, 5, 5], // thumbs
 	],
 	[KeyboardIndex.iso]: [
-		//1 2  3  4  5  6  7  8  9  10 11 12 13
-		[0, 0, 1, 2, 3, 3, 6, 6, 7, 8, 9, 9, 9], // numbers
-		[0, 1, 2, 3, 3, 6, 6, 7, 8, 9, 9, 9], // top
-		[0, 1, 2, 3, 3, 6, 6, 7, 8, 9, 9, 9], // home
-		[0, 0, 1, 2, 3, 3, 6, 6, 7, 8, 9], // bottom
+		//1 2  3  4  5  6  7  8  9  10 11 12 13 14
+		[0, 0, 1, 2, 3, 3, 6, 6, 7, 8, 9, 9, 9, 9], // 14 numbers
+		[0, 0, 1, 2, 3, 3, 6, 6, 7, 8, 9, 9, 9, 9], // 14 top
+		[0, 0, 1, 2, 3, 3, 6, 6, 7, 8, 9, 9, 9, 9], // 14 home
+		[0, 0, 0, 1, 2, 3, 3, 6, 6, 7, 8, 9, 9], // 13 bottom
+		[4, 4, 4, 5, 5, 5, 5], // thumbs
 	],
 };
 
@@ -220,12 +209,6 @@ const keyShift = `\u21E7`;
 const keySpace = `\u2423`; // ␣
 const keyTab = `\u21E5`;
 
-// \"          1         2         3         4           5         6\",
-// \"0123456789012345678901234567890123456789012 3 45678901234567890123456789\",
-// Layout string format: characters map to positions based on keyMaps indices
-
-const hasThumbRow = true;
-
 // https://colemakmods.github.io/mod-dh/
 const colemakDHMap = new Map<KeyboardIndex, KeyMap>();
 export const keyboards: Map<LayoutIndex, Map<KeyboardIndex, KeyMap>> = new Map();
@@ -240,10 +223,7 @@ const defaultColemakDHKeyMap = new KeyMap(
 		["[", "Z", "X", "C", "D", "V", "K", "H", ",", ".", "/", "\\"],
 		[keyBackspace, keyDelete, keyEscape, keyMagic, keyReturn, keySpace],
 	],
-	["", "", "", "", ""],
-	["", "", "", "", ""],
-	"justify-center",
-	hasThumbRow
+	"justify-center"
 );
 colemakDHMap.set(KeyboardIndex.matrix, defaultColemakDHKeyMap);
 
@@ -261,10 +241,7 @@ dvorakMap.set(
 			["\\", ";", "q", "j", "k", "x", "b", "m", "w", "v", "z", "]"],
 			[keyBackspace, keyDelete, keyEscape, keyMagic, keyReturn, keySpace],
 		],
-		["", "", "", "", ""],
-		["", "", "", "", ""],
-		"justify-center",
-		hasThumbRow
+		"justify-center"
 	)
 );
 
@@ -283,10 +260,7 @@ enthiumMap.set(
 			["\\", "'", ",", ".", ";", "/", "j", "m", "g", "p", "v", "]"],
 			[keyBackspace, keyDelete, keyEscape, keyMagic, keyReturn, "r"],
 		],
-		["", "", "", "", ""],
-		["", "", "", "", ""],
-		"justify-center",
-		hasThumbRow
+		"justify-center"
 	)
 );
 enthiumMap.set(
@@ -295,13 +269,12 @@ enthiumMap.set(
 		LayoutIndex.enthium,
 		KeyboardIndex.ansi,
 		[
-			["`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", keyCapslock, keyAltRight],
-			["q", "y", "o", "u", "=", "x", "l", "d", "w", "z", "[", "]", "\\"],
-			["c", "i", "a", "e", "-", "k", "h", "t", "n", "s", "f"],
-			["'", ",", ".", ";", "/", "j", "m", "g", "p", "v"],
+			["`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", keyCapslock, keyAltRight, keyBackspace],
+			[keyTab, "q", "y", "o", "u", "=", "x", "l", "d", "w", "z", "[", "]", "\\"],
+			["b", "c", "i", "a", "e", "-", "k", "h", "t", "n", "s", "f", keyEnter],
+			[keyShift, "'", ",", ".", ";", "/", "j", "m", "g", "p", "v", keyShift],
+			[keyControl, keyAltLeft, keyCommand, keySpace, keyCommand, "r", keyControl],
 		],
-		["", keyTab, "b", keyShift],
-		[keyBackspace, "", keyEnter, keyShift],
 		"justify-center"
 	)
 );
@@ -322,10 +295,7 @@ galliumMap.set(
 			["\\", "q", "x", "m", "w", "j", "k", "f", "'", ";", ".", "]"],
 			[keyBackspace, keyDelete, keyEscape, keyMagic, keyReturn, keySpace],
 		],
-		["", "", "", "", ""],
-		["", "", "", "", ""],
-		"justify-center",
-		hasThumbRow
+		"justify-center"
 	)
 );
 galliumMap.set(
@@ -334,13 +304,12 @@ galliumMap.set(
 		LayoutIndex.gallium,
 		KeyboardIndex.ansi,
 		[
-			["`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "="],
-			["b", "l", "d", "c", "v", "j", "f", "o", "u", ",", "[", "]", "\\"],
-			["n", "r", "t", "s", "g", "y", "h", "a", "e", "i", "/"],
-			["x", "q", "m", "w", "z", "k", "p", "'", ";", "."],
+			["`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=", keyBackspace],
+			[keyTab, "b", "l", "d", "c", "v", "j", "f", "o", "u", ",", "[", "]", "\\"],
+			[keyCapslock, "n", "r", "t", "s", "g", "y", "h", "a", "e", "i", "/", keyEnter],
+			[keyShift, "x", "q", "m", "w", "z", "k", "p", "'", ";", ".", keyShift],
+			[keyControl, keyAltLeft, keyCommand, keySpace, keyCommand, keyAltRight, keyControl],
 		],
-		["", keyTab, keyCapslock, keyShift],
-		[keyBackspace, "", keyEnter, keyShift],
 		"justify-center"
 	)
 );
@@ -354,13 +323,12 @@ graphiteMap.set(
 		LayoutIndex.graphite,
 		KeyboardIndex.ansi,
 		[
-			["`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "[", "]"],
-			["b", "l", "d", "w", "z", "'", "f", "o", "u", "j", ";", "=", "\\"],
-			["n", "r", "t", "s", "g", "y", "h", "a", "e", "i", ","],
-			["q", "x", "m", "c", "v", "k", "p", ".", "-", "/"],
+			["`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "[", "]", keyBackspace],
+			[keyTab, "b", "l", "d", "w", "z", "'", "f", "o", "u", "j", ";", "=", "\\"],
+			[keyCapslock, "n", "r", "t", "s", "g", "y", "h", "a", "e", "i", ",", keyEnter],
+			[keyShift, "q", "x", "m", "c", "v", "k", "p", ".", "-", "/", keyShift],
+			[keyControl, keyAltLeft, keyCommand, keySpace, keyCommand, keyAltRight, keyControl],
 		],
-		["", keyTab, keyCapslock, keyShift],
-		[keyBackspace, "", keyEnter, keyShift],
 		"justify-center"
 	)
 );
@@ -380,10 +348,7 @@ halmakMap.set(
 			["\\", "f", "m", "v", "c", "/", ";", "p", "x", "k", "y", "]"],
 			[keyBackspace, keyDelete, keyEscape, keyMagic, keyReturn, keySpace],
 		],
-		["", "", "", "", ""],
-		["", "", "", "", ""],
-		"justify-center",
-		hasThumbRow
+		"justify-center"
 	)
 );
 halmakMap.set(
@@ -392,13 +357,12 @@ halmakMap.set(
 		LayoutIndex.halmak,
 		KeyboardIndex.ansi,
 		[
-			["`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "="],
-			["w", "l", "r", "b", "z", "q", "g", "u", "d", "j", "[", "]", "\\"],
-			["s", "h", "n", "t", ",", ".", "a", "e", "o", "i", "/"],
-			["f", "m", "v", "c", "/", ";", "p", "x", "k", "y"],
+			["`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=", keyBackspace],
+			[keyTab, "w", "l", "r", "b", "z", "q", "g", "u", "d", "j", "[", "]", "\\"],
+			[keyCapslock, "s", "h", "n", "t", ",", ".", "a", "e", "o", "i", "/", keyEnter],
+			[keyShift, "f", "m", "v", "c", "/", ";", "p", "x", "k", "y", keyShift],
+			[keyControl, keyAltLeft, keyCommand, keySpace, keyCommand, keyAltRight, keyControl],
 		],
-		["", keyTab, keyCapslock, keyShift],
-		[keyBackspace, "", keyEnter, keyShift],
 		"justify-center"
 	)
 );
@@ -408,13 +372,12 @@ halmakMap.set(
 		LayoutIndex.halmak,
 		KeyboardIndex.iso,
 		[
-			["`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "="],
-			["w", "l", "r", "b", "z", "q", "g", "u", "d", "j", "[", "]"],
-			["s", "h", "n", "t", ",", ".", "a", "e", "o", "i", "'", "#"],
-			["f", "m", "v", "c", "/", ";", "p", "x", "k", "y", "/"],
+			["`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=", keyBackspace],
+			[keyTab, "w", "l", "r", "b", "z", "q", "g", "u", "d", "j", "[", "]", keyEnter],
+			[keyCapslock, "s", "h", "n", "t", ",", ".", "a", "e", "o", "i", "'", "#", keyEnter],
+			[keyShift, "f", "m", "v", "c", "\\", ";", "p", "x", "k", "y", "/", keyShift],
+			[keyControl, keyAltLeft, keyCommand, keySpace, keyCommand, keyAltRight, keyControl],
 		],
-		["", keyTab, keyCapslock, keyShift],
-		[keyBackspace, keyEnter, keyEnter, keyShift],
 		"justify-center"
 	)
 );
@@ -435,10 +398,7 @@ nordrassilMap.set(
 			["\\", "x", "/", "'", ",", ";", "z", "c", "l", "f", "b", "]"],
 			[keySpace, keyArcane, keyBackspace, keyCommand, keyArcane, "t"],
 		],
-		["", "", "", "", ""],
-		["", "", "", "", ""],
-		"justify-center",
-		hasThumbRow
+		"justify-center"
 	)
 );
 
@@ -458,10 +418,7 @@ prometheumMap.set(
 			["\\", "v", "w", "g", "m", "j", "-", ".", "'", "=", "/", "]"],
 			[keyBackspace, keyAltLeft, keyControl, keyCommand, keyReturn, keySpace],
 		],
-		["", "", "", "", ""],
-		["", "", "", "", ""],
-		"justify-center",
-		hasThumbRow
+		"justify-center"
 	)
 );
 
@@ -479,10 +436,7 @@ qwertyMap.set(
 			["\\", "z", "x", "c", "v", "b", "n", "m", ",", ".", "/", "]"],
 			[keyBackspace, keyAltLeft, keyControl, keyCommand, keyReturn, keySpace],
 		],
-		["", "", "", "", ""],
-		["", "", "", "", ""],
-		"justify-center",
-		hasThumbRow
+		"justify-center"
 	)
 );
 qwertyMap.set(
@@ -491,13 +445,12 @@ qwertyMap.set(
 		LayoutIndex.qwerty,
 		KeyboardIndex.ansi,
 		[
-			["`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "="],
-			["q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "[", "]", "\\"],
-			["a", "s", "d", "f", "g", "h", "j", "k", "l", ";", "'"],
-			["z", "x", "c", "v", "b", "n", "m", ",", ".", "/"],
+			["`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=", keyBackspace],
+			[keyTab, "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "[", "]", "\\"],
+			[keyCapslock, "a", "s", "d", "f", "g", "h", "j", "k", "l", ";", "'", keyEnter],
+			[keyShift, "z", "x", "c", "v", "b", "n", "m", ",", ".", "/", keyShift],
+			[keyControl, keyAltLeft, keyCommand, keySpace, keyCommand, keyAltRight, keyControl],
 		],
-		["", keyTab, keyCapslock, keyShift],
-		[keyBackspace, "", keyEnter, keyShift],
 		"justify-center"
 	)
 );
@@ -507,13 +460,12 @@ qwertyMap.set(
 		LayoutIndex.qwerty,
 		KeyboardIndex.iso,
 		[
-			["`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "="],
-			["q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "[", "]"],
-			["a", "s", "d", "f", "g", "h", "j", "k", "l", ";", "'", "#"],
-			["\\", "z", "x", "c", "v", "b", "n", "m", ",", ".", "/"],
+			["`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=", keyBackspace],
+			[keyTab, "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "[", "]", keyEnter],
+			[keyCapslock, "a", "s", "d", "f", "g", "h", "j", "k", "l", ";", "'", "#", keyEnter],
+			[keyShift, "\\", "z", "x", "c", "v", "b", "n", "m", ",", ".", "/", keyShift],
+			[keyControl, keyAltLeft, keyCommand, keySpace, keyCommand, keyAltRight, keyControl],
 		],
-		["", keyTab, keyCapslock, keyShift],
-		[keyBackspace, keyEnter, keyEnter, keyShift],
 		"justify-center"
 	)
 );
@@ -533,10 +485,7 @@ sturdyMap.set(
 			["\\", "z", "k", "q", "g", "w", "b", "h", "'", ";", ",", "/"],
 			[keyShift, keyCommand, keyArcane, keyArcane, keyBackspace, keySpace],
 		],
-		["", "", "", "", ""],
-		["", "", "", "", ""],
-		"justify-center",
-		hasThumbRow
+		"justify-center"
 	)
 );
 sturdyMap.set(
@@ -545,13 +494,12 @@ sturdyMap.set(
 		LayoutIndex.sturdy,
 		KeyboardIndex.ansi,
 		[
-			["`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "="],
-			["v", "m", "l", "c", "p", "x", "f", "o", "u", "j", "[", "]", "\\"],
-			["s", "t", "r", "d", "y", ".", "n", "a", "e", "i", "'"],
-			["z", "k", "q", "g", "w", "b", "h", "'", ";", ","],
+			["`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=", keyBackspace],
+			[keyTab, "v", "m", "l", "c", "p", "x", "f", "o", "u", "j", "[", "]", "\\"],
+			[keyCapslock, "s", "t", "r", "d", "y", ".", "n", "a", "e", "i", "'", keyEnter],
+			[keyShift, "z", "k", "q", "g", "w", "b", "h", "'", ";", ",", keyShift],
+			[keyControl, keyAltLeft, keyCommand, keySpace, keyCommand, keyAltRight, keyControl],
 		],
-		["", keyTab, keyCapslock, keyShift],
-		[keyBackspace, "", keyEnter, keyShift],
 		"justify-center"
 	)
 );
@@ -561,13 +509,12 @@ sturdyMap.set(
 		LayoutIndex.sturdy,
 		KeyboardIndex.iso,
 		[
-			["`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "="],
-			["v", "m", "l", "c", "p", "x", "f", "o", "u", "j", "[", "]"],
-			["s", "t", "r", "d", "y", ".", "n", "a", "e", "i", "'", "#"],
-			["\\", "z", "k", "q", "g", "w", "b", "h", "'", ";", ","],
+			["`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=", keyBackspace],
+			[keyTab, "v", "m", "l", "c", "p", "x", "f", "o", "u", "j", "[", "]", keyEnter],
+			[keyCapslock, "s", "t", "r", "d", "y", ".", "n", "a", "e", "i", "'", "#", keyEnter],
+			[keyShift, "\\", "z", "k", "q", "g", "w", "b", "h", "'", ";", ",", keyShift],
+			[keyControl, keyAltLeft, keyCommand, keySpace, keyCommand, keyAltRight, keyControl],
 		],
-		["", keyTab, keyCapslock, keyShift],
-		[keyBackspace, keyEnter, keyEnter, keyShift],
 		"justify-center"
 	)
 );
@@ -589,10 +536,7 @@ vibraniumMap.set(
 			["\\", "v", "p", "l", "d", "/", "-", "u", "o", "y", "f", "]"],
 			["r", keyCommand, keyArcane, keyArcane, keyBackspace, keySpace],
 		],
-		["", "", "", "", ""],
-		["", "", "", "", ""],
-		"justify-center",
-		hasThumbRow
+		"justify-center"
 	)
 );
 

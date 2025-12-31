@@ -22,6 +22,7 @@
 	import { SourceKeys } from "$lib/store/SourceDB.svelte";
 	import { arrayCopyBoolean, arrayCopyString, arrayEqualBoolean, arrayEqualString } from "$lib/utilities/utils";
 	import { settingsState } from "$lib/store/SettingsState.svelte";
+	import { StatsDB } from "$lib/store/StatsDB.svelte.ts";
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function clearAll() {
@@ -32,7 +33,7 @@
 
 	// TODO: minimal defaults for server data
 
-	const IDBKeys = ["idbLessons", "idbSettings", "idbCustomWords", "idbCodeChoices", "idbLessonIndex"];
+	const IDBKeys = ["idbLessons", "idbSettings", "idbCustomWords", "idbCodeChoices", "idbLessonIndex", "idbStats"];
 	const AllKeys = [...IDBKeys, ...CodeKeys, ...SourceKeys];
 
 	const isTracing = false;
@@ -66,6 +67,8 @@
 	let idbCodeChoices: boolean[] = [];
 	// svelte-ignore non_reactive_update
 	let idbLessonIndex = SourceAllIndex.bigrams;
+	// svelte-ignore non_reactive_update
+	let idbStats = null as unknown as StatsDB;
 
 	// svelte-ignore non_reactive_update
 	let currentLesson = null as unknown as LessonDB;
@@ -81,6 +84,7 @@
 				[] as string[],
 				[true, false, false, false, false, false, false, false, false] as boolean[],
 				SourceAllIndex.bigrams,
+				new StatsDB(),
 			],
 			isTracing
 		)
@@ -99,6 +103,7 @@
 			arrayCopyString(values[2] as string[], idbCustomWords);
 			arrayCopyBoolean(values[3] as boolean[], idbCodeChoices);
 			idbLessonIndex = (values[4] as SourceAllIndex) || SourceAllIndex.bigrams;
+			idbStats = new StatsDB(values[5] as StatsDB);
 			currentLesson = new LessonDB(idbLessons.sourceLessons[idbLessonIndex]);
 			settingsState.update(idbSettings);
 			idbLoading = false;
@@ -113,6 +118,7 @@
 
 	function onLessonChanged(
 		settingsDB: SettingsDB,
+		statsDB: StatsDB,
 		newLessonIndex: SourceAllIndex,
 		currentLesson: LessonDB,
 		lessonsDB: LessonsDB,
@@ -120,7 +126,7 @@
 		customWords?: string[]
 	) {
 		// Save dirty settings
-		onSettingsChanged(settingsDB, idbLessonIndex, currentLesson, lessonsDB, codeChoices, customWords);
+		onSettingsChanged(settingsDB, idbStats, currentLesson, lessonsDB, codeChoices, customWords);
 
 		if (currentLesson !== idbLessons.sourceLessons[newLessonIndex]!) {
 			transferTo(idbLessons.sourceLessons[newLessonIndex]!, currentLesson);
@@ -135,7 +141,7 @@
 	 */
 	function onSettingsChanged(
 		settingsDB: SettingsDB,
-		lessonIndex: SourceAllIndex,
+		statsDB: StatsDB,
 		currentLesson: LessonDB,
 		lessonsDB: LessonsDB,
 		codeChoices?: boolean[],
@@ -147,6 +153,10 @@
 			idbSettings.isDirty = false;
 			settingsDB.isDirty = false;
 			// No update needed
+		}
+		if (statsDB.isDirty) {
+			idbStore.setValue("idbStats", statsDB);
+			statsDB.isDirty = false;
 		}
 		if (lessonsDB.isDirty) {
 			let target = lessonsDB.sourceLessons[idbLessonIndex]!;
@@ -212,6 +222,7 @@
 					bind:currentLesson
 					bind:idbLessons
 					bind:idbSettings
+					bind:idbStats
 					{idbCodeChoices}
 					{idbCustomWords}
 					{onLessonChanged}
@@ -225,6 +236,7 @@
 			bind:currentLesson
 			bind:idbSettings
 			bind:idbSources
+			bind:idbStats
 			bind:idbCodes
 			bind:idbCodeChoices
 			bind:idbCustomWords

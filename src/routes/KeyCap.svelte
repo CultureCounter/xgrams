@@ -6,7 +6,7 @@
 
 	type Props = {
 		letter: string;
-		isLargeKey?: boolean;
+		isFatKey?: boolean;
 		size?: number;
 		fingerIndex?: FingerIndex;
 		showFingerColor?: boolean;
@@ -14,7 +14,7 @@
 	};
 	let {
 		letter = $bindable<string>(),
-		isLargeKey = $bindable<boolean>(),
+		isFatKey = $bindable<boolean>(),
 		size = $bindable<number>(),
 		fingerIndex = $bindable<FingerIndex>(),
 		showFingerColor = $bindable<boolean>(),
@@ -46,11 +46,12 @@
 		" w-[min(16vw,8vh,80px)]",
 		" w-[min(20vw,10vh,100px)]",
 		" w-[min(26vw,13vh,130px)]",
+		" w-[min(32vw,16vh,160px)]",
 	];
-	let keyLargeCSS = $derived(!isLargeKey ? "" : keyBaseCSS + largeWidths[size]);
+	let keyLargeCSS = $derived(!isFatKey ? "" : keyBaseCSS + largeWidths[size]);
 </script>
 
-{#if isLargeKey}
+{#if isFatKey}
 	<div class="group relative">
 		<div class={glowCSS}></div>
 		<div

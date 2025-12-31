@@ -4,11 +4,13 @@
 	import { LessonDB } from "$lib/store/LessonDB.svelte";
 	import { SettingsDB } from "$lib/store/SettingsDB.svelte";
 	import { SourceAllIndex, SourceKeys, SourceXG } from "$lib/store/SourceDB.svelte";
+	import type { StatsDB } from "$lib/store/StatsDB.svelte";
 	import type { ServerStore } from "$lib/store/ServerStore.svelte";
 	// import Celebration, { startCelebration, unleashWorker } from './Celebration.svelte';
 	import { resetStopWatch } from "../lib/utilities/StopWatch/stopwatch";
 	import { deepClone, padToMultiple, shuffle } from "$lib/utilities/utils";
 	import Typist from "./Typist.svelte";
+	import { onMount } from "svelte";
 
 	type Props = {
 		// Define the expected type for the prop
@@ -16,6 +18,7 @@
 		currentLesson: LessonDB;
 		idbLessons: LessonsDB;
 		idbSettings: SettingsDB;
+		idbStats: StatsDB;
 		idbSources: ServerStore<SourceXG>;
 		idbCodes: ServerStore<CodeXG>;
 		idbCodeChoices: boolean[];
@@ -26,6 +29,7 @@
 		currentLesson = $bindable<LessonDB>(),
 		idbLessons = $bindable<LessonsDB>(),
 		idbSettings = $bindable<SettingsDB>(),
+		idbStats = $bindable<StatsDB>(),
 		idbSources = $bindable<ServerStore<SourceXG>>(),
 		idbCodes = $bindable<ServerStore<CodeXG>>(),
 		idbCodeChoices = $bindable<boolean[]>(),
@@ -33,16 +37,30 @@
 	}: Props = $props();
 	let codesSource: string[] = [];
 
-	let lines: string[] = $state([]);
+	const thisIsTheWay = "This is the way.";
+	let lines: string[] = $state([thisIsTheWay]);
 	let linesIndex = $state(0);
-	let expectedLine = $state("");
+	let expectedLine = $state(thisIsTheWay);
 	/**
 	 * Lessons are a series of `lines`
 	 */
 	export function initializeLesson() {
 		if (idbLessonIndex == SourceAllIndex.code) updateCodeWords(idbCodeChoices);
+
+		// Reset any perfected keys and get lesson focus letters
+		const lessonLetters = idbStats.getLessonLetters(idbSettings.minimumAccuracy, idbSettings.minimumWPM);
+
+		// Generate filter from focus letters if enabled
+		if (idbStats.autoFilter) {
+			const filterPattern = idbStats.generateFilterPattern(lessonLetters);
+			if (filterPattern) {
+				currentLesson.filter = filterPattern;
+				idbLessons.isDirty = true;
+			}
+		}
+
 		lines = generateLines();
-		expectedLine = lines[0] || "";
+		expectedLine = lines[0] || thisIsTheWay;
 		linesIndex = 0;
 		if (typist && typist.initializeLine) {
 			typist.initializeLine();
@@ -138,6 +156,18 @@
 	}
 
 	let typist: Typist;
+	onMount(() => {
+		initializeLesson();
+	});
 </script>
 
-<Typist bind:this={typist} {lines} {linesIndex} {expectedLine} {idbSettings} {currentLesson} {initializeLesson} />
+<Typist
+	bind:this={typist}
+	{lines}
+	{linesIndex}
+	{expectedLine}
+	{idbSettings}
+	{idbStats}
+	{currentLesson}
+	{initializeLesson}
+/>

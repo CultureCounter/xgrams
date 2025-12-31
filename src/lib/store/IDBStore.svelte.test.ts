@@ -243,7 +243,6 @@ describe("IDBStore", () => {
 					combination: 25,
 					repetition: 35,
 					filter: "test filter",
-					WPMs: [50, 60, 70],
 				});
 
 				const keys = ["idbLessons"];
@@ -256,7 +255,6 @@ describe("IDBStore", () => {
 				expect(retrieved.sourceLessons[lessonIndex]!.combination).toBe(25);
 				expect(retrieved.sourceLessons[lessonIndex]!.repetition).toBe(35);
 				expect(retrieved.sourceLessons[lessonIndex]!.filter).toBe("test filter");
-				expect(retrieved.sourceLessons[lessonIndex]!.WPMs).toEqual([50, 60, 70]);
 			});
 
 			it("should handle default LessonsDB when nothing is stored", async () => {

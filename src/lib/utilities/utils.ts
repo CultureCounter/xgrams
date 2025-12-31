@@ -8,8 +8,26 @@ export const arrayEqualBoolean = (a1: boolean[], a2: boolean[]) => {
 		return element === a2[index];
 	});
 };
-
 export const arrayCopyBoolean = (a1: boolean[], a2: boolean[]) => {
+	if (a1.length !== a2.length) {
+		a2.length = a1.length;
+	}
+	for (let i = 0; i < a1.length; i++) {
+		a2[i] = a1[i]!;
+	}
+};
+
+export const arrayEqualNumber = (a1: number[], a2: number[]) => {
+	// Check if lengths are the same
+	if (a1.length !== a2.length) {
+		return false;
+	}
+	// Check if every element in a1 strictly equals the corresponding element in a2
+	return a1.every((element, index) => {
+		return element === a2[index];
+	});
+};
+export const arrayCopyNumber = (a1: number[], a2: number[]) => {
 	if (a1.length !== a2.length) {
 		a2.length = a1.length;
 	}
@@ -28,7 +46,6 @@ export const arrayEqualString = (a1: string[], a2: string[]) => {
 		return element === a2[index];
 	});
 };
-
 export const arrayCopyString = (a1: string[], a2: string[]) => {
 	if (a1.length !== a2.length) {
 		a2.length = a1.length;
@@ -36,6 +53,48 @@ export const arrayCopyString = (a1: string[], a2: string[]) => {
 	for (let i = 0; i < a1.length; i++) {
 		a2[i] = a1[i]!;
 	}
+};
+
+/**
+ * Copy a plain object
+ * Assumes same object type with identical and shallow properties
+ * @param src
+ * @param dest
+ * @returns true if any changes were made
+ */
+export const copyObject = (src: object, dest: object): boolean => {
+	let didChange = false;
+	for (const [key, value] of Object.entries(src)) {
+		if (dest[key as keyof typeof dest] != value) {
+			didChange = true;
+		}
+	}
+	if (didChange) {
+		dest = { ...src };
+	}
+	return didChange;
+};
+
+/**
+ * Copy a Map of objects
+ * Assumes same object types with identical and shallow properties
+ * @param srcMap
+ * @param destMap
+ * @returns true if any changes were made
+ */
+export const copyStringMap = (srcMap: Map<string, object>, destMap: Map<string, object>): boolean => {
+	let didChange = false;
+
+	for (const [key, value] of srcMap) {
+		const destValue = destMap.get(key);
+		if (destValue !== undefined) {
+			const changed = copyObject(value, destValue);
+			if (changed) {
+				didChange = true;
+			}
+		}
+	}
+	return didChange;
 };
 
 /**

@@ -39,12 +39,15 @@
 	import Dice6Icon from "@lucide/svelte/icons/dice-6";
 	import ExternalLinkIcon from "@lucide/svelte/icons/external-link";
 	import FunnelIcon from "@lucide/svelte/icons/funnel";
+	import GraduationCapIcon from "@lucide/svelte/icons/graduation-cap";
 	import InfinityIcon from "@lucide/svelte/icons/infinity";
 	import KeyboardIcon from "@lucide/svelte/icons/keyboard";
 	import PandaIcon from "@lucide/svelte/icons/panda";
 	import ShellIcon from "@lucide/svelte/icons/shell";
 	import WandSparklesIcon from "@lucide/svelte/icons/wand-sparkles";
+	import TargetIcon from "@lucide/svelte/icons/target";
 	import { settingsState } from "$lib/store/SettingsState.svelte";
+	import type { StatsDB } from "$lib/store/StatsDB.svelte";
 
 	type Props = {
 		// Define the expected type for the prop
@@ -52,10 +55,12 @@
 		currentLesson: LessonDB;
 		idbLessons: LessonsDB;
 		idbSettings: SettingsDB;
+		idbStats: StatsDB;
 		idbCustomWords: string[];
 		idbCodeChoices: boolean[];
 		onLessonChanged: (
 			settingsDB: SettingsDB,
+			statsDB: StatsDB,
 			newLessonIndex: SourceAllIndex,
 			currentLesson: LessonDB,
 			lessonsDB: LessonsDB,
@@ -64,7 +69,7 @@
 		) => void;
 		onSettingsChanged: (
 			settingsDB: SettingsDB,
-			lessonIndex: SourceAllIndex,
+			statsDB: StatsDB,
 			currentLesson: LessonDB,
 			lessonsDB: LessonsDB,
 			codeChoices?: boolean[],
@@ -76,6 +81,7 @@
 		currentLesson = $bindable<LessonDB>(),
 		idbLessons = $bindable<LessonsDB>(),
 		idbSettings = $bindable<SettingsDB>(),
+		idbStats = $bindable<StatsDB>(),
 		idbCustomWords,
 		idbCodeChoices,
 		onLessonChanged,
@@ -107,6 +113,27 @@
 		idbSettings.isDirty = true;
 	}
 
+	let autoFilter = $state(idbStats.autoFilter);
+	function setAutoFilter(isChecked: boolean) {
+		autoFilter = isChecked;
+		idbStats.autoFilter = isChecked;
+		idbStats.isDirty = true;
+	}
+
+	let focusLetters = $state(idbStats.focusLetters);
+	function setFocusLetters(newMinutes: number) {
+		focusLetters = newMinutes;
+		idbStats.focusLetters = newMinutes;
+		idbStats.isDirty = true;
+	}
+
+	let maxHistory = $state(idbStats.maxHistory);
+	function setMaxHistory(newCount: number) {
+		maxHistory = newCount;
+		idbStats.maxHistory = newCount;
+		idbStats.isDirty = true;
+	}
+
 	let volume = $derived(settingsState.volume * 100);
 	function setNewVolume(newVolume: number): void {
 		idbSettings.volume = newVolume;
@@ -129,7 +156,7 @@
 		if (newIndex === idbLessonIndex) {
 			return;
 		}
-		onLessonChanged(idbSettings, newIndex, currentLesson, idbLessons, idbCodeChoices, idbCustomWords);
+		onLessonChanged(idbSettings, idbStats, newIndex, currentLesson, idbLessons, idbCodeChoices, idbCustomWords);
 		scopeValue = currentLesson.scope.toString();
 		combination = currentLesson.combination;
 		repetition = currentLesson.repetition;
@@ -180,7 +207,7 @@
 
 	function saveSettings(): void {
 		const customArray = customString.split(/\s+/);
-		onSettingsChanged(idbSettings, idbLessonIndex, currentLesson, idbLessons, newCodeChoices, customArray);
+		onSettingsChanged(idbSettings, idbStats, currentLesson, idbLessons, newCodeChoices, customArray);
 	}
 
 	const animBackdrop =
@@ -397,6 +424,45 @@
 								maxCounter={100}
 								onChange={setMinimumAccuracy}
 								bind:count={minimumAccuracy}
+								colorIndex={settingsState.colorIndex}
+							/>
+						</article>
+					</div>
+					<div class={cardClass}>
+						<header class="card-header">
+							<span class="xs:hidden"><GraduationCapIcon class="size-6" /></span>
+							<span class="hidden xs:inline">Lesson</span>
+						</header>
+						<article class={articleClassV}>
+							<Switch checked={autoFilter} onCheckedChange={(e) => setAutoFilter(e.checked)}>
+								<Switch.Control
+									class="preset-filled-secondary-50-950 data-[state=checked]:preset-filled-secondary-500"
+								>
+									<Switch.Thumb>
+										<TargetIcon class="size-3" />
+									</Switch.Thumb>
+								</Switch.Control>
+								<Switch.HiddenInput />
+								<Switch.Label class="sm:pl-2">
+									<span class="hidden sm:inline">Auto Filter</span>
+								</Switch.Label>
+							</Switch>
+							<Counter
+								name="Focus Letters"
+								minCounter={1}
+								maxCounter={10}
+								stepCounter={1}
+								count={focusLetters}
+								onChange={setFocusLetters}
+								colorIndex={settingsState.colorIndex}
+							/>
+							<Counter
+								name="Max History"
+								minCounter={5}
+								maxCounter={240}
+								stepCounter={5}
+								count={maxHistory}
+								onChange={setMaxHistory}
 								colorIndex={settingsState.colorIndex}
 							/>
 						</article>
