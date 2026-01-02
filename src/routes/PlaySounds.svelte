@@ -54,7 +54,7 @@
 </script>
 
 <audio src="/click.mp3" bind:volume={settingsState.volume} bind:this={rightLetterSound}></audio>
-<audio src="/clack.mp3" bind:this={wrongLetterSound}></audio>
-<audio src="/failed.mp3" bind:this={failedGoalsSound}></audio>
-<audio src="/ding.wav" bind:this={passedGoalsSound}></audio>
-<audio src="/tng_transporter9.mp3" bind:this={lessonsDoneSound}></audio>
+<audio src="/clack.mp3" bind:volume={settingsState.volume} bind:this={wrongLetterSound}></audio>
+<audio src="/failed.mp3" bind:volume={settingsState.volume} bind:this={failedGoalsSound}></audio>
+<audio src="/ding.wav" bind:volume={settingsState.volume} bind:this={passedGoalsSound}></audio>
+<audio src="/tng_transporter9.mp3" bind:volume={settingsState.volume} bind:this={lessonsDoneSound}></audio>

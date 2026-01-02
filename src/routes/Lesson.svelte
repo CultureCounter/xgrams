@@ -8,7 +8,7 @@
 	import type { ServerStore } from "$lib/store/ServerStore.svelte";
 	// import Celebration, { startCelebration, unleashWorker } from './Celebration.svelte';
 	import { resetStopWatch } from "../lib/utilities/StopWatch/stopwatch";
-	import { deepClone, padToMultiple, shuffle } from "$lib/utilities/utils";
+	import { padToMultiple, selectRandomInto } from "$lib/utilities/utils";
 	import Typist from "./Typist.svelte";
 	import { onMount } from "svelte";
 	import { settingsState } from "$lib/store/SettingsState.svelte";
@@ -48,14 +48,27 @@
 	export function initializeLesson() {
 		if (idbLessonIndex == SourceAllIndex.code) updateCodeWords(idbCodeChoices);
 
+		const sourceMax = Math.min((idbLessonIndex as number) + 2, 6);
 		idbStats.setLessonKeys(settingsState.keyboard, settingsState.layout);
 		// Reset any perfected keys and get lesson focus letters
-		const lessonLetters = idbStats.getLessonLetters(idbSettings.minimumAccuracy, idbSettings.minimumWPM);
-		console.log("Lesson letters:", lessonLetters);
+		const { lessonKeys, masteredKeys } = idbStats.getLessonLetters(
+			idbSettings.minimumAccuracy,
+			idbSettings.minimumWPM,
+			sourceMax
+		);
+		console.log("Lesson letters:", lessonKeys);
 
 		// Generate filter from focus letters if enabled
 		if (idbStats.autoFilter) {
-			const filterPattern = idbStats.generateFilterPattern(lessonLetters);
+			console.log(
+				"Generating filter with lessonKeys:",
+				lessonKeys,
+				"masteredKeys:",
+				masteredKeys,
+				"maxLength:",
+				sourceMax
+			);
+			const filterPattern = idbStats.generateFilterPattern(lessonKeys, masteredKeys, sourceMax);
 			if (filterPattern) {
 				console.log("Filter pattern:", filterPattern);
 				currentLesson.filter = filterPattern;
@@ -72,6 +85,7 @@
 		resetStopWatch();
 	}
 
+	const selections: string[] = [];
 	/**
 	 * @returns lines to type
 	 */
@@ -86,19 +100,18 @@
 		else if (index == SourceAllIndex.custom) source = idbCustomWords;
 		else source = idbSources.current[SourceKeys[index]!]!;
 
-		console.log("Generating lines with source length:", index, source?.length);
+		// console.log("Generating lines with source length:", index, source?.length);
 		if (source == null) {
 			console.assert(source != null, "Generating lines with source == null:", index);
 			source = idbSources.current.bigrams.slice(0, scope);
 		}
 
-		// Use indexing to limit scope of Xgrams.
 		// Select the Top 50...16000 ngrams from source
 		if (scope) {
-			// console.log('Slicing source to scope:', source.length, '->', scope);
 			source = source.slice(0, scope);
 		}
 
+		// Apply filter
 		if (filter.length > 0) {
 			// Filter: AND characters on the same line, OR different lines.
 			let orList = filter.split("\n");
@@ -117,25 +130,15 @@
 			});
 		}
 
-		let ngrams = deepClone(source);
-		if (ngrams.length == 0) ngrams.push("NoWordsSelectedCheckFilter");
-		shuffle(ngrams);
-		padToMultiple(ngrams, combinations); // Ensure all subLines have requested combinations
+		// Select up to combinations from source and duplicate repitions times
+		selectRandomInto(source, selections, combinations, scope);
+		if (selections.length == 0) selections.push("NoWordsSelectedCheckFilter");
+		padToMultiple(selections, combinations); // Pad with duplicates if insufficient
+		let subLine = selections.join(" ") + " ";
+		let line = subLine.repeat(repetitions).trim();
 
-		let lines = [];
-		while (ngrams.length) {
-			let ngramsSublist = ngrams.slice(0, combinations);
-			let subLine = ngramsSublist.join(" ");
-			let _line = [];
-			for (let i = 0; i < repetitions; i++) {
-				_line.push(subLine);
-			}
-			lines.push(_line.join(" "));
-			// Remove the processed ngrams.
-			ngrams.splice(0, combinations);
-		}
-
-		shuffle(lines);
+		// Each test is testsPerLesson lines
+		let lines: string[] = Array(idbStats.testsPerLesson).fill(line);
 		return lines;
 	}
 
@@ -168,7 +171,7 @@
 <Typist
 	bind:this={typist}
 	{lines}
-	{linesIndex}
+	bind:linesIndex
 	{expectedLine}
 	{idbSettings}
 	{idbStats}

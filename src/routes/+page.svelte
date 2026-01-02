@@ -20,10 +20,11 @@
 	import { ServerStore } from "$lib/store/ServerStore.svelte";
 	import { CodeKeys } from "$lib/store/code";
 	import { SourceKeys } from "$lib/store/SourceDB.svelte";
-	import { arrayCopyBoolean, arrayCopyString, arrayEqualBoolean, arrayEqualString } from "$lib/utilities/utils";
+	import { arrayCopy } from "$lib/utilities/utils";
 	import { settingsState } from "$lib/store/SettingsState.svelte";
 	import { StatsDB } from "$lib/store/StatsDB.svelte.ts";
 
+	const isTracing = false;
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function clearAll() {
 		idbStore.clearIDB(); // For testing purposes only, clear the database on each load
@@ -36,7 +37,6 @@
 	const IDBKeys = ["idbLessons", "idbSettings", "idbCustomWords", "idbCodeChoices", "idbLessonIndex", "idbStats"];
 	const AllKeys = [...IDBKeys, ...CodeKeys, ...SourceKeys];
 
-	const isTracing = false;
 	// svelte-ignore non_reactive_update
 	let idbCodes = new ServerStore<CodeXG>(
 		"idbCodes",
@@ -97,11 +97,13 @@
 				idbStore.setValue("idbLessons", idbLessons);
 			}
 			idbSettings = new SettingsDB(values[1] as SettingsDB);
-			if (currentVersion < 4) {
+			if (currentVersion < 5) {
 				if (idbSettings.volume > 1) idbSettings.volume = 0.5;
+				idbSettings.isDirty = true;
+				idbStore.setValue("idbSettings", idbSettings);
 			}
-			arrayCopyString(values[2] as string[], idbCustomWords);
-			arrayCopyBoolean(values[3] as boolean[], idbCodeChoices);
+			arrayCopy(values[2] as string[], idbCustomWords);
+			arrayCopy(values[3] as boolean[], idbCodeChoices);
 			idbLessonIndex = (values[4] as SourceAllIndex) || SourceAllIndex.bigrams;
 			idbStats = new StatsDB(values[5] as StatsDB);
 			currentLesson = new LessonDB(idbLessons.sourceLessons[idbLessonIndex]);
@@ -167,16 +169,14 @@
 			needsUpdate = true;
 		}
 		if (codeChoices) {
-			if (!arrayEqualBoolean(codeChoices, idbCodeChoices)) {
-				arrayCopyBoolean(codeChoices, idbCodeChoices);
+			if (arrayCopy(codeChoices, idbCodeChoices)) {
 				idbStore.setValue("idbCodeChoices", idbCodeChoices);
 				needsUpdate = true;
 			}
 		}
 		if (customWords) {
-			if (!arrayEqualString(customWords, idbCustomWords)) {
-				idbStore.setValue("idbCustomWords", customWords);
-				arrayCopyString(customWords, idbCustomWords);
+			if (arrayCopy(customWords, idbCustomWords)) {
+				idbStore.setValue("idbCustomWords", idbCustomWords);
 				needsUpdate = true;
 			}
 		}
@@ -188,7 +188,11 @@
 
 <div class="flex h-full w-full flex-col overflow-y-auto">
 	{#if idbLoading || !idbSources.isLoaded() || !idbCodes.isLoaded()}
-		<div class="flex h-full w-full items-center justify-center"><h1>Loading...</h1></div>
+		<div class="flex h-full w-full items-center justify-center">
+			<h1>
+				Loading...idbLoading: {idbLoading}, idbSources.isLoaded(): {idbSources.isLoaded()}, idbCodes.isLoaded(): {idbCodes.isLoaded()}
+			</h1>
+		</div>
 	{:else}
 		<div class="flex items-start justify-between h-24">
 			<div class="object-left p-6">

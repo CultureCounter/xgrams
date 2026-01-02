@@ -28,6 +28,9 @@
 		initializeLesson = $bindable<() => void>(),
 	}: Props = $props();
 
+	/**
+	 * The typed line so far, including backspaces.
+	 */
 	let typedLine = "";
 	let rightLetters = 0;
 	let wrongLetters = 0;
@@ -43,12 +46,19 @@
 		failedChar: 4,
 		remedyChar: 5,
 	};
+	/**
+	 * The `ColorChars` state of each character.
+	 */
 	let colorLine: number[] = [];
 
-	const ClassSpan = ["", "normalChar", "underline ", "text-slate-400 ", "text-red-600 ", "text-orange-600 "] as const;
+	const ClassSpan = ["", "normalChar", "underline ", "text-slate-400 ", "text-red-600 ", "text-teal-600 "] as const;
 	type ClassLine = { class: string; chars: string; typing: boolean };
 	let classLine: ClassLine[] = $state([]);
 
+	/**
+	 * Break the line up into spans with classes for the color states of the enclosed characters.
+	 * The class line is used to apply the correct styles to the characters.
+	 */
 	function makeColorLine() {
 		let currentColor = ColorChars.untoldChar;
 		let currentIsTyping = false;
@@ -80,13 +90,16 @@
 			} else if (t == "&") {
 				// currentClass.chars += `&amp;`;
 				currentClass.chars += `&`;
+			} else if (t === undefined) {
+				currentClass.chars += ` `;
 			} else {
 				currentClass.chars += t;
 			}
+			console.assert(t !== undefined, "t is undefined");
 		}
-		// console.log('classLine:' + JSON.stringify(classLine, null, '\t'));
+		// console.log("classLine before:" + JSON.stringify(classLine, null, "\t"));
 		classLine = aClassLine;
-		// console.log("classLine:", JSON.stringify(classLine, null, "\t"));
+		// console.log("classLine after:" + JSON.stringify(classLine, null, "\t"));
 		// Update shared typing state for keyboard highlighting
 		settingsState.nextChar = expectedLine[typedLine.length] ?? "";
 		settingsState.typedLength = typedLine.length;
@@ -104,6 +117,7 @@
 		}
 		if (typedLine.length > expectedLine.length) {
 			typedLine = typedLine.slice(0, -1);
+			console.log("typedLine:", typedLine);
 			if (idbSettings.sounds[SoundIndex.wrongletter]) playSound(Sounds.wrongLetter);
 			return;
 		}
@@ -135,8 +149,12 @@
 		// failedChar -> remedyChar
 		// typingChar floats virtually at the insertion point
 		// TODO: create a true lesson that persists between sessions
-		// TODO: make deliberate line length -> lesson length
-		// TODO: autofocus on bad characters scheme with auto filter and calculated character practice order from layout.
+		// TODO: add mastered key list
+		// TODO: display focus and mastered keys
+		// TODO: show stats for focus keys
+		// TODO: show stats for mastered keys?
+		// TODO: detect regressions
+		console.assert(key != undefined, "key is undefined");
 		typedLine += key;
 		let i = typedLine.length - 1;
 		if (colorLine.length < typedLine.length) {
@@ -194,6 +212,7 @@
 			// Goals Achieved
 			let newRoundStarted = linesIndex == 0;
 			if (newRoundStarted) {
+				console.log("New Round Started");
 				idbStats.WPMs = [];
 			}
 			idbStats.WPMs.push(rawWPM);
@@ -218,15 +237,18 @@
 	}
 
 	function nextLine() {
+		// console.log("nextLine() LinesIndex:", linesIndex);
 		let nextLineExists = lines.length > linesIndex + 1;
 		if (nextLineExists) {
 			linesIndex += 1;
+			// console.log("nextLine() LinesIndex -> ", linesIndex);
 			expectedLine = lines[linesIndex]!;
 			// unleashWorker();
 			initializeLine();
 		} else {
 			// Start again from beginning, but generate new data.
 			if (idbSettings.sounds[SoundIndex.lessonsDone]) playSound(Sounds.lessonsDone);
+			idbStats.lessonDone();
 			startCelebration();
 			initializeLesson();
 		}
@@ -265,6 +287,7 @@
 	}
 
 	let colorIndex = $derived(settingsState.colorIndex);
+	let wpmAverage = $derived(averageWPM(linesIndex));
 </script>
 
 <div class="mx-2">
@@ -297,7 +320,7 @@
 		<h3 class="mt-0 flex place-content-center gap-x-3">
 			<span>WPM: {rawWPM} / {settingsState.minimumWPM}</span>
 			<span>Accuracy: {accuracy}% / {settingsState.minimumAccuracy}%</span>
-			<span>Average WPM: {averageWPM(linesIndex)}</span>
+			<span>Average WPM: {wpmAverage}</span>
 		</h3>
 	</div>
 </div>

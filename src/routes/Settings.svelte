@@ -134,6 +134,13 @@
 		idbStats.isDirty = true;
 	}
 
+	let testsPerLesson = $state(idbStats.testsPerLesson);
+	function setTestsPerLesson(newCount: number) {
+		testsPerLesson = newCount;
+		idbStats.testsPerLesson = newCount;
+		idbStats.isDirty = true;
+	}
+
 	let volume = $derived(settingsState.volume * 100);
 	function setNewVolume(newVolume: number): void {
 		idbSettings.volume = newVolume;
@@ -218,7 +225,7 @@
 	let contentClass = "card xs:space-y-4 backdrop-blur-sm backdrop-brightness-50 backdrop-saturate-400 shadow-xl";
 	//   3xs:bg-lime-600 2xs:text-yellow-100 xs:bg-digital-blue-200 sm:bg-digital-blue-300 md:bg-digital-blue-400 lg:bg-digital-blue-500 xl:bg-digital-blue-600 2xl:bg-amber-700 3xl:bg-lime-800
 	let cardClass = $derived(
-		"card xs:p-2 space-x-1 space-y-2 border-2 "
+		"card xs:p-2 xs:space-x-1 xs:space-y-2 border-2 "
 			+ BorderColors[settingsState.colorIndex]
 			+ " "
 			+ BGColors[settingsState.colorIndex]
@@ -233,7 +240,7 @@
 	// );
 	const iconButtonClass =
 		"focus:ring-opacity-50 rounded-full text-white hover:bg-blue-600 focus:ring-2 focus:ring-blue-900 focus:outline-none";
-	const articleClassV = "flex flex-col justify-between xs:space-y-2";
+	const articleClassV = "flex flex-col justify-between justify-self-center xs:space-y-2";
 	const articleClassH = "flex flex-row justify-between xs:space-x-2";
 </script>
 
@@ -274,6 +281,7 @@
 												<SegmentedControl.ItemText>
 													<span class="hidden md:inline">Code </span>
 													<button
+														title="Choose Languages"
 														class={iconButtonClass}
 														onclick={() => {
 															conditionalDisplay = "code";
@@ -294,6 +302,7 @@
 												<SegmentedControl.ItemText>
 													<span class="hidden md:inline">Custom </span>
 													<button
+														title="Edit Custom Words"
 														class={iconButtonClass}
 														onclick={() => {
 															conditionalDisplay = "custom";
@@ -378,6 +387,7 @@
 								name="Combination"
 								minCounter={1}
 								stepCounter={1}
+								maxCounter={50}
 								count={combination}
 								onChange={setCombination}
 								colorIndex={settingsState.colorIndex}
@@ -434,7 +444,11 @@
 							<span class="hidden xs:inline">Lesson</span>
 						</header>
 						<article class={articleClassV}>
-							<Switch checked={autoFilter} onCheckedChange={(e) => setAutoFilter(e.checked)}>
+							<Switch
+								title="Automated Lesson"
+								checked={autoFilter}
+								onCheckedChange={(e) => setAutoFilter(e.checked)}
+							>
 								<Switch.Control
 									class="preset-filled-secondary-50-950 data-[state=checked]:preset-filled-secondary-500"
 								>
@@ -444,11 +458,11 @@
 								</Switch.Control>
 								<Switch.HiddenInput />
 								<Switch.Label class="sm:pl-2">
-									<span class="hidden sm:inline">Auto Filter</span>
+									<span class="hidden sm:inline">Automated Lesson</span>
 								</Switch.Label>
 							</Switch>
 							<Counter
-								name="Focus Letters"
+								name="Number of Focus Letters"
 								minCounter={1}
 								maxCounter={60}
 								stepCounter={1}
@@ -457,12 +471,21 @@
 								colorIndex={settingsState.colorIndex}
 							/>
 							<Counter
-								name="Max History"
+								name="Max Lesson History"
 								minCounter={1}
 								maxCounter={20}
 								stepCounter={1}
 								count={maxHistory}
 								onChange={setMaxHistory}
+								colorIndex={settingsState.colorIndex}
+							/>
+							<Counter
+								name="Tests per Lesson"
+								minCounter={1}
+								maxCounter={50}
+								stepCounter={1}
+								count={testsPerLesson}
+								onChange={setTestsPerLesson}
 								colorIndex={settingsState.colorIndex}
 							/>
 						</article>
@@ -484,6 +507,7 @@
 							></Counter>
 							{#each SoundNames as name, i (name)}
 								<Switch
+									title="{name} Sound"
 									checked={sounds[i]}
 									onCheckedChange={(e) => {
 										soundsChanged(e.checked, i);

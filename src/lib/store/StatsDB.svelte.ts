@@ -1,4 +1,4 @@
-import { arrayCopyNumber, arrayEqualNumber, copyStringMap } from "$lib/utilities/utils";
+import { arrayCopy, copyStringMap, getCombinations } from "$lib/utilities/utils";
 import { getKeyboard, KeyboardIndex, type LayoutIndex } from "./keyboard";
 
 export class StatsDB {
@@ -15,6 +15,9 @@ export class StatsDB {
 	/** History length. After this many perfect lessons for a key, it's stats are reset */
 	maxHistory: number = 5;
 
+	/** Number of lines per lesson */
+	testsPerLesson: number = 5;
+
 	/** WPMs for each entire lesson */
 	WPMs: number[] = [];
 
@@ -26,6 +29,7 @@ export class StatsDB {
 			}
 			if (init.focusLetters !== undefined) this.focusLetters = init.focusLetters;
 			if (init.maxHistory !== undefined) this.maxHistory = init.maxHistory;
+			if (init.testsPerLesson !== undefined) this.testsPerLesson = init.testsPerLesson;
 			if (init.WPMs !== undefined) this.WPMs = init.WPMs;
 		}
 	}
@@ -45,7 +49,9 @@ export class StatsDB {
 			this.autoFilter = stats.autoFilter;
 			didChange = true;
 		}
-		copyStringMap(stats.stats, this.stats);
+		if (copyStringMap(stats.stats, this.stats)) {
+			didChange = true;
+		}
 
 		if (this.focusLetters !== stats.focusLetters) {
 			this.focusLetters = stats.focusLetters;
@@ -55,9 +61,12 @@ export class StatsDB {
 			this.maxHistory = stats.maxHistory;
 			didChange = true;
 		}
+		if (this.testsPerLesson !== stats.testsPerLesson) {
+			this.testsPerLesson = stats.testsPerLesson;
+			didChange = true;
+		}
 
-		if (!arrayEqualNumber(stats.WPMs, this.WPMs)) {
-			arrayCopyNumber(stats.WPMs, this.WPMs);
+		if (arrayCopy(stats.WPMs, this.WPMs)) {
 			didChange = true;
 		}
 
@@ -83,9 +92,11 @@ export class StatsDB {
 			stats.correct++;
 		} else {
 			stats.incorrect++;
+			stats.perfectThisLesson = false;
 			stats.perfections = 0;
 		}
 		stats.typingTime += elapsedMs;
+		stats.typedThisLesson = true;
 
 		this.#isDirty = true;
 	}
@@ -128,31 +139,47 @@ export class StatsDB {
 	 * @param count Number of letters to return
 	 * @returns Array of letters sorted by worst accuracy first
 	 */
-	getLessonLetters(minimumAccuracy: number, minimumWPM: number, count: number = this.focusLetters): string[] {
+	getLessonLetters(
+		minimumAccuracy: number,
+		minimumWPM: number,
+		sourceMax: number
+	): { lessonKeys: string[]; masteredKeys: string[] } {
 		// Calculate accuracy ratio for each letter and sort
-		const perfections: Record<string, LetterStats> = {};
+		const lessonKeys: Record<string, LetterStats> = {};
+		const masteredKeys: Record<string, LetterStats> = {};
+		const count = Math.min(this.stats.size, sourceMax);
 
-		let perfects = 0;
 		let forSures = 0;
 		let probables = 0;
+		let perfectsOnly: boolean = false;
 		for (const [letter, stats] of this.stats.entries()) {
 			const score = stats.scoreMe(minimumAccuracy, minimumWPM, this.maxHistory);
-			if (score <= 0) {
+
+			if (" ".includes(letter)) {
+				console.log("ignoring", letter);
+				continue;
+			}
+			if (score <= 0 && !perfectsOnly) {
 				// Lower score = worse accuracy
-				perfections[letter] = stats;
+				lessonKeys[letter] = stats;
 				forSures++;
-			} else if (score < 100) {
+				console.log("forSure", letter, perfectsOnly, score <= 0, !perfectsOnly);
+			} else if (score < 100 && !perfectsOnly) {
 				// Higher score = better accuracy
-				perfections[letter] = stats;
+				lessonKeys[letter] = stats;
 				probables++;
+				console.log("probable", letter, score);
 			} else {
-				if (Math.random() < 0.05) {
-					perfections[letter] = stats;
-					perfects++;
+				if (stats.perfections >= this.maxHistory) {
+					masteredKeys[letter] = stats;
+					console.log("perfect", letter, score);
 				}
 			}
 			// TODO: if all perfects, then increase wpm? Ensure perfection though.
-			if (perfects + forSures + probables >= count) break;
+			if (!perfectsOnly && forSures + probables >= count) {
+				perfectsOnly = true;
+				console.log("perfectsOnly", perfectsOnly);
+			}
 		}
 
 		// TODO: sort by details
@@ -162,19 +189,62 @@ export class StatsDB {
 		// 	return b.total - a.total;
 		// });
 
-		return Object.keys(perfections);
+		return { lessonKeys: Object.keys(lessonKeys), masteredKeys: Object.keys(masteredKeys) };
 	}
 
 	/**
 	 * Generate a filter pattern from worst-performing letters
 	 * Each letter goes on its own line (OR'd in filter logic)
+	 * If there are mastered keys, pad to maxLength with random mastered keys
+	 * If there are no mastered keys, strip out short lines
+	 * @param lessonKeys Array of worst-performing letters
+	 * @param masteredKeys Array of mastered letters
+	 * @param maxLength Maximum number of letters per line
 	 * @returns Filter string with worst letters
 	 */
-	generateFilterPattern(lessonLetters: string[]): string {
-		if (lessonLetters.length === 0) return "";
+	generateFilterPattern(lessonKeys: string[], masteredKeys: string[], maxLength: number): string {
+		if (lessonKeys.length === 0) return "";
+		const pattern = getCombinations(lessonKeys, maxLength);
+
+		if (masteredKeys.length > 0) {
+			// Pad to maxLength with random mastered keys
+			const range = masteredKeys.length;
+			for (let i = pattern.length - 1; i >= 0; i--) {
+				while (pattern[i]!.length < maxLength) {
+					const j = Math.floor(Math.random() * range);
+					pattern[i] += masteredKeys[j]!;
+					console.log("generateFilterPattern new andLine", pattern[i]);
+				}
+			}
+			console.log("generateFilterPattern padded", pattern);
+		} else {
+			// Strip out short ones
+			for (let i = pattern.length - 1; i >= 0; i--) {
+				if (pattern[i]!.length < maxLength) {
+					pattern.splice(i, 1);
+				}
+			}
+			console.log("generateFilterPattern stripped", pattern);
+		}
 
 		// Each letter on its own line = OR'd together in filter logic
-		return lessonLetters.join("\n");
+		return pattern.join("\n");
+	}
+
+	/**
+	 * Lesson complete, increment perfections for all letters
+	 * Bad letters reset during lesson.
+	 */
+	lessonDone() {
+		for (const [letter, stats] of this.stats) {
+			if (stats.perfectThisLesson && stats.typedThisLesson) {
+				stats.perfections++;
+				console.log("stats.perfections", letter, stats.perfections);
+			}
+			stats.perfectThisLesson = true;
+			stats.typedThisLesson = false;
+		}
+		this.#isDirty = true;
 	}
 }
 
@@ -191,6 +261,8 @@ class LetterStats {
 	typingTime: number = 0;
 	/** Number of lessons with perfect typing and wpm for this key */
 	perfections: number = 0;
+	perfectThisLesson: boolean = true;
+	typedThisLesson: boolean = false;
 
 	#score: number = 0;
 	get score(): number {
@@ -216,15 +288,31 @@ class LetterStats {
 
 		const accuracy = this.correct / total;
 		let score = accuracy * 100;
+		console.log(
+			"score",
+			score,
+			"accuracy",
+			accuracy,
+			"minimumAccuracy",
+			minimumAccuracy,
+			"correct",
+			this.correct,
+			"total",
+			total
+		);
 		// accuracy penalty
-		if (accuracy < minimumAccuracy) {
-			score -= (100 * (minimumAccuracy - accuracy)) / minimumAccuracy;
+		if (!this.perfectThisLesson && accuracy < minimumAccuracy) {
+			score -= Math.floor((100 * (minimumAccuracy - accuracy)) / minimumAccuracy);
+			console.log("accuracy penalty", score);
 		}
 		// wpm penalty
-		const wpm = total / this.typingTime / 60000;
+		const wpm = (total / this.typingTime) * 60000;
 		if (wpm < minimumWPM) {
-			score -= (100 * (minimumWPM - wpm)) / minimumWPM;
+			console.log("wpm", wpm, "minimumWPM", minimumWPM, "(100 * (minimumWPM - wpm))", 100 * (minimumWPM - wpm));
+			score -= Math.floor((100 * (minimumWPM - wpm)) / minimumWPM);
+			console.log("wpm penalty", score);
 		}
+		console.log("score", score);
 		this.#score = score;
 		return score;
 	}
