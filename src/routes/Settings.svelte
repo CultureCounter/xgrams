@@ -238,10 +238,12 @@
 	// 		+ BGColors[colorIndex]
 	// 		+ " rounded-lg"
 	// );
+
 	const iconButtonClass =
 		"focus:ring-opacity-50 rounded-full text-white hover:bg-blue-600 focus:ring-2 focus:ring-blue-900 focus:outline-none";
 	const articleClassV = "flex flex-col justify-between justify-self-center xs:space-y-2";
 	const articleClassH = "flex flex-row justify-between xs:space-x-2";
+	const tabTriggerClass = "flex-1 gap-0";
 </script>
 
 <Dialog restoreFocus={true} onOpenChange={saveSettings}>
@@ -385,6 +387,7 @@
 						<article class={articleClassV}>
 							<Counter
 								name="Combination"
+								title="Combination"
 								minCounter={1}
 								stepCounter={1}
 								maxCounter={50}
@@ -394,6 +397,7 @@
 							/>
 							<Counter
 								name="Repetition"
+								title="Repetition"
 								stepCounter={1}
 								minCounter={1}
 								count={repetition}
@@ -421,6 +425,7 @@
 						<article class={articleClassV}>
 							<Counter
 								name="Minimum&nbsp;WPM"
+								title="Minimum WPM"
 								minCounter={0}
 								maxCounter={400}
 								stepCounter={10}
@@ -430,6 +435,7 @@
 							/>
 							<Counter
 								name="Minimum&nbsp;Accuracy"
+								title="Minimum Accuracy"
 								minCounter={0}
 								maxCounter={100}
 								onChange={setMinimumAccuracy}
@@ -462,7 +468,8 @@
 								</Switch.Label>
 							</Switch>
 							<Counter
-								name="Number of Focus Letters"
+								name="Focus Letters"
+								title="Number of Focus Letters"
 								minCounter={1}
 								maxCounter={60}
 								stepCounter={1}
@@ -471,7 +478,8 @@
 								colorIndex={settingsState.colorIndex}
 							/>
 							<Counter
-								name="Max Lesson History"
+								name="Max History"
+								title="Max Lesson History"
 								minCounter={1}
 								maxCounter={20}
 								stepCounter={1}
@@ -480,7 +488,8 @@
 								colorIndex={settingsState.colorIndex}
 							/>
 							<Counter
-								name="Tests per Lesson"
+								name="Tests"
+								title="Tests per Lesson"
 								minCounter={1}
 								maxCounter={50}
 								stepCounter={1}
@@ -498,6 +507,7 @@
 						<article class={articleClassV}>
 							<Counter
 								name="Volume"
+								title="Volume"
 								minCounter={0}
 								maxCounter={100}
 								stepCounter={5}
@@ -547,34 +557,34 @@
 						onValueChange={(details) => (conditionalDisplay = details.value as ConditionalDisplay)}
 					>
 						<Tabs.List>
-							<Tabs.Trigger class="flex-1" value="code"
+							<Tabs.Trigger class={tabTriggerClass} value="code"
 								><span class="sm:hidden">🤖</span>
 								<span class="hidden sm:inline">Code</span></Tabs.Trigger
 							>
-							<Tabs.Trigger class="flex-1" value="custom"
+							<Tabs.Trigger class={tabTriggerClass} value="custom"
 								><span class="sm:hidden">📜</span>
 								<span class="hidden sm:inline">Custom</span></Tabs.Trigger
 							>
-							<Tabs.Trigger class="flex-1" value="filter"
+							<Tabs.Trigger class={tabTriggerClass} value="filter"
 								><span class="sm:hidden"
 									><FunnelIcon class={getHourStrokeFill(settingsState.colorIndex)} size={24} /></span
 								>
 								<span class="hidden sm:inline">Filter</span></Tabs.Trigger
 							>
-							<Tabs.Trigger class="flex-1" value="fonts"
+							<Tabs.Trigger class={tabTriggerClass} value="fonts"
 								><span class="sm:hidden"><ALargeSmallIcon size={24} /></span>
 								<span class="hidden sm:inline">Fonts</span></Tabs.Trigger
 							>
-							<Tabs.Trigger class="flex-1" value="fontInfo"
+							<Tabs.Trigger class={tabTriggerClass} value="fontInfo"
 								><span class="sm:hidden"><ExternalLinkIcon size={24} /></span>
 								<span class="hidden sm:inline">Font Info</span></Tabs.Trigger
 							>
-							<Tabs.Trigger class="flex-1" value="keyboard"
+							<Tabs.Trigger class={tabTriggerClass} value="keyboard"
 								><span class="sm:hidden"><KeyboardIcon size={24} /></span><span class="hidden sm:inline"
 									>Keyboard</span
 								></Tabs.Trigger
 							>
-							<Tabs.Trigger class="flex-1" value="colors"
+							<Tabs.Trigger class={tabTriggerClass} value="colors"
 								><span class="sm:hidden">🎨</span><span class="hidden sm:inline">Colors</span
 								></Tabs.Trigger
 							>

@@ -181,18 +181,19 @@
 	// 	}
 	// }
 
-	const articleClassV = "flex flex-col justify-center space-y-2";
-	const articleClassH = "flex flex-row justify-stretch space-x-2";
-	const dropdownLabelClass = "label w-full max-w-48";
+	const articleClassV = "flex flex-col justify-center xs:space-y-2";
+	const articleClassH = "flex flex-row justify-stretch xs:space-x-2";
+	const dropdownLabelClass = "label max-w-48";
 </script>
 
 <!-- <button class="btn h-0 px-0" onclick={getAvailableFonts}>Get Available Fonts</button> -->
 <article class={articleClassH}>
 	<label class={dropdownLabelClass} for="font-family-select">
-		<span>Font Family</span>
+		<span>Family</span>
 		<select
 			class="select"
 			id="font-family-select"
+			title="Font Family"
 			name="Font Family"
 			bind:value={selectedFontFamily}
 			onchange={() => {
@@ -207,10 +208,11 @@
 		</select>
 	</label>
 	<label class={dropdownLabelClass} for="font-size-select">
-		<span>Font Size</span>
+		<span>Size</span>
 		<select
 			class="select"
 			id="font-size-select"
+			title="Font Size"
 			name="Font Size"
 			bind:value={selectedFontSize}
 			onchange={() => {
@@ -225,10 +227,11 @@
 		</select>
 	</label>
 	<label class={dropdownLabelClass} for="font-weight-select">
-		<span>Font Weight</span>
+		<span>Weight</span>
 		<select
 			class="select"
 			id="font-weight-select"
+			title="Font Weight"
 			name="Font Weight"
 			bind:value={selectedFontWeight}
 			onchange={() => {
@@ -243,10 +246,11 @@
 		</select>
 	</label>
 	<label class={dropdownLabelClass} for="font-spacing-select">
-		<span>Font Spacing</span>
+		<span>Spacing</span>
 		<select
 			class="select"
 			id="font-spacing-select"
+			title="Font Spacing"
 			name="Font Spacing"
 			bind:value={selectedFontSpacing}
 			onchange={() => {

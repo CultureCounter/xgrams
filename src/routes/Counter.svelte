@@ -10,6 +10,7 @@
 		stepCounter?: number;
 		count?: number;
 		name?: string;
+		title?: string;
 		onChange?: (count: number) => void;
 		colorIndex: ColorIndex;
 	};
@@ -19,6 +20,7 @@
 		stepCounter = 5,
 		count = $bindable<number>(),
 		name = "name",
+		title = "Change {name}",
 		onChange,
 		colorIndex,
 	}: Props = $props();
@@ -55,7 +57,7 @@
 	<header class="card-header text-center hidden md:inline">
 		<p>{name}</p>
 	</header>
-	<div class="grid grid-rows-1 justify-between justify-self-center xs:grid-cols-3">
+	<div class="grid grid-rows-1 justify-between justify-self-center xs:grid-cols-3 xs:gap-4">
 		<button onmouseup={onMouseUp} title="Decrease {name}">
 			<MinusIcon class="size-4" />
 		</button>
@@ -72,7 +74,7 @@
 	<div class="mt-3 hidden xs:block">
 		<Slider
 			{name}
-			title="Change {name}"
+			{title}
 			defaultValue={[50]}
 			value={[count]}
 			min={minCounter}

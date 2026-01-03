@@ -35,3 +35,4 @@ pnpm-debug.log*
 
 !prettier.config.js
 test-output.json
+/test-results
