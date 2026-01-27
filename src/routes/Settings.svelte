@@ -32,6 +32,7 @@
 	import ALargeSmallIcon from "@lucide/svelte/icons/a-large-small";
 	import BookOpenTextIcon from "@lucide/svelte/icons/book-open-text";
 	import CheckIcon from "@lucide/svelte/icons/check";
+	import CrosshairIcon from "@lucide/svelte/icons/crosshair";
 	import Dice2Icon from "@lucide/svelte/icons/dice-2";
 	import Dice3Icon from "@lucide/svelte/icons/dice-3";
 	import Dice4Icon from "@lucide/svelte/icons/dice-4";
@@ -419,7 +420,7 @@
 					</div>
 					<div class={cardClass}>
 						<header class="card-header">
-							<span class="xs:hidden"><RabbitIcon class="size-6" /></span>
+							<span class="xs:hidden"><CrosshairIcon class="size-6" /></span>
 							<span class="hidden xs:inline">Goals</span>
 						</header>
 						<article class={articleClassV}>

@@ -16,6 +16,7 @@ Thumbs.db
 
 # Logs
 pnpm-debug.log*
+/test-results
 
 # Local environment variables
 .env
@@ -34,5 +35,3 @@ pnpm-debug.log*
 *.sw?
 
 !prettier.config.js
-test-output.json
-/test-results
